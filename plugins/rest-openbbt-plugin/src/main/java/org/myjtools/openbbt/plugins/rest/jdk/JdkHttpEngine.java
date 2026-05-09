@@ -37,33 +37,33 @@ public class JdkHttpEngine implements RestEngine {
     }
 
     @Override
-    public void requestGET(String endpoint) {
-        send(builder(endpoint).GET().build(), null);
+    public int requestGET(String endpoint) {
+        return send(builder(endpoint).GET().build(), null);
     }
 
     @Override
-    public void requestPOST(String endpoint) {
-        send(builder(endpoint).POST(HttpRequest.BodyPublishers.noBody()).build(), null);
+    public int requestPOST(String endpoint) {
+        return send(builder(endpoint).POST(HttpRequest.BodyPublishers.noBody()).build(), null);
     }
 
     @Override
-    public void requestPOST(String endpoint, String content) {
-        send(builder(endpoint).POST(HttpRequest.BodyPublishers.ofString(content)).build(), content);
+    public int requestPOST(String endpoint, String content) {
+        return send(builder(endpoint).POST(HttpRequest.BodyPublishers.ofString(content)).build(), content);
     }
 
     @Override
-    public void requestPUT(String endpoint, String content) {
-        send(builder(endpoint).PUT(HttpRequest.BodyPublishers.ofString(content)).build(), content);
+    public int requestPUT(String endpoint, String content) {
+        return send(builder(endpoint).PUT(HttpRequest.BodyPublishers.ofString(content)).build(), content);
     }
 
     @Override
-    public void requestPATCH(String endpoint, String content) {
-        send(builder(endpoint).method("PATCH", HttpRequest.BodyPublishers.ofString(content)).build(), content);
+    public int requestPATCH(String endpoint, String content) {
+        return send(builder(endpoint).method("PATCH", HttpRequest.BodyPublishers.ofString(content)).build(), content);
     }
 
     @Override
-    public void requestDELETE(String endpoint) {
-        send(builder(endpoint).DELETE().build(), null);
+    public int requestDELETE(String endpoint) {
+        return send(builder(endpoint).DELETE().build(), null);
     }
 
     @Override
@@ -124,7 +124,7 @@ public class JdkHttpEngine implements RestEngine {
         return sb.toString();
     }
 
-    private void send(HttpRequest request, String body) {
+    private int send(HttpRequest request, String body) {
         lastRequest = request;
         lastRequestBody = body;
         try {
@@ -137,7 +137,9 @@ public class JdkHttpEngine implements RestEngine {
             throw new OpenBBTException("HTTP request failed [{}]: {}", request.uri(), reason);
         }
         checkThreshold();
+        return lastResponse.statusCode();
     }
+
 
     private void checkThreshold() {
         if (httpCodeThreshold != null && lastResponse.statusCode() >= httpCodeThreshold) {
