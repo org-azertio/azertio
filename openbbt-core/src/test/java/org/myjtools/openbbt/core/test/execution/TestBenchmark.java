@@ -157,6 +157,7 @@ class TestBenchmark {
         benchmark.markFinished(n2, false);
 
         ExecutionNodeStats stats = benchmark.statistics();
+        System.out.println(stats);
         assertThat(stats.min()).isEqualTo(100);
         assertThat(stats.max()).isEqualTo(200);
         assertThat(stats.errorRate()).isEqualTo(0.5);

@@ -18,4 +18,14 @@ public class ExecutionNodeStats {
     private int p99;
     private double throughput;
     private double errorRate;
+
+    @Override
+    public String toString() {
+        return """
+             | Executions |  Threads  |    Min    |    Max    |   Mean    |    P50    |    P95    |    P99    | Throughput | Error Rate |
+             ----------------------------------------------------------------------------------------------------------------------------
+             | %10d | %9d | %9d | %9d | %9d | %9d | %9d | %9d | %10.2f | %9.2f%% |
+             """.formatted(
+             numExecutions, numThreads, min, max, mean, p50, p95, p99, throughput, errorRate * 100);
+    }
 }

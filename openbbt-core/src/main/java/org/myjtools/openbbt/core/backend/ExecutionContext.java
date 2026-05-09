@@ -7,6 +7,7 @@ import org.myjtools.openbbt.core.persistence.TestExecutionRepository;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BooleanSupplier;
 
 public class ExecutionContext {
 
@@ -97,8 +98,37 @@ public class ExecutionContext {
 		return benchmark;
 	}
 
+
+	/**
+	 * Runs the given task within the benchmark context, measuring its execution time and error status.
+	 * If benchmark mode is not enabled, it simply executes the task without measuring.
+	 * The task should return true if it succeeded, or false if it failed. Any thrown
+	 * exceptions will be treated as failures and rethrown after recording the failure in the benchmark statistics.
+	 * @param task the task to execute, returning true if it succeeded or false if it failed
+	 * @throws Throwable if the task throws any exception, which will be rethrown
+	 */
+	public void runWithinBenchmark(BooleanSupplier task) {
+		if (benchmark == null) {
+			task.getAsBoolean();
+			return;
+		}
+		int executionNumber = benchmark.markStarted();
+		try {
+			benchmark.markFinished(executionNumber, !task.getAsBoolean());
+		} catch (Throwable t) {
+			benchmark.markFinished(executionNumber, true);
+			throw t;
+		}
+	}
+
+	public boolean isBenchmarkMode() {
+		return benchmark != null;
+	}
+
 	public ExecutionNodeStats lastBenchmarkStatistics() {
 		return lastBenchmarkStatistics;
 	}
+
+
 
 }
