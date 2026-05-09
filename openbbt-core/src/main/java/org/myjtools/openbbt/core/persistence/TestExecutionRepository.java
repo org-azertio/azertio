@@ -77,7 +77,11 @@ public interface TestExecutionRepository extends Repository {
 	 */
 	void deleteExecutionsByPlan(UUID planId);
 
-	Optional<ExecutionNodeStats> getExecutionNodeStats(UUID executionNodeID);
+	default Optional<ExecutionNodeStats> getExecutionNodeStats(UUID executionNodeID) {
+		return Optional.empty();
+	}
 
-	void storeExecutionNodeStats(UUID executionNodeID, ExecutionNodeStats stats);
+	default void storeExecutionNodeStats(UUID executionNodeID, ExecutionNodeStats stats) {
+		// no-op for repositories that don't support stats
+	}
 }

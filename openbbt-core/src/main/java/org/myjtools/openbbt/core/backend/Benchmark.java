@@ -1,6 +1,8 @@
 package org.myjtools.openbbt.core.backend;
 
+import org.myjtools.openbbt.core.Clock;
 import org.myjtools.openbbt.core.execution.ExecutionNodeStats;
+import java.time.Instant;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -8,33 +10,40 @@ public class Benchmark {
 
 	private final Integer totalExecutions;
 	private final Integer numThreads;
+	private final Clock clock;
 	private final AtomicInteger currentExecutions = new AtomicInteger(0);
+	private final ConcurrentHashMap<Integer, Instant> startTimes = new ConcurrentHashMap<>();
 	private final ConcurrentHashMap<Integer, Integer> executionTimes = new ConcurrentHashMap<>();
 	private final AtomicInteger errors = new AtomicInteger(0);
 
-	public Benchmark(Integer totalExecutions, Integer numThreads) {
+	public Benchmark(Integer totalExecutions, Integer numThreads, Clock clock) {
 		this.totalExecutions = totalExecutions;
 		this.numThreads = numThreads;
+		this.clock = clock;
 	}
 
-	int totalExecutions() {
+	public int totalExecutions() {
 		return totalExecutions;
 	}
 
-	int currentExecutions() {
+	public int currentExecutions() {
 		return currentExecutions.get();
 	}
 
-	int numThreads() {
+	public int numThreads() {
 		return numThreads;
 	}
 
 	public int markStarted() {
-		return currentExecutions.incrementAndGet();
+		int executionNumber = currentExecutions.incrementAndGet();
+		startTimes.put(executionNumber, clock.now());
+		return executionNumber;
 	}
 
-	public void markFinished(int executionId, int timeTakenMillis, boolean error) {
-		executionTimes.put(executionId, timeTakenMillis);
+	public void markFinished(int executionNumber, boolean error) {
+		Instant start = startTimes.remove(executionNumber);
+		int elapsed = start != null ? (int) (clock.now().toEpochMilli() - start.toEpochMilli()) : 0;
+		executionTimes.put(executionNumber, elapsed);
 		if (error) {
 			errors.incrementAndGet();
 		}

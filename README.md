@@ -10,6 +10,7 @@ OpenBBT is a comprehensive Java-based testing framework designed to support beha
 - **Assertion DSL**: Locale-aware assertions with natural language patterns
 - **Persistent Storage**: H2-backed repository for managing large test plans
 - **Modular Design**: Java 11+ JPMS modules for clean separation of concerns
+- **Benchmark Mode**: Run any step N times across T parallel threads and assert on min/max/mean/P95/P99/throughput/errorRate
 
 ## Project Structure
 

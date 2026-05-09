@@ -126,3 +126,143 @@
         {"recipient": "alicia@ejemplo.com", "template": "bienvenida"}
         """
         Entonces la variable texto message contiene "éxito"
+
+
+'enable.benchmark.mode':
+  expression: 'el modo benchmark está habilitado con {executions:integer} ejecuciones y {threads:integer} hilos'
+  example: |
+    Dado el modo benchmark está habilitado con 100 ejecuciones y 4 hilos
+  scenarios:
+    - title: Habilitar el modo benchmark antes de un paso
+      gherkin: |
+        Dado el modo benchmark está habilitado con 200 ejecuciones y 8 hilos
+        Cuando hago una petición GET a "health"
+        Entonces el tiempo medio de respuesta del benchmark es menor que 100
+
+
+'assert.benchmark.statistics.mean':
+  expression: 'el tiempo medio de respuesta del benchmark (ms) {{integer-assertion}}'
+  assertion-hints:
+    - 'es menor que 200'
+    - 'es menor o igual que 500'
+    - 'es igual a 100'
+  example: |
+    Entonces el tiempo medio de respuesta del benchmark (ms) es menor que 200
+  scenarios:
+    - title: Verificar que el tiempo medio está por debajo del umbral
+      gherkin: |
+        Dado el modo benchmark está habilitado con 100 ejecuciones y 4 hilos
+        Cuando hago una petición GET a "health"
+        Entonces el tiempo medio de respuesta del benchmark (ms) es menor que 200
+
+
+'assert.benchmark.statistics.min':
+  expression: 'el tiempo mínimo de respuesta del benchmark (ms) {{integer-assertion}}'
+  assertion-hints:
+    - 'es menor que 100'
+    - 'es mayor que 0'
+    - 'es igual a 10'
+  example: |
+    Entonces el tiempo mínimo de respuesta del benchmark (ms) es mayor que 0
+  scenarios:
+    - title: Verificar que el tiempo mínimo es positivo
+      gherkin: |
+        Dado el modo benchmark está habilitado con 100 ejecuciones y 4 hilos
+        Cuando hago una petición GET a "health"
+        Entonces el tiempo mínimo de respuesta del benchmark (ms) es mayor que 0
+
+
+'assert.benchmark.statistics.max':
+  expression: 'el tiempo máximo de respuesta del benchmark (ms) {{integer-assertion}}'
+  assertion-hints:
+    - 'es menor que 1000'
+    - 'es menor o igual que 500'
+    - 'es igual a 200'
+  example: |
+    Entonces el tiempo máximo de respuesta del benchmark (ms) es menor que 1000
+  scenarios:
+    - title: Verificar que el tiempo máximo está por debajo del umbral
+      gherkin: |
+        Dado el modo benchmark está habilitado con 100 ejecuciones y 4 hilos
+        Cuando hago una petición GET a "health"
+        Entonces el tiempo máximo de respuesta del benchmark (ms) es menor que 1000
+
+
+'assert.benchmark.statistics.p50':
+  expression: 'el tiempo P50 de respuesta del benchmark (ms) {{integer-assertion}}'
+  assertion-hints:
+    - 'es menor que 200'
+    - 'es menor o igual que 300'
+    - 'es igual a 150'
+  example: |
+    Entonces el tiempo P50 de respuesta del benchmark (ms) es menor que 200
+  scenarios:
+    - title: Verificar que el P50 está por debajo del umbral
+      gherkin: |
+        Dado el modo benchmark está habilitado con 100 ejecuciones y 4 hilos
+        Cuando hago una petición GET a "health"
+        Entonces el tiempo P50 de respuesta del benchmark (ms) es menor que 200
+
+
+'assert.benchmark.statistics.p95':
+  expression: 'el tiempo P95 de respuesta del benchmark (ms) {{integer-assertion}}'
+  assertion-hints:
+    - 'es menor que 500'
+    - 'es menor o igual que 1000'
+    - 'es igual a 300'
+  example: |
+    Entonces el tiempo P95 de respuesta del benchmark (ms) es menor que 500
+  scenarios:
+    - title: Verificar que el P95 está por debajo del umbral
+      gherkin: |
+        Dado el modo benchmark está habilitado con 100 ejecuciones y 4 hilos
+        Cuando hago una petición GET a "health"
+        Entonces el tiempo P95 de respuesta del benchmark (ms) es menor que 500
+
+
+'assert.benchmark.statistics.p99':
+  expression: 'el tiempo P99 de respuesta del benchmark (ms) {{integer-assertion}}'
+  assertion-hints:
+    - 'es menor que 1000'
+    - 'es menor o igual que 2000'
+    - 'es igual a 500'
+  example: |
+    Entonces el tiempo P99 de respuesta del benchmark (ms) es menor que 1000
+  scenarios:
+    - title: Verificar que el P99 está por debajo del umbral
+      gherkin: |
+        Dado el modo benchmark está habilitado con 100 ejecuciones y 4 hilos
+        Cuando hago una petición GET a "health"
+        Entonces el tiempo P99 de respuesta del benchmark (ms) es menor que 1000
+
+
+'assert.benchmark.statistics.throughput':
+  expression: 'el throughput del benchmark (req/s) {{decimal-assertion}}'
+  assertion-hints:
+    - 'es mayor que 10.0'
+    - 'es mayor o igual que 5.0'
+    - 'es igual a 20.0'
+  example: |
+    Entonces el throughput del benchmark (req/s) es mayor que 10.0
+  scenarios:
+    - title: Verificar que el throughput supera el mínimo
+      gherkin: |
+        Dado el modo benchmark está habilitado con 100 ejecuciones y 4 hilos
+        Cuando hago una petición GET a "health"
+        Entonces el throughput del benchmark (req/s) es mayor que 10.0
+
+
+'assert.benchmark.statistics.errorRate':
+  expression: 'la tasa de error del benchmark {{decimal-assertion}}'
+  assertion-hints:
+    - 'es igual a 0.0'
+    - 'es menor que 0.01'
+    - 'es menor o igual que 0.05'
+  example: |
+    Entonces la tasa de error del benchmark es igual a 0.0
+  scenarios:
+    - title: Verificar que no hay errores durante el benchmark
+      gherkin: |
+        Dado el modo benchmark está habilitado con 100 ejecuciones y 4 hilos
+        Cuando hago una petición GET a "health"
+        Entonces la tasa de error del benchmark es igual a 0.0

@@ -2,25 +2,23 @@ package org.myjtools.openbbt.core.execution;
 
 import org.myjtools.openbbt.core.OpenBBTException;
 import org.myjtools.openbbt.core.OpenBBTRuntime;
+import org.myjtools.openbbt.core.backend.Benchmark;
+import org.myjtools.openbbt.core.backend.ExecutionContext;
 import org.myjtools.openbbt.core.backend.StepProviderBackend;
 import org.myjtools.openbbt.core.testplan.NodeArgument;
 import org.myjtools.openbbt.core.testplan.TestPlanNode;
 import org.myjtools.openbbt.core.util.Log;
 import org.myjtools.openbbt.core.util.Pair;
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 
 public class BackendExecutor {
 
-	private static final Log log  = Log.of();
+	private static final Log log = Log.of();
 	private static final long NO_TIMEOUT = Long.MAX_VALUE;
 
 	private final StepProviderBackend backend;
@@ -34,8 +32,8 @@ public class BackendExecutor {
 		this.executor = Executors.newSingleThreadExecutor(); // TODO: make this configurable for parallel execution in the future
 	}
 
-	public void setUp(UUID executionID, UUID executionNodeID, Map<String,String> properties) {
-		runInExecutor(()-> backend.setUp(executionID, executionNodeID, properties));
+	public void setUp(UUID executionID, UUID executionNodeID, Map<String, String> properties) {
+		runInExecutor(() -> backend.setUp(executionID, executionNodeID, properties));
 	}
 
 	public void tearDown() {
@@ -54,22 +52,22 @@ public class BackendExecutor {
 	}
 
 
-	public Future<Pair<ExecutionResult,Throwable>> submitStepExecution(TestPlanNode node) {
+	public Future<Pair<ExecutionResult, Throwable>> submitStepExecution(TestPlanNode node) {
 		return submitStepExecution(node, null, NO_TIMEOUT);
 	}
 
 
-	public Future<Pair<ExecutionResult,Throwable>> submitStepExecution(
+	public Future<Pair<ExecutionResult, Throwable>> submitStepExecution(
 			TestPlanNode node,
 			UUID executionNodeID,
 			long timeoutSec
 	) {
 		if (timeoutSec == 0 || timeoutSec == -1) {
 			throw new OpenBBTException(
-				"Invalid timeout value: {}. Step timeout must be a positive number of seconds.", timeoutSec
+					"Invalid timeout value: {}. Step timeout must be a positive number of seconds.", timeoutSec
 			);
 		}
-		Future<Pair<ExecutionResult,Throwable>> future = this.executor.submit(() -> {
+		Future<Pair<ExecutionResult, Throwable>> future = this.executor.submit(() -> {
 			try {
 				if (testCaseFailed) {
 					return Pair.of(ExecutionResult.SKIPPED, null);
@@ -89,9 +87,9 @@ public class BackendExecutor {
 			}
 		});
 		try {
-			Pair<ExecutionResult,Throwable> result = timeoutSec == NO_TIMEOUT
-				? future.get()
-				: future.get(timeoutSec, TimeUnit.SECONDS);
+			Pair<ExecutionResult, Throwable> result = timeoutSec == NO_TIMEOUT
+					? future.get()
+					: future.get(timeoutSec, TimeUnit.SECONDS);
 			return CompletableFuture.completedFuture(result);
 		} catch (TimeoutException e) {
 			future.cancel(true);
@@ -104,6 +102,60 @@ public class BackendExecutor {
 		}
 	}
 
+
+	public Benchmark currentBenchmark() {
+		try {
+			return executor.submit(() -> {
+				ExecutionContext ctx = ExecutionContext.current();
+				return ctx != null ? ctx.benchmark() : null;
+			}).get();
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			return null;
+		} catch (ExecutionException e) {
+			return null;
+		}
+	}
+
+	public void executeBenchmark(TestPlanNode node, UUID executionNodeID, Benchmark benchmark) {
+		runInExecutor(() -> runBenchmarkIterations(node, executionNodeID, benchmark));
+	}
+
+	public void disableBenchmarkMode() {
+		runInExecutor(() -> {
+			ExecutionContext ctx = ExecutionContext.current();
+			if (ctx != null) ctx.disableBenchmarkMode();
+		});
+	}
+
+	private void runBenchmarkIterations(TestPlanNode node, UUID executionNodeID, Benchmark benchmark) {
+		var semaphore = new Semaphore(benchmark.numThreads());
+		var futures = new ArrayList<Future<?>>(benchmark.totalExecutions());
+		try (var virtualExecutor = Executors.newVirtualThreadPerTaskExecutor()) {
+			for (int i = 0; i < benchmark.totalExecutions(); i++) {
+				futures.add(virtualExecutor.submit(ExecutionContext.withCurrent(() -> {
+					semaphore.acquireUninterruptibly();
+					try {
+						backend.run(node.name(), locale(node.language()), nodeArgument(node), executionNodeID);
+					} catch (Throwable ignored) {
+						// errors are tracked by the step itself via benchmark.markFinished
+					} finally {
+						semaphore.release();
+					}
+				})));
+			}
+			for (var future : futures) {
+				try {
+					future.get();
+				} catch (InterruptedException e) {
+					Thread.currentThread().interrupt();
+					throw new OpenBBTException(e, "Interrupted during benchmark execution");
+				} catch (ExecutionException e) {
+					log.error(e.getCause(), "Unexpected error in benchmark iteration");
+				}
+			}
+		}
+	}
 
 	private NodeArgument nodeArgument(TestPlanNode node) {
 		NodeArgument nodeArgument = null;
@@ -121,6 +173,12 @@ public class BackendExecutor {
 			return Locale.ENGLISH;
 		}
 		return Locale.forLanguageTag(language);
+	}
+
+
+	public boolean hasAnnotation(TestPlanNode node, Class<? extends Annotation> annotationClass) {
+		var matchingStep = backend.matchingStep(node.name(), locale(node.language()));
+		return matchingStep.map(Pair::left).map(stepMethod -> stepMethod.hasAnnotation(annotationClass)).orElse(false);
 	}
 
 }

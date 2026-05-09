@@ -77,4 +77,52 @@ public class CoreStepProvider implements StepProvider {
 		ExecutionContext.current().enableBenchmarkMode(executions, threads);
 	}
 
+	@StepExpression(value = "assert.benchmark.statistics.mean")
+	public void assertBenchmarkStatisticsMean(Assertion assertion) {
+		ExecutionContext ctx = ExecutionContext.current();
+		Assertion.assertThat(ctx.lastBenchmarkStatistics().mean(), assertion);
+	}
+
+	@StepExpression(value = "assert.benchmark.statistics.min")
+	public void assertBenchmarkStatisticsMin(Assertion assertion) {
+		ExecutionContext ctx = ExecutionContext.current();
+		Assertion.assertThat(ctx.lastBenchmarkStatistics().min(), assertion);
+	}
+
+	@StepExpression(value = "assert.benchmark.statistics.max")
+	public void assertBenchmarkStatisticsMax(Assertion assertion) {
+		ExecutionContext ctx = ExecutionContext.current();
+		Assertion.assertThat(ctx.lastBenchmarkStatistics().max(), assertion);
+	}
+
+	@StepExpression(value = "assert.benchmark.statistics.p50")
+	public void assertBenchmarkStatisticsP50(Assertion assertion) {
+		ExecutionContext ctx = ExecutionContext.current();
+		Assertion.assertThat(ctx.lastBenchmarkStatistics().p50(), assertion);
+	}
+
+	@StepExpression(value = "assert.benchmark.statistics.p95")
+	public void assertBenchmarkStatisticsP95(Assertion assertion) {
+		ExecutionContext ctx = ExecutionContext.current();
+		Assertion.assertThat(ctx.lastBenchmarkStatistics().p95(), assertion);
+	}
+
+	@StepExpression(value = "assert.benchmark.statistics.p99")
+	public void assertBenchmarkStatisticsP99(Assertion assertion) {
+		ExecutionContext ctx = ExecutionContext.current();
+		Assertion.assertThat(ctx.lastBenchmarkStatistics().p99(), assertion);
+	}
+
+	@StepExpression(value = "assert.benchmark.statistics.throughput")
+	public void assertBenchmarkStatisticsThroughput(Assertion assertion) {
+		ExecutionContext ctx = ExecutionContext.current();
+		Assertion.assertThat(ctx.lastBenchmarkStatistics().throughput(), assertion);
+	}
+
+	@StepExpression(value = "assert.benchmark.statistics.errorRate")
+	public void assertBenchmarkStatisticsErrorRate(Assertion assertion) {
+		ExecutionContext ctx = ExecutionContext.current();
+		Assertion.assertThat(ctx.lastBenchmarkStatistics().errorRate(), assertion);
+	}
+
 }

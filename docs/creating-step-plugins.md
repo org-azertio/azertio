@@ -273,6 +273,51 @@ Multiple language files can be provided; OpenBBT selects the file matching the l
 
 ---
 
+## Benchmark Support
+
+Steps that can be executed in [benchmark mode](benchmark.md) must do two things:
+
+1. Annotate the method with `@StatisticsProvider`.
+2. Manually record the start and finish of each iteration via the `Benchmark` API.
+
+Without `@StatisticsProvider`, the framework rejects the step at runtime when benchmark mode is active.
+
+### Implementation
+
+```java
+import org.myjtools.openbbt.core.backend.Benchmark;
+import org.myjtools.openbbt.core.backend.ExecutionContext;
+import org.myjtools.openbbt.core.contributors.StatisticsProvider;
+
+@StatisticsProvider
+@StepExpression(value = "my.step.measure", args = {"endpoint:text"})
+public void measureEndpoint(String endpoint) {
+    Benchmark benchmark = ExecutionContext.current().benchmark();
+    if (benchmark == null) return;   // not in benchmark mode — should not happen, but defensive
+
+    int n = benchmark.markStarted();
+    boolean error = false;
+    try {
+        // the actual work being benchmarked
+        httpClient.get(endpoint);
+    } catch (Exception e) {
+        error = true;
+        throw e;
+    } finally {
+        benchmark.markFinished(n, error);
+    }
+}
+```
+
+### Rules
+
+- `markStarted()` returns an execution number that must be passed to `markFinished()`. Both calls must happen in the same virtual thread.
+- Pass `error = true` to `markFinished()` if the iteration failed; this counts towards `errorRate` but does not affect the timing statistics.
+- The step does not need to handle the case where benchmark mode is not active — the framework only calls it in benchmark mode when `@StatisticsProvider` is present. Defensive guards (`if (benchmark == null)`) are optional but harmless.
+- Timing is measured by the framework clock (`Clock` injected into `Benchmark`), not by wall time directly. Tests can inject a controllable clock for unit testing.
+
+---
+
 ## ContentType Integration
 
 If your steps need to compare structured content (JSON, XML, YAML, text), use the injected `ContentTypes` registry:

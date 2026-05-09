@@ -1,6 +1,7 @@
 package org.myjtools.openbbt.core.backend;
 
 import org.myjtools.openbbt.core.OpenBBTRuntime;
+import org.myjtools.openbbt.core.execution.ExecutionNodeStats;
 import org.myjtools.openbbt.core.persistence.AttachmentRepository;
 import org.myjtools.openbbt.core.persistence.TestExecutionRepository;
 import java.util.Map;
@@ -23,6 +24,18 @@ public class ExecutionContext {
 		threadLocal.remove();
 	}
 
+	public static Runnable withCurrent(Runnable task) {
+		ExecutionContext ctx = threadLocal.get();
+		return () -> {
+			threadLocal.set(ctx);
+			try {
+				task.run();
+			} finally {
+				threadLocal.remove();
+			}
+		};
+	}
+
 
 
 
@@ -31,6 +44,7 @@ public class ExecutionContext {
 	private final UUID executionID;
 	private UUID executionNodeID;
 	private Benchmark benchmark;
+	private ExecutionNodeStats lastBenchmarkStatistics;
 
 
 
@@ -69,15 +83,22 @@ public class ExecutionContext {
 	}
 
 	public void enableBenchmarkMode(Integer executions, Integer threads) {
-		this.benchmark = new Benchmark(executions,threads);
+		this.benchmark = new Benchmark(executions, threads, runtime.clock());
 	}
 
 	public void disableBenchmarkMode() {
+		if (benchmark != null) {
+			lastBenchmarkStatistics = benchmark.statistics();
+		}
 		this.benchmark = null;
 	}
 
 	public Benchmark benchmark() {
 		return benchmark;
+	}
+
+	public ExecutionNodeStats lastBenchmarkStatistics() {
+		return lastBenchmarkStatistics;
 	}
 
 }

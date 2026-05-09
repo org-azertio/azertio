@@ -58,7 +58,7 @@ public class StepProviderBackend {
 		ExecutionContext.clearCurrent();
 	}
 
-	private Optional<Pair<StepProviderMethod, Match>> matchingStep(String step, Locale locale) {
+	public Optional<Pair<StepProviderMethod, Match>> matchingStep(String step, Locale locale) {
 		for (var service : services) {
 			var match = service.matchingStep(step, locale);
 			if (match.isPresent()) {
@@ -88,6 +88,7 @@ public class StepProviderBackend {
 	public List<String> hintsForStep(String invalidStep, Locale locale, int limit) {
 		return hinter.getHintsForInvalidStep(invalidStep, locale, limit);
 	}
+
 
 
 	public void run(String step, Locale locale, NodeArgument nodeArgument, UUID executionNodeID) {
@@ -135,6 +136,7 @@ public class StepProviderBackend {
 		}
 		return hint.toString();
 	}
+
 
 
 }

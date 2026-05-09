@@ -1,8 +1,11 @@
 package org.myjtools.openbbt.core.test.execution;
 
 import org.junit.jupiter.api.Test;
+import org.myjtools.openbbt.core.Clock;
 import org.myjtools.openbbt.core.backend.Benchmark;
 import org.myjtools.openbbt.core.execution.ExecutionNodeStats;
+import java.time.Instant;
+import java.util.concurrent.atomic.AtomicReference;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 
@@ -12,13 +15,13 @@ class TestBenchmark {
 
     @Test
     void markStarted_firstCallReturns1() {
-        var benchmark = new Benchmark(1, 1);
+        var benchmark = new Benchmark(1, 1, fixedClock());
         assertThat(benchmark.markStarted()).isEqualTo(1);
     }
 
     @Test
     void markStarted_subsequentCallsIncrement() {
-        var benchmark = new Benchmark(3, 1);
+        var benchmark = new Benchmark(3, 1, fixedClock());
         assertThat(benchmark.markStarted()).isEqualTo(1);
         assertThat(benchmark.markStarted()).isEqualTo(2);
         assertThat(benchmark.markStarted()).isEqualTo(3);
@@ -28,8 +31,8 @@ class TestBenchmark {
 
     @Test
     void statistics_numThreadsIsPassedThrough() {
-        var benchmark = new Benchmark(1, 8);
-        benchmark.markFinished(benchmark.markStarted(), 100, false);
+        var benchmark = new Benchmark(1, 8, fixedClock());
+        benchmark.markFinished(benchmark.markStarted(), false);
         assertThat(benchmark.statistics().numThreads()).isEqualTo(8);
     }
 
@@ -118,27 +121,40 @@ class TestBenchmark {
 
     @Test
     void statistics_allErrors_errorRateIsOne() {
-        var benchmark = new Benchmark(5, 1);
+        var time = new AtomicReference<>(Instant.EPOCH);
+        var benchmark = new Benchmark(5, 1, time::get);
         for (int i = 0; i < 5; i++) {
-            benchmark.markFinished(benchmark.markStarted(), 100, true);
+            int n = benchmark.markStarted();
+            time.set(time.get().plusMillis(100));
+            benchmark.markFinished(n, true);
         }
         assertThat(benchmark.statistics().errorRate()).isEqualTo(1.0);
     }
 
     @Test
     void statistics_halfErrors_errorRateIsHalf() {
-        var benchmark = new Benchmark(4, 1);
+        var time = new AtomicReference<>(Instant.EPOCH);
+        var benchmark = new Benchmark(4, 1, time::get);
         for (int i = 0; i < 4; i++) {
-            benchmark.markFinished(benchmark.markStarted(), 100, i % 2 == 0);
+            int n = benchmark.markStarted();
+            time.set(time.get().plusMillis(100));
+            benchmark.markFinished(n, i % 2 == 0);
         }
         assertThat(benchmark.statistics().errorRate()).isEqualTo(0.5);
     }
 
     @Test
     void statistics_errorMarksDoNotAffectTimings() {
-        var benchmark = new Benchmark(2, 1);
-        benchmark.markFinished(benchmark.markStarted(), 100, true);
-        benchmark.markFinished(benchmark.markStarted(), 200, false);
+        var time = new AtomicReference<>(Instant.EPOCH);
+        var benchmark = new Benchmark(2, 1, time::get);
+
+        int n1 = benchmark.markStarted();
+        time.set(time.get().plusMillis(100));
+        benchmark.markFinished(n1, true);
+
+        int n2 = benchmark.markStarted();
+        time.set(time.get().plusMillis(200));
+        benchmark.markFinished(n2, false);
 
         ExecutionNodeStats stats = benchmark.statistics();
         assertThat(stats.min()).isEqualTo(100);
@@ -148,16 +164,26 @@ class TestBenchmark {
 
     // --- helpers ---
 
+    private Clock fixedClock() {
+        return () -> Instant.EPOCH;
+    }
+
     private Benchmark singleExecution(int timeMs, boolean error) {
-        var benchmark = new Benchmark(1, 1);
-        benchmark.markFinished(benchmark.markStarted(), timeMs, error);
+        var time = new AtomicReference<>(Instant.EPOCH);
+        var benchmark = new Benchmark(1, 1, time::get);
+        int n = benchmark.markStarted();
+        time.set(time.get().plusMillis(timeMs));
+        benchmark.markFinished(n, error);
         return benchmark;
     }
 
     private Benchmark tenExecutions() {
-        var benchmark = new Benchmark(10, 1);
+        var time = new AtomicReference<>(Instant.EPOCH);
+        var benchmark = new Benchmark(10, 1, time::get);
         for (int t = 10; t <= 100; t += 10) {
-            benchmark.markFinished(benchmark.markStarted(), t, false);
+            int n = benchmark.markStarted();
+            time.set(time.get().plusMillis(t));
+            benchmark.markFinished(n, false);
         }
         return benchmark;
     }
