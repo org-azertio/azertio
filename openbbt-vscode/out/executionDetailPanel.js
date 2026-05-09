@@ -113,6 +113,7 @@ async function openExecutionDetail(context, client, execution, label) {
                         message: execInfo?.message ?? null,
                         executionNodeId: execInfo?.executionNodeId ?? null,
                         attachmentCount: execInfo?.attachmentCount ?? 0,
+                        durationMs: execInfo?.durationMs ?? null,
                     };
                 }));
                 panel.webview.postMessage({ type: 'update', nodes: updates });
@@ -164,6 +165,7 @@ function mergeResult(node, execInfo) {
         message: execInfo?.message ?? null,
         executionNodeId: execInfo?.executionNodeId ?? null,
         attachmentCount: execInfo?.attachmentCount ?? 0,
+        durationMs: execInfo?.durationMs ?? null,
         testPassedCount: execInfo?.testPassedCount,
         testErrorCount: execInfo?.testErrorCount,
         testFailedCount: execInfo?.testFailedCount,
@@ -241,7 +243,8 @@ function buildHtml(webview, _extensionUri) {
     text-align: center;
     line-height: 1;
   }
-  .node-name { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+  .node-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+  .node-name-group { flex: 1; min-width: 0; display: flex; align-items: center; overflow: hidden; }
   .node-type {
     font-size: 0.8em;
     opacity: 0.6;
@@ -345,6 +348,13 @@ function buildHtml(webview, _extensionUri) {
     margin-bottom: 12px;
     white-space: pre-wrap;
   }
+  .node-duration {
+    font-size: 0.75em;
+    opacity: 0.5;
+    margin-left: 6px;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
 </style>
 </head>
 <body>
@@ -357,6 +367,7 @@ function buildHtml(webview, _extensionUri) {
   const pendingExpand = new Map();   // msgId -> resolve
   const nodeStatusMap = new Map();   // nodeId -> { status, result }
   const statusIconEls = new Map();   // nodeId -> span element
+  const durationEls = new Map();     // nodeId -> span element
   let rootNodeId = null;
   let headerBadgeEl = null;
   let pollTimer = null;
@@ -389,6 +400,13 @@ function buildHtml(webview, _extensionUri) {
 
   function registerStatusIconEl(nodeId, el) {
     statusIconEls.set(nodeId, el);
+  }
+
+  function formatDuration(ms) {
+    const totalSec = Math.floor(ms / 1000);
+    const min = Math.floor(totalSec / 60);
+    const sec = totalSec % 60;
+    return min > 0 ? min + ' min ' + sec + ' sec' : sec + ' sec';
   }
 
   function tagColor(tag) {
@@ -527,9 +545,21 @@ function buildHtml(webview, _extensionUri) {
     const sIcon = statusIconEl(node.status, node.result);
     registerStatusIconEl(node.nodeId, sIcon);
 
+    const durEl = document.createElement('span');
+    durEl.className = 'node-duration';
+    if (node.status === 'FINISHED' && node.durationMs !== null && node.durationMs !== undefined) {
+      durEl.textContent = formatDuration(node.durationMs);
+    }
+    durationEls.set(node.nodeId, durEl);
+
+    const nameGroup = document.createElement('span');
+    nameGroup.className = 'node-name-group';
+    nameGroup.appendChild(name);
+    nameGroup.appendChild(durEl);
+
     row.appendChild(expander);
     row.appendChild(sIcon);
-    row.appendChild(name);
+    row.appendChild(nameGroup);
     const tagsEl = createTagsEl(node.tags);
     if (tagsEl) { row.appendChild(tagsEl); }
 
@@ -702,7 +732,7 @@ function buildHtml(webview, _extensionUri) {
       title.textContent = (h.organization && h.project) ? h.organization + ' / ' + h.project : (h.organization || h.project || 'Execution');
       const meta = document.createElement('div');
       meta.className = 'header-meta';
-      const suitesLabel = h.suites && h.suites.length > 0 ? h.suites : 'todos';
+      const suitesLabel = h.suites && h.suites.length > 0 ? h.suites : 'all suites';
       meta.innerHTML =
         '<span>Plan: ' + h.planId + (h.planCreatedAt ? '  ·  ' + h.planCreatedAt : '') + '</span>' +
         '<span>Execution: ' + h.executionId + '  ·  ' + h.executedAt + '</span>' +
@@ -743,6 +773,10 @@ function buildHtml(webview, _extensionUri) {
         nodeStatusMap.set(upd.nodeId, { status: upd.status, result: upd.result });
         const iconEl = statusIconEls.get(upd.nodeId);
         if (iconEl) { applyStatusIcon(iconEl, upd.status, upd.result); }
+        const durEl = durationEls.get(upd.nodeId);
+        if (durEl && upd.status === 'FINISHED' && upd.durationMs !== null && upd.durationMs !== undefined) {
+          durEl.textContent = formatDuration(upd.durationMs);
+        }
       }
     } else if (msg.type === 'children') {
       const resolve = pendingExpand.get(msg.msgId);
