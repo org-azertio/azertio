@@ -41,12 +41,7 @@
             <artifactId>jooq</artifactId>
             <version>3.19.18</version>
         </dependency>
-        <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
-            <version>6.2.1</version>
-        </dependency>
-        <dependency>
+<dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-csv</artifactId>
             <version>1.10.0</version>

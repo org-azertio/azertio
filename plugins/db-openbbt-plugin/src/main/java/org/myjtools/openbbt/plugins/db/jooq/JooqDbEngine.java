@@ -1,13 +1,11 @@
 package org.myjtools.openbbt.plugins.db.jooq;
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
 import org.jooq.*;
 import org.jooq.Record;
 import org.jooq.conf.RenderQuotedNames;
 import org.jooq.conf.Settings;
+import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
-import org.jooq.impl.DataSourceConnectionProvider;
 import org.myjtools.openbbt.core.OpenBBTException;
 import org.myjtools.openbbt.core.testplan.DataTable;
 import org.myjtools.openbbt.core.util.Either;
@@ -16,16 +14,19 @@ import org.myjtools.openbbt.plugins.db.DataSet;
 import org.myjtools.openbbt.plugins.db.DbEngine;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.sql.Connection;
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 public class JooqDbEngine implements DbEngine, AutoCloseable {
 
 	private final Map<String, DSLContext> dslContexts = new HashMap<>();
-	private final Map<String, HikariDataSource> dataSources = new HashMap<>();
 	private final String nullValue;
 	private final int maxAssertRows;
 
@@ -35,32 +36,42 @@ public class JooqDbEngine implements DbEngine, AutoCloseable {
 		for (Map.Entry<String, ConnectionParameters> entry : connections.entrySet()) {
 			String alias = entry.getKey();
 			ConnectionParameters params = entry.getValue();
-			HikariDataSource dataSource = createDataSource(params);
-			dataSources.put(alias, dataSource);
+			loadDriver(params.driver());
 			SQLDialect dialect = SQLDialect.valueOf(params.dialect().toUpperCase());
 			Settings settings = new Settings();
 			if (!params.quoteIdentifiers()) {
 				settings = settings.withRenderQuotedNames(RenderQuotedNames.NEVER);
 			}
-			dslContexts.put(alias, DSL.using(new DataSourceConnectionProvider(dataSource), dialect, settings));
+			dslContexts.put(alias, DSL.using(new SimpleConnectionProvider(params), dialect, settings));
 		}
 	}
 
 	@Override
 	public void close() {
-		dataSources.values().forEach(HikariDataSource::close);
+		// connections are created and closed per statement; nothing to release here
 	}
 
-	private HikariDataSource createDataSource(ConnectionParameters params) {
-		HikariConfig config = new HikariConfig();
-		config.setJdbcUrl(params.url());
-		config.setUsername(params.username());
-		config.setPassword(params.password());
-		config.setMaximumPoolSize(10);
-		config.setCatalog(params.catalog());
-		config.setSchema(params.schema());
-		config.setDriverClassName(params.driver());
-		return new HikariDataSource(config);
+	private void loadDriver(String driverClassName) {
+		if (driverClassName == null || driverClassName.isEmpty()) return;
+		// try standard class loading first (covers drivers bundled with the plugin)
+		try {
+			Class.forName(driverClassName);
+			return;
+		} catch (ClassNotFoundException ignored) {}
+		// the driver may be in a sibling module added by JExten's addRuntimeDependency;
+		// scan every module in the current layer to find and register it
+		ModuleLayer layer = JooqDbEngine.class.getModule().getLayer();
+		if (layer == null) return;
+		for (Module module : layer.modules()) {
+			ClassLoader loader = module.getClassLoader();
+			if (loader == null) continue;
+			try {
+				Class<?> driverClass = loader.loadClass(driverClassName);
+				Driver driver = (Driver) driverClass.getDeclaredConstructor().newInstance();
+				DriverManager.registerDriver(driver);
+				return;
+			} catch (ReflectiveOperationException | SQLException ignored) {}
+		}
 	}
 
 	private DSLContext dslContext(String alias) {
@@ -214,5 +225,38 @@ public class JooqDbEngine implements DbEngine, AutoCloseable {
 		return map.toString();
 	}
 
+
+	private static class SimpleConnectionProvider implements ConnectionProvider {
+
+		private final ConnectionParameters params;
+
+		SimpleConnectionProvider(ConnectionParameters params) {
+			this.params = params;
+		}
+
+		@Override
+		public Connection acquire() throws DataAccessException {
+			try {
+				Properties props = new Properties();
+				if (params.username() != null) props.setProperty("user", params.username());
+				if (params.password() != null) props.setProperty("password", params.password());
+				Connection conn = DriverManager.getConnection(params.url(), props);
+				if (params.catalog() != null && !params.catalog().isEmpty()) conn.setCatalog(params.catalog());
+				if (params.schema() != null && !params.schema().isEmpty()) conn.setSchema(params.schema());
+				return conn;
+			} catch (SQLException e) {
+				throw new DataAccessException("Cannot acquire connection to " + params.url(), e);
+			}
+		}
+
+		@Override
+		public void release(Connection connection) throws DataAccessException {
+			try {
+				connection.close();
+			} catch (SQLException e) {
+				throw new DataAccessException("Cannot close connection", e);
+			}
+		}
+	}
 
 }

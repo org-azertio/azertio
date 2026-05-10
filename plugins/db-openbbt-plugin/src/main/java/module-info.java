@@ -10,8 +10,7 @@ module org.myjtools.openbbt.plugins.db {
 	requires org.myjtools.imconfig;
 	requires java.sql;
 	requires org.jooq;
-	requires com.zaxxer.hikari;
-	requires org.apache.poi.ooxml;
+requires org.apache.poi.ooxml;
 	requires org.apache.poi.poi;
 	requires org.apache.commons.csv;
 
