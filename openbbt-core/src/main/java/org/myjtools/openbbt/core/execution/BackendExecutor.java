@@ -1,5 +1,6 @@
 package org.myjtools.openbbt.core.execution;
 
+import org.myjtools.openbbt.core.OpenBBTConfig;
 import org.myjtools.openbbt.core.OpenBBTException;
 import org.myjtools.openbbt.core.OpenBBTRuntime;
 import org.myjtools.openbbt.core.backend.Benchmark;
@@ -23,6 +24,7 @@ public class BackendExecutor {
 
 	private final StepProviderBackend backend;
 	private final ExecutorService executor;
+	private final long stepTimeoutSec;
 
 	private boolean testCaseFailed = false;
 
@@ -30,6 +32,7 @@ public class BackendExecutor {
 	public BackendExecutor(OpenBBTRuntime runtime) {
 		this.backend = new StepProviderBackend(runtime);
 		this.executor = Executors.newSingleThreadExecutor(); // TODO: make this configurable for parallel execution in the future
+		this.stepTimeoutSec = runtime.configuration().getLong(OpenBBTConfig.STEP_EXECUTION_TIMEOUT).orElse(NO_TIMEOUT);
 	}
 
 	public void setUp(UUID executionID, UUID executionNodeID, Map<String, String> properties) {
@@ -146,7 +149,10 @@ public class BackendExecutor {
 			}
 			for (var future : futures) {
 				try {
-					future.get();
+					future.get(stepTimeoutSec, TimeUnit.SECONDS);
+				} catch (TimeoutException e) {
+					future.cancel(true);
+					log.error("Benchmark iteration timed out after {} seconds", stepTimeoutSec);
 				} catch (InterruptedException e) {
 					Thread.currentThread().interrupt();
 					throw new OpenBBTException(e, "Interrupted during benchmark execution");

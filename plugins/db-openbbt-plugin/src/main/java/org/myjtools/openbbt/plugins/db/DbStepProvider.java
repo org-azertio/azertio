@@ -105,7 +105,7 @@ public class DbStepProvider implements StepProvider {
 			return true;
 		});
 		if (!ctx.isBenchmarkMode()) {
-			lastQueryResult.value().ifPresent(dataSet -> ctx.storeAttachment(dataSet.toCsv().getBytes(), "csv"));
+			lastQueryResult.value().ifPresent(dataSet -> ctx.storeAttachment(dataSet.toCsv().getBytes(), "text/csv"));
 		}
 	}
 
@@ -187,7 +187,7 @@ public class DbStepProvider implements StepProvider {
 		String tableContent = engine.printTable(alias, table);
 		log.debug("{}\n{}", table, tableContent);
 		ExecutionContext.current()
-			.storeAttachment(tableContent.getBytes(StandardCharsets.UTF_8), "csv");
+			.storeAttachment(tableContent.getBytes(StandardCharsets.UTF_8), "text/csv");
 	}
 
 }

@@ -52,6 +52,16 @@ public class JsonRpcServer {
          * {@code suites} is the list of test suite names to include; empty means all suites.
          */
         TestExecution exec(BiConsumer<UUID, UUID> onExecutionCreated, String profileName, List<String> suites);
+
+        /**
+         * Re-run a previously stored plan identified by {@code planID}.
+         * Uses the stored plan node tree as-is rather than rebuilding from openbbt.yaml,
+         * so the same test structure is executed regardless of how the config has changed.
+         * Default implementation delegates to {@link #exec} with no suite filter (runs all suites).
+         */
+        default TestExecution rerun(BiConsumer<UUID, UUID> onExecutionCreated, UUID planID, String profileName) {
+            return exec(onExecutionCreated, profileName, List.of());
+        }
     }
 
     @FunctionalInterface
@@ -393,20 +403,18 @@ public class JsonRpcServer {
             throw new IllegalStateException("exec handler not configured");
         }
         boolean detach = params.has("detach") && params.get("detach").getAsBoolean();
+        boolean isRerun = params.has("rerun") && !params.get("rerun").isJsonNull();
         String profileName;
-        List<String> suites;
-        if (params.has("rerun") && !params.get("rerun").isJsonNull()) {
+        List<String> suites = List.of();
+        UUID rerunPlanID = null;
+        if (isRerun) {
             if (executionRepository == null)
                 throw new IllegalStateException("Execution repository not available");
             UUID rerunId = UUID.fromString(params.get("rerun").getAsString());
             TestExecution sourceEx = executionRepository.getExecution(rerunId)
                 .orElseThrow(() -> new IllegalArgumentException("Execution not found: " + rerunId));
             profileName = sourceEx.profile();
-            TestPlan sourcePlan = repository.getPlan(sourceEx.planID())
-                .orElseThrow(() -> new IllegalArgumentException("Plan not found: " + sourceEx.planID()));
-            suites = sourcePlan.suites() != null && !sourcePlan.suites().isBlank()
-                ? List.of(sourcePlan.suites().split(","))
-                : List.of();
+            rerunPlanID = sourceEx.planID();
         } else {
             profileName = params.has("profile") && !params.get("profile").isJsonNull()
                 ? params.get("profile").getAsString()
@@ -417,8 +425,14 @@ public class JsonRpcServer {
                 : List.of();
         }
 
+        final String finalProfileName = profileName;
+        final List<String> finalSuites = suites;
+        final UUID finalRerunPlanID = rerunPlanID;
+
         if (!detach) {
-            TestExecution ex = execHandler.exec(null, profileName, suites);
+            TestExecution ex = isRerun
+                ? execHandler.rerun(null, finalRerunPlanID, finalProfileName)
+                : execHandler.exec(null, finalProfileName, finalSuites);
             JsonObject result = new JsonObject();
             result.addProperty("executionId", ex.executionID().toString());
             result.addProperty("planId", ex.planID().toString());
@@ -438,11 +452,16 @@ public class JsonRpcServer {
 
         Thread thread = new Thread(() -> {
             try {
-                execHandler.exec((id, planId) -> {
+                BiConsumer<UUID, UUID> cb = (id, planId) -> {
                     idRef.set(id);
                     planIdRef.set(planId);
                     latch.countDown();
-                }, profileName, suites);
+                };
+                if (isRerun) {
+                    execHandler.rerun(cb, finalRerunPlanID, finalProfileName);
+                } else {
+                    execHandler.exec(cb, finalProfileName, finalSuites);
+                }
             } catch (Throwable t) {
                 errorRef.set(t);
                 latch.countDown();

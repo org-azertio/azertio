@@ -6,6 +6,7 @@ import org.myjtools.openbbt.core.OpenBBTContext;
 import org.myjtools.openbbt.core.OpenBBTException;
 import org.myjtools.openbbt.core.OpenBBTPluginManager;
 import org.myjtools.openbbt.core.OpenBBTRuntime;
+import org.myjtools.openbbt.core.execution.TestExecution;
 import org.myjtools.openbbt.core.execution.TestPlanExecutor;
 import org.myjtools.openbbt.core.persistence.AttachmentRepository;
 import org.myjtools.openbbt.core.persistence.TestExecutionRepository;
@@ -38,32 +39,44 @@ public final class ServeCommand extends AbstractCommand {
         // which would prevent exec from writing execution records.
         OpenBBTRuntime runtime = new OpenBBTRuntime(context.configuration());
 
-        JsonRpcServer.ExecHandler execHandler = (onExecutionCreated, profileName, suites) -> {
-            if (!context.plugins().isEmpty()) {
-                OpenBBTPluginManager pluginManager = new OpenBBTPluginManager(context.configuration());
-                for (String plugin : context.plugins()) {
-                    try {
-                        pluginManager.installPlugin(plugin);
-                    } catch (Exception e) {
-                        log.error(e, "Failed to install plugin {}", plugin);
+        JsonRpcServer.ExecHandler execHandler = new JsonRpcServer.ExecHandler() {
+            @Override
+            public TestExecution exec(java.util.function.BiConsumer<UUID, UUID> onExecutionCreated, String profileName, List<String> suites) {
+                if (!context.plugins().isEmpty()) {
+                    OpenBBTPluginManager pluginManager = new OpenBBTPluginManager(context.configuration());
+                    for (String plugin : context.plugins()) {
+                        try {
+                            pluginManager.installPlugin(plugin);
+                        } catch (Exception e) {
+                            log.error(e, "Failed to install plugin {}", plugin);
+                        }
                     }
                 }
+                OpenBBTContext execContext = suites.isEmpty()
+                    ? context
+                    : readConfigurationFile().createContext(inputParams, suites);
+                TestPlan plan;
+                OpenBBTRuntime execRuntime = runtime.withProfile(profile(profileName));
+                try {
+                    plan = execRuntime.buildTestPlan(execContext, suites);
+                } catch (Exception e) {
+                    throw new OpenBBTException(e, "Failed to build test plan: {}", e.getMessage());
+                }
+                final var planId = plan.planID();
+                Consumer<UUID> cb = onExecutionCreated != null
+                    ? id -> onExecutionCreated.accept(id, planId)
+                    : null;
+                return new TestPlanExecutor(execRuntime).execute(planId, cb);
             }
-            OpenBBTContext execContext = suites.isEmpty()
-                ? context
-                : readConfigurationFile().createContext(inputParams, suites);
-            TestPlan plan;
-            OpenBBTRuntime execRuntime = runtime.withProfile(profile(profileName));
-            try {
-                plan = execRuntime.buildTestPlan(execContext, suites);
-            } catch (Exception e) {
-                throw new OpenBBTException(e, "Failed to build test plan: {}", e.getMessage());
+
+            @Override
+            public TestExecution rerun(java.util.function.BiConsumer<UUID, UUID> onExecutionCreated, UUID planID, String profileName) {
+                OpenBBTRuntime execRuntime = runtime.withProfile(profile(profileName));
+                Consumer<UUID> cb = onExecutionCreated != null
+                    ? id -> onExecutionCreated.accept(id, planID)
+                    : null;
+                return new TestPlanExecutor(execRuntime).execute(planID, cb);
             }
-            final var planId = plan.planID();
-            Consumer<UUID> cb = onExecutionCreated != null
-                ? id -> onExecutionCreated.accept(id, planId)
-                : null;
-            return new TestPlanExecutor(execRuntime).execute(planId, cb);
         };
 
         JsonRpcServer.PlanHandler planHandler = () -> {

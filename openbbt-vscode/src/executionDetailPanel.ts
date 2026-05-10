@@ -208,6 +208,7 @@ function contentTypeToExtension(contentType: string): string {
     const base = contentType.split(';')[0].trim().toLowerCase();
     const map: Record<string, string> = {
         'text/plain': '.txt',
+        'text/csv': '.csv',
         'text/html': '.html',
         'text/xml': '.xml',
         'application/xml': '.xml',

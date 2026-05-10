@@ -48,7 +48,12 @@ public class JooqDbEngine implements DbEngine, AutoCloseable {
 
 	@Override
 	public void close() {
-		// connections are created and closed per statement; nothing to release here
+		for (DSLContext ctx : dslContexts.values()) {
+			ConnectionProvider provider = ctx.configuration().connectionProvider();
+			if (provider instanceof SimpleConnectionProvider scp) {
+				scp.closeQuietly();
+			}
+		}
 	}
 
 	private void loadDriver(String driverClassName) {
@@ -229,6 +234,7 @@ public class JooqDbEngine implements DbEngine, AutoCloseable {
 	private static class SimpleConnectionProvider implements ConnectionProvider {
 
 		private final ConnectionParameters params;
+		private Connection cached;
 
 		SimpleConnectionProvider(ConnectionParameters params) {
 			this.params = params;
@@ -237,24 +243,30 @@ public class JooqDbEngine implements DbEngine, AutoCloseable {
 		@Override
 		public Connection acquire() throws DataAccessException {
 			try {
+				if (cached != null && !cached.isClosed() && cached.isValid(2)) {
+					return cached;
+				}
 				Properties props = new Properties();
 				if (params.username() != null) props.setProperty("user", params.username());
 				if (params.password() != null) props.setProperty("password", params.password());
-				Connection conn = DriverManager.getConnection(params.url(), props);
-				if (params.catalog() != null && !params.catalog().isEmpty()) conn.setCatalog(params.catalog());
-				if (params.schema() != null && !params.schema().isEmpty()) conn.setSchema(params.schema());
-				return conn;
+				cached = DriverManager.getConnection(params.url(), props);
+				if (params.catalog() != null && !params.catalog().isEmpty()) cached.setCatalog(params.catalog());
+				if (params.schema() != null && !params.schema().isEmpty()) cached.setSchema(params.schema());
+				return cached;
 			} catch (SQLException e) {
 				throw new DataAccessException("Cannot acquire connection to " + params.url(), e);
 			}
 		}
 
 		@Override
-		public void release(Connection connection) throws DataAccessException {
-			try {
-				connection.close();
-			} catch (SQLException e) {
-				throw new DataAccessException("Cannot close connection", e);
+		public void release(Connection connection) {
+			// keep connection open for reuse
+		}
+
+		void closeQuietly() {
+			if (cached != null) {
+				try { cached.close(); } catch (SQLException ignored) {}
+				cached = null;
 			}
 		}
 	}
