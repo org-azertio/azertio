@@ -1,3 +1,4 @@
+# language: dsl
 Feature: Rfam Public Database
   Queries against the Rfam database (https://rfam.org), a public read-only MySQL
   database maintained by the European Bioinformatics Institute (EBI).
