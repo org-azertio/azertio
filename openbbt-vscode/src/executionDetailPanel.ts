@@ -438,6 +438,7 @@ function buildHtml(webview: vscode.Webview, _extensionUri: vscode.Uri): string {
   }
 
   function formatDuration(ms) {
+    if (ms < 1000) return ms + ' ms';
     const totalSec = Math.floor(ms / 1000);
     const min = Math.floor(totalSec / 60);
     const sec = totalSec % 60;

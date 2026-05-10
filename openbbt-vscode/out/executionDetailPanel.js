@@ -732,7 +732,7 @@ function buildHtml(webview, _extensionUri) {
       title.textContent = (h.organization && h.project) ? h.organization + ' / ' + h.project : (h.organization || h.project || 'Execution');
       const meta = document.createElement('div');
       meta.className = 'header-meta';
-      const suitesLabel = h.suites && h.suites.length > 0 ? h.suites : 'all suites';
+      const suitesLabel = h.suites && h.suites.length > 0 ? h.suites : 'todos';
       meta.innerHTML =
         '<span>Plan: ' + h.planId + (h.planCreatedAt ? '  ·  ' + h.planCreatedAt : '') + '</span>' +
         '<span>Execution: ' + h.executionId + '  ·  ' + h.executedAt + '</span>' +
