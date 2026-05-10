@@ -153,6 +153,22 @@ test-suites:
 | JExten | Plugin framework |
 | ULID Creator | Unique identifier generation |
 
+## VS Code Extension
+
+OpenBBT includes a Visual Studio Code extension that integrates the testing framework directly into the editor. It allows you to browse test plans, trigger executions, and inspect results without leaving the IDE.
+
+### Features
+
+- **Test Plan Browser**: Navigate the full test plan tree (plan → suite → feature → scenario → step)
+- **Execution Detail Panel**: Real-time execution results with pass/fail/error status per step
+- **Step Durations**: Each step shows its execution time (ms / sec / min)
+- **Attachments**: Inline access to HTTP exchanges, benchmark statistics, and error stack traces
+- **Benchmark Support**: Run any step N times across T parallel threads and visualise P50/P95/P99 statistics
+
+### Screenshot
+
+![OpenBBT VS Code Extension](images/screenshot1.png)
+
 ## License
 
 This testProject is licensed under the MIT License - see the [LICENSE](openbbt-core/LICENSE) file for details.
