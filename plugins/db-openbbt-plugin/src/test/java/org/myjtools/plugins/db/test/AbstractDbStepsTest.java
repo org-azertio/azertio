@@ -190,4 +190,76 @@ abstract class AbstractDbStepsTest {
 		withDbConfig(plan).execute().assertAllFailed();
 	}
 
+	@Test
+	@FeatureDir("query-count-passes")
+	void query_count_passes(JUnitOpenBBTPlan plan) {
+		withDbConfig(plan).execute().assertAllPassed();
+	}
+
+	@Test
+	@FeatureDir("query-count-fails")
+	void query_count_fails(JUnitOpenBBTPlan plan) {
+		withDbConfig(plan).execute().assertAllFailed();
+	}
+
+	@Test
+	@FeatureDir("dsl-query-count-passes")
+	void dsl_query_count_passes(JUnitOpenBBTPlan plan) {
+		withDbConfig(plan).execute().assertAllPassed();
+	}
+
+	@Test
+	@FeatureDir("dsl-query-count-fails")
+	void dsl_query_count_fails(JUnitOpenBBTPlan plan) {
+		withDbConfig(plan).execute().assertAllFailed();
+	}
+
+	@Test
+	@FeatureDir("query-dml-count-passes")
+	void query_dml_count_passes(JUnitOpenBBTPlan plan) {
+		withDbConfig(plan).execute().assertAllPassed();
+	}
+
+	@Test
+	@FeatureDir("query-dml-count-fails")
+	void query_dml_count_fails(JUnitOpenBBTPlan plan) {
+		withDbConfig(plan).execute().assertAllFailed();
+	}
+
+	@Test
+	@FeatureDir("dsl-query-dml-count-passes")
+	void dsl_query_dml_count_passes(JUnitOpenBBTPlan plan) {
+		withDbConfig(plan).execute().assertAllPassed();
+	}
+
+	@Test
+	@FeatureDir("dsl-query-dml-count-fails")
+	void dsl_query_dml_count_fails(JUnitOpenBBTPlan plan) {
+		withDbConfig(plan).execute().assertAllFailed();
+	}
+
+	@Test
+	@FeatureDir("query-store-result-passes")
+	void query_store_result_passes(JUnitOpenBBTPlan plan) {
+		withDbConfig(plan).execute().assertAllPassed();
+	}
+
+	@Test
+	@FeatureDir("dsl-query-store-result-passes")
+	void dsl_query_store_result_passes(JUnitOpenBBTPlan plan) {
+		withDbConfig(plan).execute().assertAllPassed();
+	}
+
+	@Test
+	@FeatureDir("query-teardown-passes")
+	void query_teardown_passes(JUnitOpenBBTPlan plan) {
+		withDbConfig(plan).execute().assertAllPassed();
+	}
+
+	@Test
+	@FeatureDir("dsl-query-teardown-passes")
+	void dsl_query_teardown_passes(JUnitOpenBBTPlan plan) {
+		withDbConfig(plan).execute().assertAllPassed();
+	}
+
 }

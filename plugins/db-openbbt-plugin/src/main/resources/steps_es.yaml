@@ -10,6 +10,75 @@
   
 
 
+'db.teardown.execute':
+  expression: 'al finalizar se ejecutará en el origen de datos {alias:text} la sentencia SQL:'
+  example: |
+    Dado que al finalizar se ejecutará en el origen de datos "main" la sentencia SQL:
+      """sql
+      DELETE FROM users WHERE status = 'active'
+      """
+  scenarios:
+    - title: Registrar una sentencia de limpieza para ejecutar al finalizar el escenario
+      gherkin: |
+        Dado que al finalizar se ejecutará en el origen de datos "main" la sentencia SQL:
+          """sql
+          DELETE FROM users WHERE status = 'active'
+          """
+
+
+'db.execute.query':
+  expression: 'ejecuto la sentencia SQL:'
+  example: |
+    Dado que ejecuto la sentencia SQL:
+      """sql
+      SELECT * FROM users WHERE status = 'active'
+      """
+  scenarios:
+    - title: Ejecutar una SELECT y verificar el resultado en pasos posteriores
+      gherkin: |
+        Dado que uso el origen de datos "main"
+        Y ejecuto la sentencia SQL:
+          """sql
+          SELECT id, nombre FROM users WHERE status = 'active'
+          """
+        Entonces el número de filas de la respuesta SQL es mayor que 0
+
+
+'db.store.query.result':
+  expression: 'guardo el resultado de la consulta SQL en la variable {variable:text}'
+  example: |
+    Entonces guardo el resultado de la consulta SQL en la variable "nombre"
+  scenarios:
+    - title: Guardar el primer campo del resultado de una SELECT en una variable
+      gherkin: |
+        Dado que uso el origen de datos "main"
+        Y ejecuto la sentencia SQL:
+          """sql
+          SELECT nombre FROM users WHERE status = 'active'
+          """
+        Entonces guardo el resultado de la consulta SQL en la variable "nombre"
+
+
+'db.assert.query.count':
+  expression: 'el número de filas de la respuesta SQL {{integer-assertion}}'
+  assertion-hints:
+    - 'es igual a 0'
+    - 'es igual a 1'
+    - 'es mayor que 0'
+    - 'no es igual a 0'
+  example: |
+    Entonces el número de filas de la respuesta SQL es mayor que 0
+  scenarios:
+    - title: Verificar el número de filas devueltas por la última consulta SQL
+      gherkin: |
+        Dado que uso el origen de datos "main"
+        Y ejecuto la sentencia SQL:
+          """sql
+          SELECT * FROM users WHERE status = 'active'
+          """
+        Entonces el número de filas de la respuesta SQL es mayor que 0
+
+
 'db.assert.count':
   expression: 'el número de filas de la tabla {table:word} {{integer-assertion}}'
   assertion-hints:

@@ -10,12 +10,14 @@ import org.jooq.impl.DSL;
 import org.jooq.impl.DataSourceConnectionProvider;
 import org.myjtools.openbbt.core.OpenBBTException;
 import org.myjtools.openbbt.core.testplan.DataTable;
+import org.myjtools.openbbt.core.util.Either;
 import org.myjtools.openbbt.plugins.db.ConnectionParameters;
 import org.myjtools.openbbt.plugins.db.DataSet;
 import org.myjtools.openbbt.plugins.db.DbEngine;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -167,6 +169,25 @@ public class JooqDbEngine implements DbEngine, AutoCloseable {
 			return new ExcelRecordLoader(nullValue).readExcel(file, maxAssertRows);
 		} catch (IOException e) {
 			throw new OpenBBTException(e, "Failed to read Excel file {}", file);
+		}
+	}
+
+
+	@Override
+	public Either<DataSet, Long> executeQuery(String alias, String sql) {
+		String firstToken = sql.stripLeading().split("\\s+", 2)[0].toUpperCase();
+		if (firstToken.equals("SELECT") || firstToken.equals("WITH")) {
+			var result = dslContext(alias).resultQuery(sql).fetch();
+			List<String> columns = Arrays.stream(result.fields()).map(Field::getName).toList();
+			List<List<String>> rows = result.stream()
+				.map(record -> Arrays.stream(record.intoArray())
+					.map(v -> v == null ? nullValue : v.toString())
+					.toList())
+				.toList();
+			return Either.of(new DataSet(null, columns, rows));
+		} else {
+			long count = dslContext(alias).query(sql).execute();
+			return Either.fallback(count);
 		}
 	}
 
