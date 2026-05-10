@@ -131,6 +131,7 @@ public class TestPlanExecutor {
 			log.error(e);
 			Instant finish = runtime.clock().now();
 			testExecutionRepository.updateExecutionNodeFinish(executionNodeID, ExecutionResult.ERROR, finish);
+			storeStackTraceAttachment(executionID, executionNodeID, e);
 			runtime.eventBus().publish(
 				new ExecutionNodeFinished(finish, executionID, executionNodeID, testPlanNodeID, ExecutionResult.ERROR)
 			);
@@ -254,16 +255,13 @@ public class TestPlanExecutor {
 		Benchmark benchmark
 	) {
 		if (benchmark != null) {
-
-			if (!backendExecutor.hasAnnotation(node, StatisticsProvider.class)) {
-				throw new OpenBBTException(
-					"Step '{}' cannot be executed in benchmark mode because it does not provide statistics, which are required in benchmark mode.",
-					node.name()
-				);
-			}
-
-
 			try {
+				if (!backendExecutor.hasAnnotation(node, StatisticsProvider.class)) {
+					throw new OpenBBTException(
+						"Step '{}' cannot be executed in benchmark mode because it does not provide statistics, which are required in benchmark mode.",
+						node.name()
+					);
+				}
 				backendExecutor.executeBenchmark(node, executionNodeID, benchmark);
 				return new Result(ExecutionResult.PASSED, null, null);
 			} catch (Exception e) {

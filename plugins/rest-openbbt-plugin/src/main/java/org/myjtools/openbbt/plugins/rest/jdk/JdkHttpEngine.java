@@ -127,8 +127,9 @@ public class JdkHttpEngine implements RestEngine {
     private int send(HttpRequest request, String body) {
         lastRequest = request;
         lastRequestBody = body;
+        HttpResponse<String> response;
         try {
-            lastResponse = client.send(request, HttpResponse.BodyHandlers.ofString());
+            response = client.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new OpenBBTException("HTTP request interrupted: {}",request.uri());
@@ -136,15 +137,16 @@ public class JdkHttpEngine implements RestEngine {
             String reason = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
             throw new OpenBBTException("HTTP request failed [{}]: {}", request.uri(), reason);
         }
-        checkThreshold();
-        return lastResponse.statusCode();
+        lastResponse = response;
+        checkThreshold(response.statusCode());
+        return response.statusCode();
     }
 
 
-    private void checkThreshold() {
-        if (httpCodeThreshold != null && lastResponse.statusCode() >= httpCodeThreshold) {
+    private void checkThreshold(int statusCode) {
+        if (httpCodeThreshold != null && statusCode >= httpCodeThreshold) {
             throw new AssertionError(
-                "HTTP response status " + lastResponse.statusCode() +
+                "HTTP response status " + statusCode +
                 " exceeds threshold " + httpCodeThreshold
             );
         }

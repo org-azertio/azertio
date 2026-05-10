@@ -9,6 +9,7 @@ import org.myjtools.openbbt.core.ContentTypes;
 import org.myjtools.openbbt.core.ResourceFinder;
 import org.myjtools.openbbt.core.backend.ExecutionContext;
 import org.myjtools.openbbt.core.contributors.ContentType;
+import org.myjtools.openbbt.core.contributors.StatisticsProvider;
 import org.myjtools.openbbt.core.contributors.StepExpression;
 import org.myjtools.openbbt.core.contributors.StepProvider;
 import org.myjtools.openbbt.core.testplan.Document;
@@ -49,46 +50,55 @@ public class RestStepProvider implements StepProvider  {
 	}
 
 
+	@StatisticsProvider
 	@StepExpression(value = "rest.request.GET", args = {"endpoint:text"})
 	public void get(String endpoint) {
 		request(() -> restEngine.requestGET(interpolate(endpoint)));
 	}
 
+	@StatisticsProvider
 	@StepExpression(value = "rest.request.POST.empty", args = {"endpoint:text"})
 	public void post(String endpoint) {
 		request(() -> restEngine.requestPOST(interpolate(endpoint)));
 	}
 
+	@StatisticsProvider
 	@StepExpression(value = "rest.request.POST.body", args = {"endpoint:text"})
 	public void postWithBody(String endpoint, Document body) {
 		request(() -> restEngine.requestPOST(interpolate(endpoint), interpolate(body.content())));
 	}
 
+	@StatisticsProvider
 	@StepExpression(value = "rest.request.POST.file", args = {"endpoint:text", "file:text"})
 	public void postWithFile(String endpoint, String file) {
 		request(() -> restEngine.requestPOST(interpolate(endpoint), resourceFinder.readAsString(file)));
 	}
 
+	@StatisticsProvider
 	@StepExpression(value = "rest.request.PUT.body", args = {"endpoint:text"})
 	public void putWithBody(String endpoint, Document body) {
 		request(() -> restEngine.requestPUT(interpolate(endpoint), interpolate(body.content())));
 	}
 
+	@StatisticsProvider
 	@StepExpression(value = "rest.request.PUT.file", args = {"endpoint:text", "file:text"})
 	public void putWithFile(String endpoint, String file) {
 		request(() -> restEngine.requestPUT(interpolate(endpoint), resourceFinder.readAsString(file)));
 	}
 
+	@StatisticsProvider
 	@StepExpression(value = "rest.request.PATCH.body", args = {"endpoint:text"})
 	public void patchWithBody(String endpoint, Document body) {
 		request(() -> restEngine.requestPATCH(interpolate(endpoint), interpolate(body.content())));
 	}
 
+	@StatisticsProvider
 	@StepExpression(value = "rest.request.PATCH.file", args = {"endpoint:text", "file:text"})
 	public void patchWithFile(String endpoint, String file) {
 		request(() -> restEngine.requestPATCH(interpolate(endpoint), resourceFinder.readAsString(file)));
 	}
 
+	@StatisticsProvider
 	@StepExpression(value = "rest.request.DELETE", args = {"endpoint:text"})
 	public void delete(String endpoint) {
 		request(() -> restEngine.requestDELETE(interpolate(endpoint)));
