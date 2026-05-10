@@ -11,7 +11,7 @@ project:
         tag-expression: GET
       - name: Others
         description: REST API Other Operations
-        tag-expression: not GET
+        tag-expression: not GET and not DB
       - name: Database
         description: DB queries against the public Rfam MySQL database
         tag-expression: DB
