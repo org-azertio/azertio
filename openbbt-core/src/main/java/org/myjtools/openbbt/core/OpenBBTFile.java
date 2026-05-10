@@ -139,11 +139,17 @@ public class OpenBBTFile {
 
 
 	private String normalizePluginName(String name) {
-		int groupNameIndex = name.indexOf(":");
-		if (groupNameIndex == -1) { // If no group is specified, assume it's an OpenBBT plugin
-			return "org.myjtools.openbbt.plugins:" + name + "-openbbt-plugin";
+		String suffix = "";
+		String pluginPart = name;
+		int withIndex = name.indexOf(" with ");
+		if (withIndex != -1) {
+			pluginPart = name.substring(0, withIndex);
+			suffix = name.substring(withIndex);
 		}
-		return name;
+		if (!pluginPart.contains(":")) {
+			pluginPart = "org.myjtools.openbbt.plugins:" + pluginPart + "-openbbt-plugin";
+		}
+		return pluginPart + suffix;
 	}
 
 
