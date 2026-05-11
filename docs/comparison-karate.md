@@ -20,6 +20,7 @@
 | Custom protocols | ✅ write a plugin (pure Java) | ⚠️ requires JS/Java in feature files |
 | Multilingual steps | ✅ EN / ES / compact DSL | ❌ single DSL |
 | Definition / implementation | ✅ two-level scenario model | ❌ |
+| Execution history | ✅ transient / file / remote DB | ❌ no built-in persistence |
 | Runtime deps | ✅ declared in YAML, auto-downloaded | ❌ must be in Maven/Gradle POM |
 
 ---
@@ -325,6 +326,42 @@ test-suites:
 ```
 
 Running a specific suite is a single flag: `openbbt run -s regression`. Suites can be combined in the same run.
+
+---
+
+## Execution History and Persistence
+
+### Karate
+
+Karate produces JUnit XML and HTML reports at the end of each run. These reports are written to the `target/` directory and discarded with the next build. There is no persistent store of past executions: you cannot browse a historical run from two weeks ago, compare results across runs, or re-execute a specific past run by ID. If you need long-term result tracking, you must integrate an external tool (Allure, ReportPortal, a CI dashboard) and configure the export yourself.
+
+### OpenBBT: three persistence modes
+
+OpenBBT has a built-in persistence layer with three configurable modes, covering the full spectrum from ephemeral CI runs to team-wide shared history:
+
+| Mode | Backend | Attachments | Use case |
+|---|---|---|---|
+| `transient` | Temp HSQLDB file (deleted on exit) | Temp directory | CI pipelines that only need pass/fail |
+| `file` | HSQLDB file in `.openbbt/` | Local filesystem | Developer workstation, browsable in VS Code |
+| `remote` | PostgreSQL | MinIO (S3-compatible) | Shared team history across CI and all developers |
+
+Configuration is a single block in `openbbt.yaml`:
+
+```yaml
+configuration:
+  core:
+    persistence.mode: remote
+    persistence.db.url: jdbc:postgresql://db-server:5432/openbbt
+    persistence.db.username: openbbt
+    persistence.db.password: '{{DB_PASSWORD}}'
+    attachment.server.url: http://minio-server:9000
+    attachment.server.username: minio-user
+    attachment.server.password: '{{MINIO_PASSWORD}}'
+```
+
+In `remote` mode, every CI run writes its full execution tree — plan, suites, scenarios, steps, timings, and attachments — to the shared database. Every developer opens VS Code and can immediately browse any past execution: drill into individual steps, inspect response body attachments, view benchmark statistics, and re-run any execution with a single click. No Allure server, no ReportPortal, no external dashboard.
+
+This also enables workflows impossible with report-file approaches: because every execution is a structured record in a relational database, it is straightforward to query trends (e.g. which scenarios have been flaky over the last 30 days), compare runs across branches, or build custom dashboards directly from the PostgreSQL data.
 
 ---
 

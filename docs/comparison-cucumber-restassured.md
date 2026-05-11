@@ -21,6 +21,7 @@ Cucumber + RestAssured is arguably the most common Java BDD stack for API testin
 | Custom steps | ✅ write a plugin, distribute as artifact | ✅ write Java step defs in the project |
 | Multilingual steps | ✅ EN / ES / compact DSL | ⚠️ manual per-project translation |
 | Definition / implementation | ✅ two-level scenario model | ❌ |
+| Execution history | ✅ transient / file / remote DB | ❌ JUnit XML only, no persistence |
 | Runtime deps | ✅ declared in YAML, auto-downloaded | ❌ must be in Maven/Gradle POM |
 | Step reuse across projects | ✅ publish plugin to Maven | ⚠️ copy-paste or shared library |
 
@@ -369,7 +370,15 @@ openbbt run -s smoke -p staging
 openbbt run --rerun <execution-id>
 ```
 
-Every execution is persisted to a local HSQLDB database. Past executions can be inspected, compared, and re-run from the CLI or the VS Code extension at any time.
+Every execution is persisted through a configurable persistence layer with three modes:
+
+| Mode | Backend | Use case |
+|---|---|---|
+| `transient` | Temp HSQLDB (deleted on exit) | CI pipelines that only need pass/fail |
+| `file` | HSQLDB file in `.openbbt/` | Developer workstation, browsable in VS Code |
+| `remote` | PostgreSQL + MinIO for attachments | Shared team history across CI and all developers |
+
+In `remote` mode, CI runs write every execution to a shared PostgreSQL database, including the full result tree, step timings, and binary attachments (response bodies, CSV query results). Every developer's VS Code extension connects to the same database and can browse, inspect, and re-run any past CI execution — no Allure server, no ReportPortal, no dashboard configuration required. The raw data is also directly queryable for custom reporting or flakiness analysis.
 
 ---
 

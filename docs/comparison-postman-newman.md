@@ -22,7 +22,7 @@
 | Profile / environment mgmt | ✅ YAML profiles            | ⚠️ Postman environments (GUI or JSON) |
 | Plugin / extensibility     | ✅ Maven plugin API         | ❌ JS scripts only                      |
 | Definition / implementation | ✅ two-level scenario model | ❌ |
-| Execution history & re-run | ✅ local persistent store   | ❌ no history between runs              |
+| Execution history           | ✅ transient / file / remote DB | ❌ no persistence between runs     |
 | Cost                       | Free / open source          | Freemium (team features are paid)       |
 | CI integration             | `openbbt run`               | `newman run`                            |
 
@@ -265,20 +265,36 @@ Newman produces a test report (JUnit XML, JSON, or HTML) at the end of each run.
 
 ### OpenBBT
 
-Every execution is persisted in a local HSQLDB database. From the VS Code extension you can:
+OpenBBT has a built-in persistence layer with three modes that cover the full spectrum from ephemeral CI to team-wide shared history:
 
-- Browse all past executions with date, duration, and status.
-- Drill into any execution's full result tree (suite → scenario → step).
-- View step-level attachments (response bodies, query result CSVs).
-- Re-run any past execution against its original test plan and profile with one click.
+| Mode | Backend | Attachments | Use case |
+|---|---|---|---|
+| `transient` | Temp HSQLDB (deleted on exit) | Temp directory | CI pipelines that only need pass/fail |
+| `file` | HSQLDB file in `.openbbt/` | Local filesystem | Developer workstation, full history in VS Code |
+| `remote` | PostgreSQL | MinIO (S3-compatible) | Shared history across CI and all developers |
+
+In **`file` mode** (the default for server mode), every execution is persisted locally. From VS Code you can browse all past runs, drill into the full result tree (suite → scenario → step), view step-level attachments (response bodies, CSV query results), and re-run any past execution with one click.
+
+In **`remote` mode**, CI writes to a shared PostgreSQL database and MinIO object store. Every developer's VS Code connects to the same backend and can immediately browse, inspect, and re-run any CI execution — including runs from other team members or other branches. Configuration is a single block in `openbbt.yaml`:
+
+```yaml
+configuration:
+  core:
+    persistence.mode: remote
+    persistence.db.url: jdbc:postgresql://db-server:5432/openbbt
+    persistence.db.username: openbbt
+    persistence.db.password: '{{DB_PASSWORD}}'
+    attachment.server.url: http://minio-server:9000
+    attachment.server.username: minio-user
+    attachment.server.password: '{{MINIO_PASSWORD}}'
+```
+
+Because the execution store is a relational database, the data is also directly queryable for custom reporting, flakiness tracking, or SLA trend analysis — without any additional tooling.
 
 From the CLI:
 
 ```bash
-# List recent executions
-openbbt executions
-
-# Re-run a specific past execution
+# Re-run a specific past execution by ID
 openbbt run --rerun <execution-id>
 ```
 
