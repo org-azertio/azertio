@@ -6,23 +6,25 @@
 
 ## Quick Overview
 
-| | **OpenBBT** | **Postman / Newman** |
-|---|---|---|
-| First release | 2025 | 2012 / 2014 |
-| Primary interface | CLI + VS Code extension | GUI (Postman app) + CLI (Newman) |
-| Test format | Gherkin / compact DSL | Proprietary JSON collections |
-| Test authoring | Plain text in any editor | Postman GUI or raw JSON |
-| Git-friendly | ✅ plain text, diffable | ⚠️ JSON collections, noisy diffs |
-| BDD / readable scenarios | ✅ Gherkin | ❌ |
-| Test logic language | Declarative steps (no code) | JavaScript (`pm.test`, `pm.expect`) |
-| Database testing | ✅ first-class plugin | ❌ not supported |
-| Performance benchmarking | ✅ built-in benchmark mode | ❌ separate tool needed |
-| VS Code execution history | ✅ dedicated extension | ❌ |
-| Profile / environment mgmt | ✅ YAML profiles | ⚠️ Postman environments (GUI or JSON) |
-| Plugin / extensibility | ✅ Maven plugin API | ❌ JS scripts only |
-| Execution history & re-run | ✅ local persistent store | ❌ no history between runs |
-| Cost | Free / open source | Freemium (team features are paid) |
-| CI integration | `openbbt run` | `newman run` |
+
+|                            | **OpenBBT**                 | **Postman / Newman**                    |
+| -------------------------- | --------------------------- | --------------------------------------- |
+| First release              | 2025                        | 2012 / 2014                             |
+| Primary interface          | CLI + VS Code extension     | GUI (Postman app) + CLI (Newman)        |
+| Test format                | Gherkin / compact DSL       | Proprietary JSON collections            |
+| Test authoring             | Plain text in any editor    | Postman GUI or raw JSON                 |
+| Git-friendly               | ✅ plain text, diffable     | ⚠️ JSON collections, noisy diffs      |
+| BDD / readable scenarios   | ✅ Gherkin                  | ❌                                      |
+| Test logic language        | Declarative steps (no code) | JavaScript (`pm.test`, `pm.expect`)     |
+| Database testing           | ✅ first-class plugin       | ❌ not supported                        |
+| Performance benchmarking   | ✅ built-in benchmark mode  | ❌ separate tool needed                 |
+| VS Code execution history  | ✅ dedicated extension      | ❌                                      |
+| Profile / environment mgmt | ✅ YAML profiles            | ⚠️ Postman environments (GUI or JSON) |
+| Plugin / extensibility     | ✅ Maven plugin API         | ❌ JS scripts only                      |
+| Definition / implementation | ✅ two-level scenario model | ❌ |
+| Execution history & re-run | ✅ local persistent store   | ❌ no history between runs              |
+| Cost                       | Free / open source          | Freemium (team features are paid)       |
+| CI integration             | `openbbt run`               | `newman run`                            |
 
 ---
 
@@ -41,7 +43,7 @@ This model is excellent for exploration and for teams where the primary persona 
 
 ### OpenBBT: automated black-box testing as code
 
-OpenBBT starts from the opposite direction: tests are plain text files, written in a domain-specific language, version-controlled alongside the system under test, and run entirely from the CLI. There is no GUI for authoring — the IDE is a text editor (VS Code recommended). The VS Code extension is for *inspecting results*, not for writing tests.
+OpenBBT starts from the opposite direction: tests are plain text files, written in a domain-specific language, version-controlled alongside the system under test, and run entirely from the CLI. There is no GUI for authoring — the IDE is any text editor (VS Code recommended). The recommended VS Code extension is also for *inspecting results*, not only for writing tests.
 
 ---
 
@@ -317,15 +319,88 @@ The `openbbt.yaml` and `.feature` files are committed to the repository like any
 
 ## Cost and Licensing
 
-| | **OpenBBT** | **Postman** |
-|---|---|---|
-| License | MIT (open source) | Proprietary (freemium) |
-| Free tier | Unlimited | Limited collaboration, limited mock calls |
-| Team collaboration | Via git | Paid workspace features |
-| Offline use | ✅ fully offline | ⚠️ some features require cloud connectivity |
-| Self-hosting | N/A (CLI tool) | ⚠️ enterprise plan required |
+
+|                    | **OpenBBT**       | **Postman**                                   |
+| ------------------ | ----------------- | --------------------------------------------- |
+| License            | MIT (open source) | Proprietary (freemium)                        |
+| Free tier          | Unlimited         | Limited collaboration, limited mock calls     |
+| Team collaboration | Via git           | Paid workspace features                       |
+| Offline use        | ✅ fully offline  | ⚠️ some features require cloud connectivity |
+| Self-hosting       | N/A (CLI tool)    | ⚠️ enterprise plan required                 |
 
 Postman's free tier is generous for individual use, but teams that need shared workspaces, private APIs, or advanced monitoring quickly hit the paid tier. OpenBBT has no paid tier — it is MIT-licensed and entirely self-hosted.
+
+---
+
+## Two-Level Scenarios: Definition / Implementation
+
+### Postman
+
+Postman has no concept of separating test intent from test execution. A collection request is always both the specification and the implementation: the URL, headers, body, and JavaScript assertions are all one artifact. There is no way to write a business-readable description of what the test does separately from how it does it.
+
+Some teams add a "description" field to requests, but this is free text with no structural meaning — it is not executable, not validated, and not visible in CI reports.
+
+### OpenBBT: definition / implementation
+
+OpenBBT introduces a two-level scenario model unique among testing tools. A **definition** feature (tagged `@definition`) is a plain-English, business-readable specification of test intent. An **implementation** feature (tagged `@implementation`) is the concrete execution, matched to the definition by scenario identifier.
+
+```gherkin
+# definition.feature — readable by anyone
+@definition
+Feature: Payment Processing
+
+@ID-PAY-01
+Scenario: A valid payment is accepted
+  Given a customer with a valid credit card
+  When a payment of €49.99 is submitted
+  Then the payment is approved
+  And the customer receives a confirmation
+
+@ID-PAY-02
+Scenario: An expired card is rejected
+  Given a customer with an expired credit card
+  When a payment of €49.99 is submitted
+  Then the payment is declined
+  And the customer receives an error message
+```
+
+```gherkin
+# implementation.feature — the technical test
+@implementation
+Feature: Payment Processing — REST
+
+# gherkin.step-map: 1-1-1-1
+@ID-PAY-01
+Scenario: A valid payment is accepted
+  When I make a POST request to "payments" with body:
+    """json
+    { "amount": 49.99, "currency": "EUR", "card": "4111111111111111", "expiry": "12/28" }
+    """
+  Then the HTTP status code is equal to 200
+  And the response body contains:
+    """json
+    { "status": "APPROVED" }
+    """
+  And the response body field "confirmationId" is not empty
+
+# gherkin.step-map: 1-1-1-1
+@ID-PAY-02
+Scenario: An expired card is rejected
+  When I make a POST request to "payments" with body:
+    """json
+    { "amount": 49.99, "currency": "EUR", "card": "4111111111111111", "expiry": "01/20" }
+    """
+  Then the HTTP status code is equal to 422
+  And the response body contains:
+    """json
+    { "error": "CARD_EXPIRED" }
+    """
+  And the response body field "message" contains "expired"
+```
+
+Unlike Postman's request descriptions — which are free text that no tool validates or enforces — OpenBBT's definition features are structural: they drive the test plan, appear in the result tree, and provide the vocabulary that stakeholders sign off on. The implementation is hidden from business review but fully visible to engineers in the execution detail.
+
+This enables a workflow impossible in Postman: a product owner reviews and approves the definition feature files in a pull request, without ever seeing the technical implementation details. The CI pipeline runs the implementation and reports results against the business-defined structure.
 
 ---
 

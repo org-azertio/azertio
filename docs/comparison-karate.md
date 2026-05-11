@@ -19,6 +19,7 @@
 | VS Code extension | ✅ dedicated extension | ❌ community-only |
 | Custom protocols | ✅ write a plugin (pure Java) | ⚠️ requires JS/Java in feature files |
 | Multilingual steps | ✅ EN / ES / compact DSL | ❌ single DSL |
+| Definition / implementation | ✅ two-level scenario model | ❌ |
 | Runtime deps | ✅ declared in YAML, auto-downloaded | ❌ must be in Maven/Gradle POM |
 
 ---
@@ -324,6 +325,62 @@ test-suites:
 ```
 
 Running a specific suite is a single flag: `openbbt run -s regression`. Suites can be combined in the same run.
+
+---
+
+## Two-Level Scenarios: Definition / Implementation
+
+### Karate
+
+Karate has no concept of separating test intent from test implementation. A Karate feature file is always a single level: the steps you write are the steps that execute. There is no built-in mechanism for a business analyst to maintain an abstract, readable specification while an engineer maintains a separate, technically precise version of the same test.
+
+Teams that want this separation in Karate typically resort to calling reusable `.feature` files as functions — but the caller file is itself a technical Karate script, not a business-readable specification.
+
+### OpenBBT: definition / implementation
+
+OpenBBT has first-class support for a two-level scenario model. A **definition** feature (tagged `@definition`) declares abstract, business-readable scenarios identified by `@ID-*` tags. An **implementation** feature (tagged `@implementation`) provides the concrete, executable steps for each scenario, matched by identifier.
+
+```gherkin
+# definition.feature — written and owned by the business
+@definition
+Feature: User Registration
+
+@ID-REG-01
+Scenario: A new user can register with valid data
+  Given a valid registration form
+  When the form is submitted
+  Then the account is created
+  And a welcome email is sent
+```
+
+```gherkin
+# implementation.feature — written by the test engineer
+@implementation
+Feature: User Registration — REST
+
+# gherkin.step-map: 1-1-1-1
+@ID-REG-01
+Scenario: A new user can register
+  When I make a POST request to "users" with body:
+    """json
+    { "name": "Alice", "email": "alice@example.com" }
+    """
+  Then the HTTP status code is equal to 201
+  And the response body contains:
+    """json
+    { "email": "alice@example.com" }
+    """
+  And the response body field "welcomeEmailSent" is equal to "true"
+```
+
+At plan-build time, the two files are merged: the definition structure becomes the visible test tree, while the implementation steps are what actually execute. The `gherkin.step-map` comment controls how many implementation steps replace each abstract definition step (including `0` for virtual steps that appear in the tree but run no code).
+
+Implementation features can be in a **different natural language** from the definition — enabling a project where the business contract is in English and the technical implementation is in Spanish (or any other supported language), all in the same plan.
+
+This is particularly valuable for:
+- Regulatory or contractual traceability (the definition is the signed-off specification).
+- Multilingual teams where business and engineering speak different languages.
+- Projects where the same abstract test contract needs multiple concrete implementations (e.g. REST today, gRPC tomorrow).
 
 ---
 

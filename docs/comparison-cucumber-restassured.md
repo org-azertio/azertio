@@ -20,6 +20,7 @@ Cucumber + RestAssured is arguably the most common Java BDD stack for API testin
 | VS Code extension | ✅ dedicated extension | ❌ generic Cucumber highlighting only |
 | Custom steps | ✅ write a plugin, distribute as artifact | ✅ write Java step defs in the project |
 | Multilingual steps | ✅ EN / ES / compact DSL | ⚠️ manual per-project translation |
+| Definition / implementation | ✅ two-level scenario model | ❌ |
 | Runtime deps | ✅ declared in YAML, auto-downloaded | ❌ must be in Maven/Gradle POM |
 | Step reuse across projects | ✅ publish plugin to Maven | ⚠️ copy-paste or shared library |
 
@@ -369,6 +370,72 @@ openbbt run --rerun <execution-id>
 ```
 
 Every execution is persisted to a local HSQLDB database. Past executions can be inspected, compared, and re-run from the CLI or the VS Code extension at any time.
+
+---
+
+## Two-Level Scenarios: Definition / Implementation
+
+### Cucumber + RestAssured
+
+Cucumber was designed with a natural separation between feature files (Gherkin) and step definitions (Java). In theory this is already a two-level model: the business writes Gherkin, the developer writes Java. In practice, the Gherkin steps must map 1-to-1 to Java methods, which means the vocabulary in the feature file is constrained by what the developer has already implemented. Abstract, business-level language that does not correspond to an existing step definition causes a `Undefined step` error at runtime.
+
+There is no built-in mechanism to write an abstract, un-executable specification and later bind it to concrete steps — the feature file and its glue code must always be in sync.
+
+Some teams work around this with nested step definitions (a high-level step calls lower-level steps in Java), but this is invisible in the feature file: the stakeholder sees only the high-level step, with no view of what actually executed underneath.
+
+### OpenBBT: definition / implementation
+
+OpenBBT has first-class support for a two-level scenario model without any Java code. A **definition** feature (tagged `@definition`) declares abstract, business-readable scenarios identified by `@ID-*` tags. An **implementation** feature (tagged `@implementation`) provides the concrete, executable steps matched by identifier.
+
+```gherkin
+# definition.feature — the business specification
+@definition
+Feature: Order Fulfilment
+
+@ID-ORD-01
+Scenario: An order is fulfilled when stock is available
+  Given a confirmed order for 5 units of product P-001
+  When the fulfilment process runs
+  Then the order status is "FULFILLED"
+  And the stock of P-001 is reduced by 5
+```
+
+```gherkin
+# implementation.feature — the technical execution
+@implementation
+Feature: Order Fulfilment — DB + REST
+
+Background:
+  * use db "warehouse"
+
+# gherkin.step-map: 2-1-1-2
+@ID-ORD-01
+Scenario: An order is fulfilled
+  * db table orders has:
+    | id | product | quantity | status    |
+    | 1  | P-001   | 5        | CONFIRMED |
+  * db table stock has:
+    | product | units |
+    | P-001   | 20    |
+  When I make a POST request to "fulfilment/run"
+  Then the HTTP status code is equal to 200
+  * db query:
+    """sql
+    SELECT status FROM orders WHERE id = 1
+    """
+  * db query count = 1
+  * db table stock is:
+    | product | units |
+    | P-001   | 15    |
+```
+
+The `gherkin.step-map: 2-1-1-2` comment means:
+- The first definition step (`Given a confirmed order…`) is replaced by 2 implementation steps (seed the database).
+- The second (`When the fulfilment process runs`) by 1 step (call the API).
+- The third (`Then the order status is "FULFILLED"`) by 1 step (query the DB).
+- The fourth (`And the stock of P-001 is reduced by 5`) by 2 steps (two DB assertions).
+
+The result tree shows the business-readable definition structure. Drilling into any definition step reveals the concrete implementation steps that executed it — providing full traceability from business requirement to technical action, without mixing the two in the same file.
 
 ---
 
