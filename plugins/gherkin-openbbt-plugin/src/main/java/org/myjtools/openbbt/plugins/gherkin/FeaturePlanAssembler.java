@@ -294,15 +294,35 @@ public class FeaturePlanAssembler {
 			if (scenarioID.isEmpty()) {
 				return scenarioID;
 			}
-			repository.getNodeChildren(scenarioID.orElseThrow()).forEach(scenarioChildID -> {
-				var scenarioChild = repository.getNodeData(scenarioChildID).orElseThrow();
-				if (scenarioChild.name() != null) {
-					scenarioChild.name(substitution.apply(scenarioChild.name()));
-					repository.persistNode(scenarioChild);
-				}
-			});
+			applySubstitution(scenarioID.orElseThrow(), substitution);
 			return scenarioID;
 		}).stream().filter(Optional::isPresent).map(Optional::get).toList();
+	}
+
+
+	private void applySubstitution(UUID nodeID, Function<String,String> substitution) {
+		var node = repository.getNodeData(nodeID).orElseThrow();
+		if (node.name() != null) {
+			node.name(substitution.apply(node.name()));
+		}
+		if (node.description() != null) {
+			node.description(substitution.apply(node.description()));
+		}
+		if (node.document() != null) {
+			node.document(new Document(
+				node.document().mimeType(),
+				substitution.apply(node.document().content())
+			));
+		}
+		if (node.dataTable() != null) {
+			node.dataTable(new org.myjtools.openbbt.core.testplan.DataTable(
+				node.dataTable().values().stream()
+					.map(row -> row.stream().map(substitution).toList())
+					.toList()
+			));
+		}
+		repository.persistNode(node);
+		repository.getNodeChildren(nodeID).forEach(childID -> applySubstitution(childID, substitution));
 	}
 
 

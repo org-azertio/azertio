@@ -7,6 +7,7 @@ import org.myjtools.openbbt.core.*;
 import org.myjtools.openbbt.core.persistence.TestPlanRepository;
 import org.myjtools.openbbt.core.persistence.TestPlanRepositoryWriter;
 import org.myjtools.openbbt.core.contributors.SuiteAssembler;
+import org.myjtools.openbbt.core.testplan.NodeType;
 import org.myjtools.openbbt.core.testplan.TagExpression;
 import org.myjtools.openbbt.core.testplan.TestSuite;
 import java.io.IOException;
@@ -161,7 +162,48 @@ class GherkinSuiteAssemblerTest {
 
 	}
 
+	@Test
+	void testScenarioOutlineSubstitutesPlaceholdersInDocStringsAndDataTables() {
+		AssembledSuite suite = assembleSuiteData("src/test/resources/test-outline-arguments");
+		TestPlanRepository repository = suite.repository();
+
+		var nodes = repository.getNodeDescendants(suite.rootNode()).toList().stream()
+			.map(id -> repository.getNodeData(id).orElseThrow())
+			.toList();
+
+		assertThat(nodes)
+			.filteredOn(node -> node.nodeType() == NodeType.STEP && node.document() != null)
+			.extracting(node -> node.document().content())
+			.containsExactly(
+				"{\n  \"name\": \"Alice\",\n  \"age\": 31\n}",
+				"{\n  \"name\": \"Bob\",\n  \"age\": 42\n}"
+			);
+
+		assertThat(nodes)
+			.filteredOn(node -> node.nodeType() == NodeType.STEP && node.dataTable() != null)
+			.extracting(node -> node.dataTable().values())
+			.containsExactly(
+				java.util.List.of(
+					java.util.List.of("name", "age"),
+					java.util.List.of("Alice", "31")
+				),
+				java.util.List.of(
+					java.util.List.of("name", "age"),
+					java.util.List.of("Bob", "42")
+				)
+			);
+	}
+
 	private String assembleSuite(String path) throws IOException {
+		AssembledSuite suite = assembleSuiteData(path);
+		TestPlanRepository repository = suite.repository();
+		TestPlanRepositoryWriter writer = new TestPlanRepositoryWriter(repository);
+		StringBuilder output = new StringBuilder();
+		writer.write(suite.rootNode(), output::append);
+		return output.toString();
+	}
+
+	private AssembledSuite assembleSuiteData(String path) {
 		OpenBBTRuntime cm = new OpenBBTRuntime(Config.ofMap(Map.of(
 			OpenBBTConfig.ENV_PATH, "target/.openbbt",
 			OpenBBTConfig.RESOURCE_PATH, path,
@@ -170,12 +212,11 @@ class GherkinSuiteAssemblerTest {
 		)));
 		var planAssembler = cm.getExtensions(SuiteAssembler.class).findFirst().orElseThrow();
 		TestSuite testSuite = new TestSuite("Test Suite", "Test Suite", TagExpression.EMPTY);
-		UUID planID = planAssembler.assembleSuite(testSuite).orElseThrow();
+		UUID rootNode = planAssembler.assembleSuite(testSuite).orElseThrow();
 		TestPlanRepository repository = cm.getRepository(TestPlanRepository.class);
-		TestPlanRepositoryWriter writer = new TestPlanRepositoryWriter(repository);
-		StringBuilder output = new StringBuilder();
-		writer.write(planID, output::append);
-		return output.toString();
+		return new AssembledSuite(rootNode, repository);
 	}
+
+	private record AssembledSuite(UUID rootNode, TestPlanRepository repository) {}
 
 }
