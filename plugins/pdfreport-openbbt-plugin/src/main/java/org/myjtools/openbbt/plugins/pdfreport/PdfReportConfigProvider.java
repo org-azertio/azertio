@@ -4,7 +4,7 @@ import org.myjtools.jexten.Extension;
 import org.myjtools.openbbt.core.ConfigAdapter;
 import org.myjtools.openbbt.core.contributors.ConfigProvider;
 
-@Extension
+@Extension(extensionPointVersion = "1.0")
 public class PdfReportConfigProvider extends ConfigAdapter implements ConfigProvider {
 
     @Override
