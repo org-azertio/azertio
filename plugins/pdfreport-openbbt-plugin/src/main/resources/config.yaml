@@ -1,0 +1,32 @@
+pdfreport.outputDir:
+  description: |
+    Directory where generated PDF reports will be written.
+    Relative paths are resolved from the working directory.
+  type: text
+  defaultValue: .openbbt/reports
+
+pdfreport.title:
+  description: |
+    Title displayed in the header of the generated PDF report.
+    Defaults to the project name if not set.
+  type: text
+
+pdfreport.logoPath:
+  description: |
+    Path to an image file (PNG or JPEG) to embed as a logo in the report header.
+    If not set, no logo is displayed.
+  type: text
+
+pdfreport.includePassedSteps:
+  description: |
+    Whether to include the detail of passed steps in the report.
+    When false, only failed and errored steps are shown, producing a more concise report.
+  type: boolean
+  defaultValue: true
+
+pdfreport.includeAttachments:
+  description: |
+    Whether to embed step attachments (response bodies, query results) in the PDF.
+    Large attachments may significantly increase the file size.
+  type: boolean
+  defaultValue: false
