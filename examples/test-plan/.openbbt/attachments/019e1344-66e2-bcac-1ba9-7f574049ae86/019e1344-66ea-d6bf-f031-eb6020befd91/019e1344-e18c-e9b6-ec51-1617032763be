@@ -1,0 +1,59 @@
+org.myjtools.openbbt.core.OpenBBTException: org.jooq.exception.DataAccessException: Cannot acquire connection to jdbc:mysql://mysql-rfam-public.ebi.ac.uk:4497/Rfam
+	at org.myjtools.openbbt.core@1.0.0-alpha1/org.myjtools.openbbt.core.backend.StepProviderBackend.run(StepProviderBackend.java:119)
+	at org.myjtools.openbbt.core@1.0.0-alpha1/org.myjtools.openbbt.core.execution.BackendExecutor.lambda$submitStepExecution$1(BackendExecutor.java:78)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: org.jooq.exception.DataAccessException: Cannot acquire connection to jdbc:mysql://mysql-rfam-public.ebi.ac.uk:4497/Rfam
+	at org.jooq_3.19.18.MYSQL.debug(Unknown Source)
+	at org.myjtools.openbbt.plugins.db@1.0.0-alpha1/org.myjtools.openbbt.plugins.db.jooq.JooqDbEngine$SimpleConnectionProvider.acquire(JooqDbEngine.java:257)
+	at org.jooq@3.19.18/org.jooq.impl.DefaultExecuteContext.connection(DefaultExecuteContext.java:651)
+	at org.jooq@3.19.18/org.jooq.impl.AbstractQuery.connection(AbstractQuery.java:388)
+	at org.jooq@3.19.18/org.jooq.impl.AbstractQuery.execute(AbstractQuery.java:308)
+	at org.jooq@3.19.18/org.jooq.impl.AbstractResultQuery.fetchLazy(AbstractResultQuery.java:301)
+	at org.jooq@3.19.18/org.jooq.impl.AbstractResultQuery.fetchLazyNonAutoClosing(AbstractResultQuery.java:322)
+	at org.jooq@3.19.18/org.jooq.impl.SelectImpl.fetchLazyNonAutoClosing(SelectImpl.java:3256)
+	at org.jooq@3.19.18/org.jooq.impl.ResultQueryTrait.fetchOne(ResultQueryTrait.java:509)
+	at org.jooq@3.19.18/org.jooq.impl.ResultQueryTrait.fetchOne(ResultQueryTrait.java:461)
+	at org.myjtools.openbbt.plugins.db@1.0.0-alpha1/org.myjtools.openbbt.plugins.db.jooq.JooqDbEngine.executeCountQueryFromTable(JooqDbEngine.java:128)
+	at org.myjtools.openbbt.plugins.db@1.0.0-alpha1/org.myjtools.openbbt.plugins.db.DbStepProvider.assertCountSql(DbStepProvider.java:135)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.myjtools.openbbt.core@1.0.0-alpha1/org.myjtools.openbbt.core.backend.StepProviderMethod.run(StepProviderMethod.java:113)
+	at org.myjtools.openbbt.core@1.0.0-alpha1/org.myjtools.openbbt.core.backend.StepProviderBackend.run(StepProviderBackend.java:113)
+	... 5 more
+Caused by: com.mysql.cj.jdbc.exceptions.CommunicationsException: Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+	at mysql.connector.j@9.7.0/com.mysql.cj.jdbc.exceptions.SQLError.createCommunicationsException(SQLError.java:165)
+	at mysql.connector.j@9.7.0/com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:55)
+	at mysql.connector.j@9.7.0/com.mysql.cj.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:840)
+	at mysql.connector.j@9.7.0/com.mysql.cj.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:416)
+	at mysql.connector.j@9.7.0/com.mysql.cj.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:237)
+	at mysql.connector.j@9.7.0/com.mysql.cj.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:180)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:683)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:191)
+	at org.myjtools.openbbt.plugins.db@1.0.0-alpha1/org.myjtools.openbbt.plugins.db.jooq.JooqDbEngine$SimpleConnectionProvider.acquire(JooqDbEngine.java:252)
+	... 19 more
+Caused by: com.mysql.cj.exceptions.CJCommunicationsException: Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+	at java.base/jdk.internal.reflect.DirectConstructorHandleAccessor.newInstance(DirectConstructorHandleAccessor.java:62)
+	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:502)
+	at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:486)
+	at mysql.connector.j@9.7.0/com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:52)
+	at mysql.connector.j@9.7.0/com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:95)
+	at mysql.connector.j@9.7.0/com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:140)
+	at mysql.connector.j@9.7.0/com.mysql.cj.exceptions.ExceptionFactory.createCommunicationsException(ExceptionFactory.java:156)
+	at mysql.connector.j@9.7.0/com.mysql.cj.protocol.a.NativeProtocol.afterHandshake(NativeProtocol.java:435)
+	at mysql.connector.j@9.7.0/com.mysql.cj.protocol.a.NativeProtocol.connect(NativeProtocol.java:1336)
+	at mysql.connector.j@9.7.0/com.mysql.cj.NativeSession.connect(NativeSession.java:155)
+	at mysql.connector.j@9.7.0/com.mysql.cj.jdbc.ConnectionImpl.connectOneTryOnly(ConnectionImpl.java:964)
+	at mysql.connector.j@9.7.0/com.mysql.cj.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:828)
+	... 25 more
+Caused by: java.net.SocketException: Connection attempt exceeded defined timeout.
+	at mysql.connector.j@9.7.0/com.mysql.cj.protocol.StandardSocketFactory.resetLoginTimeCountdown(StandardSocketFactory.java:205)
+	at mysql.connector.j@9.7.0/com.mysql.cj.protocol.StandardSocketFactory.afterHandshake(StandardSocketFactory.java:190)
+	at mysql.connector.j@9.7.0/com.mysql.cj.protocol.a.NativeProtocol.afterHandshake(NativeProtocol.java:433)
+	... 29 more

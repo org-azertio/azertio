@@ -39,12 +39,12 @@ const path = __importStar(require("path"));
 const vscode = __importStar(require("vscode"));
 const testPlanProvider_1 = require("./testPlanProvider");
 // ---------------------------------------------------------------------------
-// openbbt.yaml reader
+// azertio.yaml reader
 // ---------------------------------------------------------------------------
 function readProjectInfo(workspacePath) {
     const defaults = { organization: 'Unknown Organization', projectName: 'Unknown Project' };
     try {
-        const yamlPath = path.join(workspacePath, 'openbbt.yaml');
+        const yamlPath = path.join(workspacePath, 'azertio.yaml');
         const content = fs.readFileSync(yamlPath, 'utf8');
         let inProjectSection = false;
         let organization = defaults.organization;
@@ -94,7 +94,7 @@ class ExecutionItem extends vscode.TreeItem {
         }
         if (kind === 'execution' && execution) {
             this.command = {
-                command: 'openbbt.executions.openDetail',
+                command: 'azertio.executions.openDetail',
                 title: 'Open Execution Detail',
                 arguments: [execution],
             };

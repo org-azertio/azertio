@@ -60,7 +60,7 @@ class AiCompletionProvider {
         this.statusBar = statusBar;
     }
     async provideInlineCompletionItems(document, position, _context, token) {
-        const config = vscode.workspace.getConfiguration('openbbt.ai');
+        const config = vscode.workspace.getConfiguration('azertio.ai');
         if (!config.get('enabled', false)) {
             return;
         }
@@ -83,7 +83,7 @@ class AiCompletionProvider {
             return;
         }
         const modelFamily = config.get('model', '');
-        this.statusBar.text = '$(loading~spin) OpenBBT AI';
+        this.statusBar.text = '$(loading~spin) Azertio AI';
         this.statusBar.show();
         try {
             const completion = await this.callModel(modelFamily, locale, stepsIndex, prefix, token);

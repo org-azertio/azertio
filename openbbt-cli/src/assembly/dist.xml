@@ -9,12 +9,12 @@
 
     <files>
         <file>
-            <source>src/main/scripts/openbbt</source>
+            <source>src/main/scripts/azertio</source>
             <outputDirectory>bin</outputDirectory>
             <fileMode>0755</fileMode>
         </file>
         <file>
-            <source>src/main/scripts/openbbt.bat</source>
+            <source>src/main/scripts/azertio.bat</source>
             <outputDirectory>bin</outputDirectory>
         </file>
     </files>

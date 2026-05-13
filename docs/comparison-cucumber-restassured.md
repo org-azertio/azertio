@@ -1,12 +1,12 @@
-# OpenBBT vs Cucumber + RestAssured — A Detailed Comparison
+# Azertio vs Cucumber + RestAssured — A Detailed Comparison
 
-Cucumber + RestAssured is arguably the most common Java BDD stack for API testing: Cucumber provides the Gherkin layer and test execution, while RestAssured handles HTTP interactions through Java glue code. The combination is powerful but comes with significant ceremony. This document compares it against OpenBBT, focusing on the areas where each approach shines.
+Cucumber + RestAssured is arguably the most common Java BDD stack for API testing: Cucumber provides the Gherkin layer and test execution, while RestAssured handles HTTP interactions through Java glue code. The combination is powerful but comes with significant ceremony. This document compares it against Azertio, focusing on the areas where each approach shines.
 
 ---
 
 ## Quick Overview
 
-| | **OpenBBT** | **Cucumber + RestAssured** |
+| | **Azertio** | **Cucumber + RestAssured** |
 |---|---|---|
 | First release | 2025 | 2008 / 2010 |
 | Language | Java 21 | Java |
@@ -76,9 +76,9 @@ public class PostsStepDefs {
 
 This is code any Java developer can write — but it must be written, tested, and maintained for every project.
 
-### OpenBBT: steps are plugins, not glue code
+### Azertio: steps are plugins, not glue code
 
-In OpenBBT there is no glue code. Steps are provided by plugins — Maven artifacts that are declared in `openbbt.yaml` and downloaded automatically. Feature files call steps by name; the framework resolves them:
+In Azertio there is no glue code. Steps are provided by plugins — Maven artifacts that are declared in `azertio.yaml` and downloaded automatically. Feature files call steps by name; the framework resolves them:
 
 ```gherkin
 When I make a GET request to "posts"
@@ -118,7 +118,7 @@ public class ScenarioContext {
 
 **Step discovery at runtime.** Cucumber scans the classpath for step definitions using reflection. With many modules, getting the scan path right — and keeping it fast — requires explicit configuration.
 
-### In OpenBBT
+### In Azertio
 
 Steps are registered by plugins via the Java module system. There is no scanning, no reflection across the classpath, no ambiguity. Each step has a unique dot-separated ID (e.g. `rest.request.GET`). State between steps is stored in a typed `ExecutionContext` — no maps, no ThreadLocals, no injection framework needed.
 
@@ -144,7 +144,7 @@ Scenario: Create a post and retrieve it
 
 This feature file looks clean, but behind it is a step definition class that implements every one of those steps, including the variable substitution for `{postId}` — typically done with a custom Cucumber parameter type or manual string replacement.
 
-**OpenBBT feature file (identical in structure):**
+**Azertio feature file (identical in structure):**
 ```gherkin
 Scenario: Create a post and retrieve it
   When I make a POST request to "posts" with body:
@@ -187,7 +187,7 @@ public void tableRowCount(String table, int expected) {
 
 A full DB step vocabulary (query execution, table assertions, CSV/Excel fixtures, teardown hooks) takes days to build properly and must be replicated for each project.
 
-### OpenBBT
+### Azertio
 
 The `db` plugin provides a complete, production-ready database step vocabulary:
 
@@ -241,9 +241,9 @@ public void setUp() {
 }
 ```
 
-### OpenBBT
+### Azertio
 
-Configuration is always `openbbt.yaml`, with first-class profile support. No Java code, no Spring, no system property conventions to learn:
+Configuration is always `azertio.yaml`, with first-class profile support. No Java code, no Spring, no system property conventions to learn:
 
 ```yaml
 configuration:
@@ -260,7 +260,7 @@ profiles:
     base-url: https://api.example.com
 ```
 
-Activating a profile: `openbbt run -p staging`. Any team member can read and modify this without knowing Java.
+Activating a profile: `azertio run -p staging`. Any team member can read and modify this without knowing Java.
 
 ---
 
@@ -270,9 +270,9 @@ Activating a profile: `openbbt run -p staging`. Any team member can read and mod
 
 There is no performance testing built into this stack. Teams that need load or benchmark testing add a completely separate tool — JMeter, Gatling, k6 — with its own scripting language, configuration, and CI pipeline. Functional test scenarios cannot be reused as performance scenarios without rewriting them in the target tool's language.
 
-### OpenBBT: benchmark mode in the same feature file
+### Azertio: benchmark mode in the same feature file
 
-OpenBBT integrates benchmark testing directly. The same step used for functional testing can be run in benchmark mode in the same `.feature` file:
+Azertio integrates benchmark testing directly. The same step used for functional testing can be run in benchmark mode in the same `.feature` file:
 
 ```gherkin
 Scenario: Functional — create a post
@@ -310,7 +310,7 @@ Steps are Java classes in the project. Sharing them across projects requires:
 
 This is standard Java library management, but it is non-trivial for teams whose primary skill is testing rather than library publishing.
 
-### OpenBBT
+### Azertio
 
 Custom plugins are Maven artifacts by design. Publishing a plugin and consuming it in another project is the native workflow:
 
@@ -320,7 +320,7 @@ plugins:
   - org.myteam:my-custom-steps-plugin:1.2.0
 ```
 
-The plugin is downloaded from Maven Central (or any configured repository) at `openbbt install` time. The consuming project does not need to add anything to a `pom.xml` — it has no `pom.xml` at all.
+The plugin is downloaded from Maven Central (or any configured repository) at `azertio install` time. The consuming project does not need to add anything to a `pom.xml` — it has no `pom.xml` at all.
 
 ---
 
@@ -330,7 +330,7 @@ The plugin is downloaded from Maven Central (or any configured repository) at `o
 
 IDE support for Cucumber is mature: both IntelliJ and VS Code have plugins that link Gherkin steps to their Java implementations, highlight undefined steps, and run individual scenarios. However, this support is about editing assistance, not test execution management. Browsing past results, inspecting step-level timings, viewing response body attachments, or re-running a specific historical execution requires external tools (Allure, Extent Reports, a CI dashboard).
 
-### OpenBBT
+### Azertio
 
 The VS Code extension provides a complete execution management UI, not just editing assistance:
 
@@ -355,19 +355,19 @@ Tests are run as part of a Maven or Gradle build. This means:
 - Execution history is not stored by default — you get a JUnit XML report that is discarded after the build.
 - Re-running a past execution is not possible without re-running the full build with the same inputs.
 
-### OpenBBT
+### Azertio
 
-OpenBBT is a standalone CLI. Tests do not need a Java project; only an `openbbt.yaml` and `.feature` files are required:
+Azertio is a standalone CLI. Tests do not need a Java project; only an `azertio.yaml` and `.feature` files are required:
 
 ```bash
 # Install plugins (once)
-openbbt install
+azertio install
 
 # Run a suite
-openbbt run -s smoke -p staging
+azertio run -s smoke -p staging
 
 # Re-run a past execution by ID
-openbbt run --rerun <execution-id>
+azertio run --rerun <execution-id>
 ```
 
 Every execution is persisted through a configurable persistence layer with three modes:
@@ -375,7 +375,7 @@ Every execution is persisted through a configurable persistence layer with three
 | Mode | Backend | Use case |
 |---|---|---|
 | `transient` | Temp HSQLDB (deleted on exit) | CI pipelines that only need pass/fail |
-| `file` | HSQLDB file in `.openbbt/` | Developer workstation, browsable in VS Code |
+| `file` | HSQLDB file in `.azertio/` | Developer workstation, browsable in VS Code |
 | `remote` | PostgreSQL + MinIO for attachments | Shared team history across CI and all developers |
 
 In `remote` mode, CI runs write every execution to a shared PostgreSQL database, including the full result tree, step timings, and binary attachments (response bodies, CSV query results). Every developer's VS Code extension connects to the same database and can browse, inspect, and re-run any past CI execution — no Allure server, no ReportPortal, no dashboard configuration required. The raw data is also directly queryable for custom reporting or flakiness analysis.
@@ -392,9 +392,9 @@ There is no built-in mechanism to write an abstract, un-executable specification
 
 Some teams work around this with nested step definitions (a high-level step calls lower-level steps in Java), but this is invisible in the feature file: the stakeholder sees only the high-level step, with no view of what actually executed underneath.
 
-### OpenBBT: definition / implementation
+### Azertio: definition / implementation
 
-OpenBBT has first-class support for a two-level scenario model without any Java code. A **definition** feature (tagged `@definition`) declares abstract, business-readable scenarios identified by `@ID-*` tags. An **implementation** feature (tagged `@implementation`) provides the concrete, executable steps matched by identifier.
+Azertio has first-class support for a two-level scenario model without any Java code. A **definition** feature (tagged `@definition`) declares abstract, business-readable scenarios identified by `@ID-*` tags. An **implementation** feature (tagged `@implementation`) provides the concrete, executable steps matched by identifier.
 
 ```gherkin
 # definition.feature — the business specification
@@ -458,7 +458,7 @@ The result tree shows the business-readable definition structure. Drilling into 
 - You need step-level Java access to internal application components (repositories, services).
 - Your CI pipeline is Maven-centric and you want tests to run as part of the build lifecycle.
 
-### Choose OpenBBT if
+### Choose Azertio if
 
 - You want feature files that non-developers can read, write, and maintain without a developer involved for every new step.
 - You are testing external systems (APIs, databases) from the outside — true black-box testing.
@@ -470,4 +470,4 @@ The result tree shows the business-readable definition structure. Drilling into 
 
 ---
 
-> **Note:** OpenBBT is under active development. Spring context integration and transactional rollback between scenarios — common in Cucumber integration test suites — are not part of OpenBBT's scope by design: OpenBBT is a black-box tool and does not access application internals. For white-box integration testing within a Spring Boot application, Cucumber + RestAssured (or Spring's own `MockMvc` test support) remains the appropriate choice.
+> **Note:** Azertio is under active development. Spring context integration and transactional rollback between scenarios — common in Cucumber integration test suites — are not part of Azertio's scope by design: Azertio is a black-box tool and does not access application internals. For white-box integration testing within a Spring Boot application, Cucumber + RestAssured (or Spring's own `MockMvc` test support) remains the appropriate choice.

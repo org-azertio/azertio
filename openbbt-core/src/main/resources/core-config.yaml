@@ -15,7 +15,7 @@ core.environmentPath:
     description: |
         Path to the environment directory.
     type: text
-    defaultValue: '.openbbt'
+    defaultValue: '.azertio'
 
 core.idTagPattern:
   description: |
@@ -62,12 +62,12 @@ core.persistence.file:
     File path used when `core.persistence.mode` is set to `file`.
     This is the filesystem location of the persistence storage (for example an H2 file or JSON file).
   type: text
-  defaultValue: 'db/openbbt.db'
+  defaultValue: 'db/azertio.db'
 
 core.persistence.db.url:
   description: |
     JDBC URL used when persistence is backed by a relational database (mode `remote`).
-    Example: jdbc:h2:~/openbbt or jdbc:postgresql://db-host:5432/openbbt
+    Example: jdbc:h2:~/azertio or jdbc:postgresql://db-host:5432/azertio
   type: text
 
 core.persistence.db.username:

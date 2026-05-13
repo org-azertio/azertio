@@ -53,7 +53,7 @@ async function openExecutionDetail(context, client, execution, label) {
         existing.reveal(vscode.ViewColumn.One);
         return;
     }
-    const panel = vscode.window.createWebviewPanel('openbbt.executionDetail', `Execution: ${label}`, vscode.ViewColumn.One, { enableScripts: true, retainContextWhenHidden: true });
+    const panel = vscode.window.createWebviewPanel('azertio.executionDetail', `Execution: ${label}`, vscode.ViewColumn.One, { enableScripts: true, retainContextWhenHidden: true });
     openPanels.set(execution.executionId, panel);
     panel.onDidDispose(() => openPanels.delete(execution.executionId));
     panel.webview.html = buildHtml(panel.webview, context.extensionUri);
@@ -83,7 +83,7 @@ async function openExecutionDetail(context, client, execution, label) {
                 panel.webview.postMessage(payload);
             }
             catch (err) {
-                vscode.window.showErrorMessage(`OpenBBT: failed to load execution detail — ${err}`);
+                vscode.window.showErrorMessage(`Azertio: failed to load execution detail — ${err}`);
             }
         }
         else if (msg.type === 'expand') {
@@ -99,7 +99,7 @@ async function openExecutionDetail(context, client, execution, label) {
                 panel.webview.postMessage(payload);
             }
             catch (err) {
-                vscode.window.showErrorMessage(`OpenBBT: failed to load children — ${err}`);
+                vscode.window.showErrorMessage(`Azertio: failed to load children — ${err}`);
             }
         }
         else if (msg.type === 'poll') {
@@ -126,12 +126,12 @@ async function openExecutionDetail(context, client, execution, label) {
             try {
                 const data = await client.getAttachment(msg.executionId, msg.executionNodeId, msg.attachmentId);
                 const ext = contentTypeToExtension(data.contentType);
-                const tmpFile = path.join(os.tmpdir(), `openbbt-attachment-${msg.attachmentId}${ext}`);
+                const tmpFile = path.join(os.tmpdir(), `azertio-attachment-${msg.attachmentId}${ext}`);
                 fs.writeFileSync(tmpFile, Buffer.from(data.data, 'base64'));
                 await vscode.commands.executeCommand('vscode.open', vscode.Uri.file(tmpFile));
             }
             catch (err) {
-                vscode.window.showErrorMessage(`OpenBBT: failed to open attachment — ${err}`);
+                vscode.window.showErrorMessage(`Azertio: failed to open attachment — ${err}`);
             }
         }
     });

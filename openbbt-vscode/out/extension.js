@@ -41,7 +41,7 @@ const child_process_1 = require("child_process");
 const vscode = __importStar(require("vscode"));
 const featureFormatter_1 = require("./featureFormatter");
 const gherkinSymbolProvider_1 = require("./gherkinSymbolProvider");
-const openbbtClient_1 = require("./openbbtClient");
+const azertioClient_1 = require("./azertioClient");
 const executionProvider_1 = require("./executionProvider");
 const executionDetailPanel_1 = require("./executionDetailPanel");
 const testPlanProvider_1 = require("./testPlanProvider");
@@ -52,11 +52,11 @@ let client;
 let serveClient;
 let extensionContext;
 let errorNotificationShowing = false;
-const outputChannel = vscode.window.createOutputChannel('OpenBBT');
+const outputChannel = vscode.window.createOutputChannel('Azertio');
 function logOutput(msg) {
     outputChannel.appendLine(`[${new Date().toISOString()}] ${msg}`);
 }
-const OPENBBT_YAML_SKELETON = `project:
+const AZERTIO_YAML_SKELETON = `project:
   organization: My Organization
   name: My Project
   test-suites:
@@ -73,14 +73,14 @@ configuration:
 
 profiles: {}
 `;
-const EMPTY_YAML_DIAGNOSTIC = 'openbbt.emptyYaml';
-const diagnosticCollection = vscode.languages.createDiagnosticCollection('openbbt');
+const EMPTY_YAML_DIAGNOSTIC = 'azertio.emptyYaml';
+const diagnosticCollection = vscode.languages.createDiagnosticCollection('azertio');
 function updateDiagnostics(document) {
-    if (!document.fileName.endsWith('openbbt.yaml')) {
+    if (!document.fileName.endsWith('azertio.yaml')) {
         return;
     }
     if (document.getText().trim() === '') {
-        const diagnostic = new vscode.Diagnostic(new vscode.Range(0, 0, 0, 0), 'Empty openbbt.yaml. Generate a skeleton to get started.', vscode.DiagnosticSeverity.Hint);
+        const diagnostic = new vscode.Diagnostic(new vscode.Range(0, 0, 0, 0), 'Empty azertio.yaml. Generate a skeleton to get started.', vscode.DiagnosticSeverity.Hint);
         diagnostic.code = EMPTY_YAML_DIAGNOSTIC;
         diagnosticCollection.set(document.uri, [diagnostic]);
     }
@@ -103,8 +103,8 @@ class OpenbbtYamlCodeLensProvider {
         return [
             new vscode.CodeLens(range, {
                 title: '$(cloud-download) Install plugins',
-                command: 'openbbt.installPlugins',
-                tooltip: 'Run openbbt install to download and install plugins',
+                command: 'azertio.installPlugins',
+                tooltip: 'Run azertio install to download and install plugins',
             }),
         ];
     }
@@ -116,9 +116,9 @@ class OpenbbtYamlCodeActionProvider {
         if (!hasDiagnostic) {
             return [];
         }
-        const action = new vscode.CodeAction('Generate OpenBBT skeleton', vscode.CodeActionKind.QuickFix);
+        const action = new vscode.CodeAction('Generate Azertio skeleton', vscode.CodeActionKind.QuickFix);
         action.edit = new vscode.WorkspaceEdit();
-        action.edit.insert(document.uri, new vscode.Position(0, 0), OPENBBT_YAML_SKELETON);
+        action.edit.insert(document.uri, new vscode.Position(0, 0), AZERTIO_YAML_SKELETON);
         action.isPreferred = true;
         return [action];
     }
@@ -133,7 +133,7 @@ async function showConnectionError(message) {
         const retry = 'Retry';
         const choice = await vscode.window.showErrorMessage(message, openSettings, retry);
         if (choice === openSettings) {
-            await vscode.commands.executeCommand('workbench.action.openSettings', 'openbbt.executablePath');
+            await vscode.commands.executeCommand('workbench.action.openSettings', 'azertio.executablePath');
         }
         else if (choice === retry) {
             await startClient();
@@ -167,10 +167,10 @@ async function startClient() {
         }
         client = undefined;
     }
-    const config = vscode.workspace.getConfiguration('openbbt');
-    const executable = config.get('executablePath', 'openbbt');
+    const config = vscode.workspace.getConfiguration('azertio');
+    const executable = config.get('executablePath', 'azertio');
     if (!executableExists(executable)) {
-        showConnectionError(`OpenBBT LSP could not connect to '${executable}'. ` +
+        showConnectionError(`Azertio LSP could not connect to '${executable}'. ` +
             `Make sure the CLI is installed or configure the correct path.`);
         return;
     }
@@ -184,12 +184,12 @@ async function startClient() {
     const clientOptions = {
         documentSelector: [
             { scheme: 'file', language: 'feature' },
-            { scheme: 'file', pattern: '**/openbbt.yaml' },
+            { scheme: 'file', pattern: '**/azertio.yaml' },
         ],
         workspaceFolder,
-        outputChannelName: 'OpenBBT LSP',
+        outputChannelName: 'Azertio LSP',
         initializationFailedHandler: (_error) => {
-            showConnectionError(`OpenBBT LSP could not connect to '${executable}'. ` +
+            showConnectionError(`Azertio LSP could not connect to '${executable}'. ` +
                 `Make sure the CLI is installed or configure the correct path.`);
             return false;
         },
@@ -198,7 +198,7 @@ async function startClient() {
             closed: () => ({ action: node_1.CloseAction.DoNotRestart }),
         },
     };
-    client = new node_1.LanguageClient('openbbt-lsp', 'OpenBBT Language Server', serverOptions, clientOptions);
+    client = new node_1.LanguageClient('azertio-lsp', 'Azertio Language Server', serverOptions, clientOptions);
     await client.start();
     extensionContext.subscriptions.push(client);
 }
@@ -232,20 +232,20 @@ function activate(context) {
     startClient();
     vscode.workspace.textDocuments.forEach(updateDiagnostics);
     const testPlanProvider = new testPlanProvider_1.TestPlanProvider(logOutput);
-    vscode.window.registerTreeDataProvider('openbbt.testPlan', testPlanProvider);
+    vscode.window.registerTreeDataProvider('azertio.testPlan', testPlanProvider);
     const contributorsProvider = new contributorsProvider_1.ContributorsProvider(logOutput);
-    vscode.window.registerTreeDataProvider('openbbt.contributors', contributorsProvider);
+    vscode.window.registerTreeDataProvider('azertio.contributors', contributorsProvider);
     // Auto-populate the tree on startup using existing plan data (no plan re-run).
     const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
     const executionProvider = new executionProvider_1.ExecutionProvider(workspaceFolder?.uri.fsPath);
-    const executionTreeView = vscode.window.createTreeView('openbbt.executions', { treeDataProvider: executionProvider, showCollapseAll: true });
+    const executionTreeView = vscode.window.createTreeView('azertio.executions', { treeDataProvider: executionProvider, showCollapseAll: true });
     context.subscriptions.push(executionTreeView, executionProvider);
     if (workspaceFolder) {
-        const config = vscode.workspace.getConfiguration('openbbt');
-        const executable = config.get('executablePath', 'openbbt');
+        const config = vscode.workspace.getConfiguration('azertio');
+        const executable = config.get('executablePath', 'azertio');
         if (executableExists(executable)) {
             logOutput('[startup] starting serve connection');
-            serveClient = new openbbtClient_1.OpenBBTClient(executable, workspaceFolder.uri.fsPath, logOutput);
+            serveClient = new azertioClient_1.AzertioClient(executable, workspaceFolder.uri.fsPath, logOutput);
             contributorsProvider.setClient(serveClient);
             serveClient.connect();
             testPlanProvider.setClient(serveClient);
@@ -267,28 +267,28 @@ function activate(context) {
     async function doBuildPlan() {
         const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
         if (!workspaceFolder) {
-            vscode.window.showErrorMessage('OpenBBT: no workspace folder open.');
+            vscode.window.showErrorMessage('Azertio: no workspace folder open.');
             return;
         }
-        const config = vscode.workspace.getConfiguration('openbbt');
-        const executable = config.get('executablePath', 'openbbt');
+        const config = vscode.workspace.getConfiguration('azertio');
+        const executable = config.get('executablePath', 'azertio');
         const cwd = workspaceFolder.uri.fsPath;
         if (serveClient) {
             logOutput(`[build] stopping existing serve process`);
             serveClient.shutdown().catch(() => { });
             serveClient = undefined;
         }
-        const planResult = await vscode.window.withProgress({ location: vscode.ProgressLocation.Window, title: 'OpenBBT: building plan…' }, () => runPlan(executable, cwd));
+        const planResult = await vscode.window.withProgress({ location: vscode.ProgressLocation.Window, title: 'Azertio: building plan…' }, () => runPlan(executable, cwd));
         if (!planResult.planId) {
-            vscode.window.showErrorMessage('OpenBBT: plan generation failed. See the OpenBBT output channel for details.');
+            vscode.window.showErrorMessage('Azertio: plan generation failed. See the Azertio output channel for details.');
             outputChannel.show(true);
             return;
         }
         if (planResult.hasValidationErrors) {
-            vscode.window.showWarningMessage('OpenBBT: test plan has validation issues.');
+            vscode.window.showWarningMessage('Azertio: test plan has validation issues.');
         }
         logOutput(`[build] starting new serve connection`);
-        serveClient = new openbbtClient_1.OpenBBTClient(executable, cwd, logOutput);
+        serveClient = new azertioClient_1.AzertioClient(executable, cwd, logOutput);
         contributorsProvider.setClient(serveClient);
         serveClient.connect();
         testPlanProvider.setClient(serveClient);
@@ -297,11 +297,11 @@ function activate(context) {
         testPlanProvider.invalidate();
         executionProvider.refresh();
     }
-    context.subscriptions.push(vscode.commands.registerCommand('openbbt.testPlan.refresh', async () => {
+    context.subscriptions.push(vscode.commands.registerCommand('azertio.testPlan.refresh', async () => {
         await startClient();
         await doBuildPlan();
     }));
-    context.subscriptions.push(vscode.commands.registerCommand('openbbt.openSource', async (source) => {
+    context.subscriptions.push(vscode.commands.registerCommand('azertio.openSource', async (source) => {
         const match = source.match(/^(.*)\[(\d+),(\d+)\]$/);
         if (!match) {
             return;
@@ -321,13 +321,13 @@ function activate(context) {
             selection: new vscode.Range(pos, pos),
         });
     }));
-    context.subscriptions.push(vscode.commands.registerCommand('openbbt.executions.run', async (_item) => {
+    context.subscriptions.push(vscode.commands.registerCommand('azertio.executions.run', async (_item) => {
         if (!serveClient) {
-            vscode.window.showErrorMessage('OpenBBT: serve connection not available.');
+            vscode.window.showErrorMessage('Azertio: serve connection not available.');
             return;
         }
         const suitesInput = await vscode.window.showInputBox({
-            title: 'OpenBBT: Test Suites',
+            title: 'Azertio: Test Suites',
             prompt: 'Enter test suite names separated by commas, or leave blank to run all suites',
             placeHolder: 'e.g. smoke, regression',
         });
@@ -335,7 +335,7 @@ function activate(context) {
             return;
         }
         const profileInput = await vscode.window.showInputBox({
-            title: 'OpenBBT: Profile',
+            title: 'Azertio: Profile',
             prompt: 'Enter the profile name to activate, or leave blank for none',
             placeHolder: 'e.g. staging',
         });
@@ -358,16 +358,16 @@ function activate(context) {
                     await (0, executionDetailPanel_1.openExecutionDetail)(context, serveClient, execItem, label);
                 }
             }
-            vscode.window.showInformationMessage(`OpenBBT: execution ${result.executionId.substring(0, 8)} started`);
+            vscode.window.showInformationMessage(`Azertio: execution ${result.executionId.substring(0, 8)} started`);
         }
         catch (err) {
             const msg = err instanceof Error ? err.message : String(err);
-            vscode.window.showErrorMessage(`OpenBBT: execution failed — ${msg}`);
+            vscode.window.showErrorMessage(`Azertio: execution failed — ${msg}`);
         }
     }));
-    context.subscriptions.push(vscode.commands.registerCommand('openbbt.executions.rerun', async (item) => {
+    context.subscriptions.push(vscode.commands.registerCommand('azertio.executions.rerun', async (item) => {
         if (!serveClient) {
-            vscode.window.showErrorMessage('OpenBBT: serve connection not available.');
+            vscode.window.showErrorMessage('Azertio: serve connection not available.');
             return;
         }
         const executionId = item?.execution?.executionId;
@@ -386,27 +386,27 @@ function activate(context) {
                     await (0, executionDetailPanel_1.openExecutionDetail)(context, serveClient, execItem, label);
                 }
             }
-            vscode.window.showInformationMessage(`OpenBBT: execution ${result.executionId.substring(0, 8)} started`);
+            vscode.window.showInformationMessage(`Azertio: execution ${result.executionId.substring(0, 8)} started`);
         }
         catch (err) {
             const msg = err instanceof Error ? err.message : String(err);
-            vscode.window.showErrorMessage(`OpenBBT: re-run failed — ${msg}`);
+            vscode.window.showErrorMessage(`Azertio: re-run failed — ${msg}`);
         }
     }));
-    context.subscriptions.push(vscode.commands.registerCommand('openbbt.executions.openDetail', async (execution) => {
+    context.subscriptions.push(vscode.commands.registerCommand('azertio.executions.openDetail', async (execution) => {
         if (!serveClient) {
-            vscode.window.showErrorMessage('OpenBBT: serve connection not available.');
+            vscode.window.showErrorMessage('Azertio: serve connection not available.');
             return;
         }
         const label = execution.executedAt ? execution.executedAt.substring(0, 19) : execution.executionId.substring(0, 8);
         await (0, executionDetailPanel_1.openExecutionDetail)(context, serveClient, execution, label);
     }));
-    context.subscriptions.push(vscode.commands.registerCommand('openbbt.contributors.refresh', async () => {
+    context.subscriptions.push(vscode.commands.registerCommand('azertio.contributors.refresh', async () => {
         await contributorsProvider.refresh();
     }));
-    context.subscriptions.push(vscode.commands.registerCommand('openbbt.executions.deleteExecution', async (item) => {
+    context.subscriptions.push(vscode.commands.registerCommand('azertio.executions.deleteExecution', async (item) => {
         if (!serveClient) {
-            vscode.window.showErrorMessage('OpenBBT: serve connection not available.');
+            vscode.window.showErrorMessage('Azertio: serve connection not available.');
             return;
         }
         const executionId = item?.execution?.executionId;
@@ -426,12 +426,12 @@ function activate(context) {
         }
         catch (err) {
             const msg = err instanceof Error ? err.message : String(err);
-            vscode.window.showErrorMessage(`OpenBBT: failed to delete execution — ${msg}`);
+            vscode.window.showErrorMessage(`Azertio: failed to delete execution — ${msg}`);
         }
     }));
-    context.subscriptions.push(vscode.commands.registerCommand('openbbt.executions.pruneEmpty', async () => {
+    context.subscriptions.push(vscode.commands.registerCommand('azertio.executions.pruneEmpty', async () => {
         if (!serveClient) {
-            vscode.window.showErrorMessage('OpenBBT: serve connection not available.');
+            vscode.window.showErrorMessage('Azertio: serve connection not available.');
             return;
         }
         const confirm = await vscode.window.showWarningMessage('Delete all plans with no executions? This cannot be undone.', { modal: true }, 'Delete');
@@ -444,12 +444,12 @@ function activate(context) {
         }
         catch (err) {
             const msg = err instanceof Error ? err.message : String(err);
-            vscode.window.showErrorMessage(`OpenBBT: failed to delete unexecuted plans — ${msg}`);
+            vscode.window.showErrorMessage(`Azertio: failed to delete unexecuted plans — ${msg}`);
         }
     }));
-    context.subscriptions.push(vscode.commands.registerCommand('openbbt.executions.deletePlan', async (item) => {
+    context.subscriptions.push(vscode.commands.registerCommand('azertio.executions.deletePlan', async (item) => {
         if (!serveClient) {
-            vscode.window.showErrorMessage('OpenBBT: serve connection not available.');
+            vscode.window.showErrorMessage('Azertio: serve connection not available.');
             return;
         }
         const planId = item?.planId;
@@ -466,18 +466,18 @@ function activate(context) {
         }
         catch (err) {
             const msg = err instanceof Error ? err.message : String(err);
-            vscode.window.showErrorMessage(`OpenBBT: failed to delete plan — ${msg}`);
+            vscode.window.showErrorMessage(`Azertio: failed to delete plan — ${msg}`);
         }
     }));
-    context.subscriptions.push(vscode.commands.registerCommand('openbbt.showLogs', () => {
+    context.subscriptions.push(vscode.commands.registerCommand('azertio.showLogs', () => {
         outputChannel.show(true);
     }));
-    context.subscriptions.push(vscode.commands.registerCommand('openbbt.installPlugins', async () => {
-        const config = vscode.workspace.getConfiguration('openbbt');
-        const executable = config.get('executablePath', 'openbbt');
+    context.subscriptions.push(vscode.commands.registerCommand('azertio.installPlugins', async () => {
+        const config = vscode.workspace.getConfiguration('azertio');
+        const executable = config.get('executablePath', 'azertio');
         const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
         const cwd = workspaceFolder?.uri.fsPath;
-        const success = await vscode.window.withProgress({ location: vscode.ProgressLocation.Window, title: 'OpenBBT: installing plugins…' }, () => new Promise((resolve) => {
+        const success = await vscode.window.withProgress({ location: vscode.ProgressLocation.Window, title: 'Azertio: installing plugins…' }, () => new Promise((resolve) => {
             logOutput(`[install] running: ${executable} install --clean (cwd=${cwd})`);
             (0, child_process_1.execFile)(executable, ['install', '--clean'], { cwd }, (err, stdout, stderr) => {
                 logOutput(`[install] stdout: ${stdout.trim() || '(empty)'}`);
@@ -489,20 +489,20 @@ function activate(context) {
             });
         }));
         if (!success) {
-            vscode.window.showErrorMessage('OpenBBT: plugin installation failed. See the OpenBBT output channel for details.');
+            vscode.window.showErrorMessage('Azertio: plugin installation failed. See the Azertio output channel for details.');
             outputChannel.show(true);
             return;
         }
         logOutput('[install] restarting LSP after plugin installation');
         await startClient();
-        vscode.window.showInformationMessage('OpenBBT: plugins installed and LSP connection restarted.');
+        vscode.window.showInformationMessage('Azertio: plugins installed and LSP connection restarted.');
     }));
     context.subscriptions.push(vscode.workspace.onDidChangeConfiguration((event) => {
-        if (event.affectsConfiguration('openbbt.executablePath')) {
+        if (event.affectsConfiguration('azertio.executablePath')) {
             startClient();
         }
-    }), vscode.languages.registerCodeLensProvider({ scheme: 'file', pattern: '**/openbbt.yaml' }, new OpenbbtYamlCodeLensProvider()), vscode.languages.registerCodeActionsProvider({ scheme: 'file', pattern: '**/openbbt.yaml' }, new OpenbbtYamlCodeActionProvider(), { providedCodeActionKinds: OpenbbtYamlCodeActionProvider.providedCodeActionKinds }), vscode.workspace.onDidOpenTextDocument(updateDiagnostics), vscode.workspace.onDidChangeTextDocument(e => updateDiagnostics(e.document)), vscode.workspace.onDidCloseTextDocument(doc => diagnosticCollection.delete(doc.uri)), vscode.workspace.onDidSaveTextDocument(doc => {
-        if (doc.fileName.endsWith('openbbt.yaml')) {
+    }), vscode.languages.registerCodeLensProvider({ scheme: 'file', pattern: '**/azertio.yaml' }, new OpenbbtYamlCodeLensProvider()), vscode.languages.registerCodeActionsProvider({ scheme: 'file', pattern: '**/azertio.yaml' }, new OpenbbtYamlCodeActionProvider(), { providedCodeActionKinds: OpenbbtYamlCodeActionProvider.providedCodeActionKinds }), vscode.workspace.onDidOpenTextDocument(updateDiagnostics), vscode.workspace.onDidChangeTextDocument(e => updateDiagnostics(e.document)), vscode.workspace.onDidCloseTextDocument(doc => diagnosticCollection.delete(doc.uri)), vscode.workspace.onDidSaveTextDocument(doc => {
+        if (doc.fileName.endsWith('azertio.yaml')) {
             startClient();
             executionProvider.refresh();
             testPlanProvider.invalidate();
@@ -516,11 +516,11 @@ function activate(context) {
     }));
     const aiStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
     context.subscriptions.push(aiStatusBar);
-    context.subscriptions.push(vscode.languages.registerInlineCompletionItemProvider({ scheme: 'file', language: 'feature' }, new aiCompletionProvider_1.AiCompletionProvider(() => serveClient, aiStatusBar)), vscode.commands.registerCommand('openbbt.ai.toggle', () => {
-        const cfg = vscode.workspace.getConfiguration('openbbt.ai');
+    context.subscriptions.push(vscode.languages.registerInlineCompletionItemProvider({ scheme: 'file', language: 'feature' }, new aiCompletionProvider_1.AiCompletionProvider(() => serveClient, aiStatusBar)), vscode.commands.registerCommand('azertio.ai.toggle', () => {
+        const cfg = vscode.workspace.getConfiguration('azertio.ai');
         const current = cfg.get('enabled', false);
         cfg.update('enabled', !current, vscode.ConfigurationTarget.Global);
-        vscode.window.showInformationMessage(`OpenBBT AI completions ${!current ? 'enabled' : 'disabled'}.`);
+        vscode.window.showInformationMessage(`Azertio AI completions ${!current ? 'enabled' : 'disabled'}.`);
     }));
 }
 function deactivate() {

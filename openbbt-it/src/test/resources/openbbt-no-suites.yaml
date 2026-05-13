@@ -4,7 +4,7 @@ project:
 
 plugins:
   - gherkin
-  - org.myjtools.openbbt.plugins:gherkin-openbbt-plugin
+  - org.azertio.plugins:gherkin-azertio-plugin
 
 configuration:
   gherkin:

@@ -102,10 +102,10 @@ type PendingRequest = {
 };
 
 /**
- * Manages an `openbbt serve` subprocess and communicates with it
+ * Manages an `azertio serve` subprocess and communicates with it
  * via JSON-RPC 2.0 over stdio with Content-Length framing (same as LSP).
  */
-export class OpenBBTClient {
+export class AzertioClient {
 
     private process: ChildProcessWithoutNullStreams | undefined;
     private buffer = Buffer.alloc(0);
@@ -147,7 +147,7 @@ export class OpenBBTClient {
         proc.on('close', (code) => {
             this.log(`[serve] process closed (exit code ${code})`);
             this.process = undefined;
-            this.rejectAll(new Error(`openbbt serve process exited (code ${code})`));
+            this.rejectAll(new Error(`azertio serve process exited (code ${code})`));
         });
         this.process = proc;
         this.onConnected?.();

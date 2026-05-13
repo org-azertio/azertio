@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.OpenBBTClient = void 0;
+exports.AzertioClient = void 0;
 const child_process_1 = require("child_process");
 /**
- * Manages an `openbbt serve` subprocess and communicates with it
+ * Manages an `azertio serve` subprocess and communicates with it
  * via JSON-RPC 2.0 over stdio with Content-Length framing (same as LSP).
  */
-class OpenBBTClient {
+class AzertioClient {
     process;
     buffer = Buffer.alloc(0);
     nextId = 1;
@@ -44,7 +44,7 @@ class OpenBBTClient {
         proc.on('close', (code) => {
             this.log(`[serve] process closed (exit code ${code})`);
             this.process = undefined;
-            this.rejectAll(new Error(`openbbt serve process exited (code ${code})`));
+            this.rejectAll(new Error(`azertio serve process exited (code ${code})`));
         });
         this.process = proc;
         this.onConnected?.();
@@ -208,5 +208,5 @@ class OpenBBTClient {
         this.pending.clear();
     }
 }
-exports.OpenBBTClient = OpenBBTClient;
-//# sourceMappingURL=openbbtClient.js.map
+exports.AzertioClient = AzertioClient;
+//# sourceMappingURL=azertioClient.js.map

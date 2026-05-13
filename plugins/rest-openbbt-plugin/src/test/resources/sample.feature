@@ -1,6 +1,6 @@
 # language: en
 Feature:
-  Example feature file for testing the REST OpenBBT plugin.
+  Example feature file for testing the REST Azertio plugin.
 
 Scenario: Perform a sample API call
   When I make a GET request to "/sample-endpoint"

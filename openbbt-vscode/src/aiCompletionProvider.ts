@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { OpenBBTClient } from './openbbtClient';
+import { AzertioClient } from './azertioClient';
 
 const STEP_PREFIXES = [
     'given ', 'when ', 'then ', 'and ', 'but ', '* ',
@@ -22,7 +22,7 @@ function isOnStepLine(lineText: string): boolean {
 export class AiCompletionProvider implements vscode.InlineCompletionItemProvider {
 
     constructor(
-        private readonly getClient: () => OpenBBTClient | undefined,
+        private readonly getClient: () => AzertioClient | undefined,
         private readonly statusBar: vscode.StatusBarItem
     ) {}
 
@@ -32,7 +32,7 @@ export class AiCompletionProvider implements vscode.InlineCompletionItemProvider
         _context: vscode.InlineCompletionContext,
         token: vscode.CancellationToken
     ): Promise<vscode.InlineCompletionList | undefined> {
-        const config = vscode.workspace.getConfiguration('openbbt.ai');
+        const config = vscode.workspace.getConfiguration('azertio.ai');
         if (!config.get<boolean>('enabled', false)) { return; }
 
         if (!isOnStepLine(document.lineAt(position.line).text)) { return; }
@@ -54,7 +54,7 @@ export class AiCompletionProvider implements vscode.InlineCompletionItemProvider
 
         const modelFamily = config.get<string>('model', '');
 
-        this.statusBar.text = '$(loading~spin) OpenBBT AI';
+        this.statusBar.text = '$(loading~spin) Azertio AI';
         this.statusBar.show();
         try {
             const completion = await this.callModel(modelFamily, locale, stepsIndex, prefix, token);

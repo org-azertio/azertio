@@ -3,7 +3,7 @@ pdfreport.outputDir:
     Directory where generated PDF reports will be written.
     Relative paths are resolved from the working directory.
   type: text
-  defaultValue: .openbbt/reports
+  defaultValue: .azertio/reports
 
 pdfreport.title:
   description: |

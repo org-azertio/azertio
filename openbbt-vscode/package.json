@@ -1,7 +1,7 @@
 {
-  "name": "openbbt",
-  "displayName": "OpenBBT",
-  "description": "Language support for OpenBBT feature files",
+  "name": "azertio",
+  "displayName": "Azertio",
+  "description": "Language support for Azertio feature files",
   "version": "1.0.0-alpha1",
   "publisher": "myjtools.org",
   "engines": {
@@ -9,9 +9,9 @@
   },
   "categories": ["Testing"],
   "activationEvents": [
-    "workspaceContains:openbbt.yaml"
+    "workspaceContains:azertio.yaml"
   ],
-  "icon": "./resources/openbbt-icon.svg",
+  "icon": "./resources/azertio-icon.svg",
   "main": "./out/extension.js",
   "contributes": {
     "languages": [
@@ -24,87 +24,87 @@
       },
       {
         "id": "yaml",
-        "filenames": ["openbbt.yaml"]
+        "filenames": ["azertio.yaml"]
       }
     ],
     "commands": [
       {
-        "command": "openbbt.installPlugins",
-        "title": "OpenBBT: Install plugins",
+        "command": "azertio.installPlugins",
+        "title": "Azertio: Install plugins",
         "icon": "$(cloud-download)"
       },
       {
-        "command": "openbbt.testPlan.refresh",
-        "title": "OpenBBT: Refresh",
+        "command": "azertio.testPlan.refresh",
+        "title": "Azertio: Refresh",
         "icon": "$(refresh)"
       },
       {
-        "command": "openbbt.openSource",
-        "title": "OpenBBT: Open Source Location"
+        "command": "azertio.openSource",
+        "title": "Azertio: Open Source Location"
       },
       {
-        "command": "openbbt.executions.run",
-        "title": "OpenBBT: Run",
+        "command": "azertio.executions.run",
+        "title": "Azertio: Run",
         "icon": "$(run-all)"
       },
       {
-        "command": "openbbt.executions.rerun",
-        "title": "OpenBBT: Re-run",
+        "command": "azertio.executions.rerun",
+        "title": "Azertio: Re-run",
         "icon": "$(run-all)"
       },
       {
-        "command": "openbbt.executions.deleteExecution",
-        "title": "OpenBBT: Delete Execution",
+        "command": "azertio.executions.deleteExecution",
+        "title": "Azertio: Delete Execution",
         "icon": "$(trash)"
       },
       {
-        "command": "openbbt.executions.deletePlan",
-        "title": "OpenBBT: Delete Plan",
+        "command": "azertio.executions.deletePlan",
+        "title": "Azertio: Delete Plan",
         "icon": "$(trash)"
       },
       {
-        "command": "openbbt.executions.pruneEmpty",
-        "title": "OpenBBT: Delete Plans Without Executions",
+        "command": "azertio.executions.pruneEmpty",
+        "title": "Azertio: Delete Plans Without Executions",
         "icon": "$(clear-all)"
       },
       {
-        "command": "openbbt.contributors.refresh",
-        "title": "OpenBBT: Refresh Contributors",
+        "command": "azertio.contributors.refresh",
+        "title": "Azertio: Refresh Contributors",
         "icon": "$(refresh)"
       },
       {
-        "command": "openbbt.showLogs",
-        "title": "OpenBBT: Show Logs",
+        "command": "azertio.showLogs",
+        "title": "Azertio: Show Logs",
         "icon": "$(output)"
       },
       {
-        "command": "openbbt.ai.toggle",
-        "title": "OpenBBT: Toggle AI Completions"
+        "command": "azertio.ai.toggle",
+        "title": "Azertio: Toggle AI Completions"
       }
     ],
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "openbbt",
-          "title": "OpenBBT",
-          "icon": "./resources/openbbt-activity.svg"
+          "id": "azertio",
+          "title": "Azertio",
+          "icon": "./resources/azertio-activity.svg"
         }
       ]
     },
     "views": {
-      "openbbt": [
+      "azertio": [
         {
-          "id": "openbbt.testPlan",
+          "id": "azertio.testPlan",
           "name": "Test Plan",
           "icon": "$(list-tree)"
         },
         {
-          "id": "openbbt.executions",
+          "id": "azertio.executions",
           "name": "Executions",
           "icon": "$(run-all)"
         },
         {
-          "id": "openbbt.contributors",
+          "id": "azertio.contributors",
           "name": "Contributors",
           "icon": "$(extensions)"
         }
@@ -113,40 +113,40 @@
     "menus": {
       "view/title": [
         {
-          "command": "openbbt.executions.pruneEmpty",
-          "when": "view == openbbt.executions",
+          "command": "azertio.executions.pruneEmpty",
+          "when": "view == azertio.executions",
           "group": "navigation"
         },
         {
-          "command": "openbbt.executions.run",
-          "when": "view == openbbt.testPlan",
+          "command": "azertio.executions.run",
+          "when": "view == azertio.testPlan",
           "group": "navigation"
         },
         {
-          "command": "openbbt.testPlan.refresh",
-          "when": "view == openbbt.testPlan",
+          "command": "azertio.testPlan.refresh",
+          "when": "view == azertio.testPlan",
           "group": "navigation"
         },
         {
-          "command": "openbbt.contributors.refresh",
-          "when": "view == openbbt.contributors",
+          "command": "azertio.contributors.refresh",
+          "when": "view == azertio.contributors",
           "group": "navigation"
         }
       ],
       "view/item/context": [
         {
-          "command": "openbbt.executions.rerun",
-          "when": "view == openbbt.executions && viewItem == execution",
+          "command": "azertio.executions.rerun",
+          "when": "view == azertio.executions && viewItem == execution",
           "group": "inline@1"
         },
         {
-          "command": "openbbt.executions.deleteExecution",
-          "when": "view == openbbt.executions && viewItem == execution",
+          "command": "azertio.executions.deleteExecution",
+          "when": "view == azertio.executions && viewItem == execution",
           "group": "inline@2"
         },
         {
-          "command": "openbbt.executions.deletePlan",
-          "when": "view == openbbt.executions && viewItem == plan",
+          "command": "azertio.executions.deletePlan",
+          "when": "view == azertio.executions && viewItem == plan",
           "group": "inline"
         }
       ]
@@ -169,19 +169,19 @@
       }
     ],
     "configuration": {
-      "title": "OpenBBT",
+      "title": "Azertio",
       "properties": {
-        "openbbt.executablePath": {
+        "azertio.executablePath": {
           "type": "string",
-          "default": "openbbt",
-          "description": "Path to the openbbt CLI executable. Defaults to 'openbbt' (must be on PATH)."
+          "default": "azertio",
+          "description": "Path to the azertio CLI executable. Defaults to 'azertio' (must be on PATH)."
         },
-        "openbbt.ai.enabled": {
+        "azertio.ai.enabled": {
           "type": "boolean",
           "default": false,
           "description": "Enable AI-powered inline step completions in .feature files. Requires a language model provider (e.g. GitHub Copilot)."
         },
-        "openbbt.ai.model": {
+        "azertio.ai.model": {
           "type": "string",
           "default": "",
           "description": "Language model family to use (e.g. 'gpt-4o', 'claude-sonnet-4-5'). Leave empty to use the first available model."

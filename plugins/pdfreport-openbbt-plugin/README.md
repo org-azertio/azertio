@@ -1,6 +1,6 @@
-# pdfreport-openbbt-plugin
+# pdfreport-azertio-plugin
 
-An OpenBBT plugin that generates paginated PDF test reports after each execution.
+An Azertio plugin that generates paginated PDF test reports after each execution.
 
 ## Report structure
 
@@ -29,7 +29,7 @@ All keys are prefixed with `pdfreport.`.
 
 | Key | Default | Description |
 |-----|---------|-------------|
-| `outputDir` | `.openbbt/reports` | Directory where PDF files are written. Relative paths are resolved from the working directory. |
+| `outputDir` | `.azertio/reports` | Directory where PDF files are written. Relative paths are resolved from the working directory. |
 | `outputFile` | `%Y%m%d-%h%M%s.pdf` | Filename pattern. Supports the tokens below, relative to `outputDir`. |
 
 **Filename tokens**

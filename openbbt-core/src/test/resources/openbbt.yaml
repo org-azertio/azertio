@@ -11,8 +11,8 @@ project:
 
 plugins:
   - gherkin
-  - org.myjtools.openbbt.plugins:gherkin-openbbt-plugin
-  - org.myjtools.openbbt.plugins:gherkin-openbbt-plugin:1.0.0
+  - org.azertio.plugins:gherkin-azertio-plugin
+  - org.azertio.plugins:gherkin-azertio-plugin:1.0.0
 
 configuration:
   gherkin:

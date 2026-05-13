@@ -1,8 +1,8 @@
-# Gherkin OpenBBT Plugin
+# Gherkin Azertio Plugin
 
-A plugin for [OpenBBT](https://github.com/myjtools/openbbt) that enables writing test plans
+A plugin for [Azertio](https://github.com/myjtools/azertio) that enables writing test plans
 using [Gherkin](https://cucumber.io/docs/gherkin/) syntax. It parses `.feature` files and
-transforms them into the PlanNode tree structure that the OpenBBT engine uses to organise and
+transforms them into the PlanNode tree structure that the Azertio engine uses to organise and
 execute tests.
 
 ## How It Works
@@ -136,7 +136,7 @@ This is used internally (e.g. `gherkin.step-map`) and can be leveraged for custo
 ## Module Structure
 
 ```
-src/main/java/org/myjtools/openbbt/plugins/gherkin/
+src/main/java/org/azertio/plugins/gherkin/
 ├── GherkinConstants.java       — Property keys/values for Gherkin node types
 ├── GherkinConfig.java          — ConfigProvider loading gherkin-config.yaml
 ├── GherkinSuiteAssembler.java  — SuiteAssembler entry point (SPI)

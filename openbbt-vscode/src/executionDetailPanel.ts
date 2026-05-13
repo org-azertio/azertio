@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { AttachmentMeta, ExecNodeInfo, ExecutionListItem, NodeInfo, OpenBBTClient } from './openbbtClient';
+import { AttachmentMeta, ExecNodeInfo, ExecutionListItem, NodeInfo, AzertioClient } from './azertioClient';
 
 // ---------------------------------------------------------------------------
 // Messages between extension host and webview
@@ -70,7 +70,7 @@ function formatDate(iso: string): string {
 
 export async function openExecutionDetail(
     context: vscode.ExtensionContext,
-    client: OpenBBTClient,
+    client: AzertioClient,
     execution: ExecutionListItem,
     label: string
 ): Promise<void> {
@@ -81,7 +81,7 @@ export async function openExecutionDetail(
     }
 
     const panel = vscode.window.createWebviewPanel(
-        'openbbt.executionDetail',
+        'azertio.executionDetail',
         `Execution: ${label}`,
         vscode.ViewColumn.One,
         { enableScripts: true, retainContextWhenHidden: true }
@@ -117,7 +117,7 @@ export async function openExecutionDetail(
                 const payload: ToWebview = { type: 'init', node, header };
                 panel.webview.postMessage(payload);
             } catch (err) {
-                vscode.window.showErrorMessage(`OpenBBT: failed to load execution detail — ${err}`);
+                vscode.window.showErrorMessage(`Azertio: failed to load execution detail — ${err}`);
             }
         } else if (msg.type === 'expand') {
             try {
@@ -133,7 +133,7 @@ export async function openExecutionDetail(
                 const payload: ToWebview = { type: 'children', msgId: msg.msgId, nodes: children, attachments };
                 panel.webview.postMessage(payload);
             } catch (err) {
-                vscode.window.showErrorMessage(`OpenBBT: failed to load children — ${err}`);
+                vscode.window.showErrorMessage(`Azertio: failed to load children — ${err}`);
             }
         } else if (msg.type === 'poll') {
             try {
@@ -159,18 +159,18 @@ export async function openExecutionDetail(
             try {
                 const data = await client.getAttachment(msg.executionId, msg.executionNodeId, msg.attachmentId);
                 const ext = contentTypeToExtension(data.contentType);
-                const tmpFile = path.join(os.tmpdir(), `openbbt-attachment-${msg.attachmentId}${ext}`);
+                const tmpFile = path.join(os.tmpdir(), `azertio-attachment-${msg.attachmentId}${ext}`);
                 fs.writeFileSync(tmpFile, Buffer.from(data.data, 'base64'));
                 await vscode.commands.executeCommand('vscode.open', vscode.Uri.file(tmpFile));
             } catch (err) {
-                vscode.window.showErrorMessage(`OpenBBT: failed to open attachment — ${err}`);
+                vscode.window.showErrorMessage(`Azertio: failed to open attachment — ${err}`);
             }
         }
     });
 }
 
 
-async function resolvePlanNodeRoot(client: OpenBBTClient, execution: ExecutionListItem): Promise<string> {
+async function resolvePlanNodeRoot(client: AzertioClient, execution: ExecutionListItem): Promise<string> {
     if (execution.planNodeRoot) {
         return execution.planNodeRoot;
     }

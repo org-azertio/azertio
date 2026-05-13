@@ -6,7 +6,7 @@
         </encoder>
     </appender>
 
-    <logger name="org.myjtools.openbbt" level="DEBUG"/>
+    <logger name="org.azertio" level="DEBUG"/>
 
     <root level="OFF">
         <appender-ref ref="CONSOLE"/>

@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { ContributorTypeInfo, OpenBBTClient, PluginContributors } from './openbbtClient';
+import { ContributorTypeInfo, AzertioClient, PluginContributors } from './azertioClient';
 
 export class PluginItem extends vscode.TreeItem {
     constructor(
@@ -42,12 +42,12 @@ export class ContributorsProvider implements vscode.TreeDataProvider<TreeItem> {
     private readonly _onDidChangeTreeData = new vscode.EventEmitter<TreeItem | undefined | void>();
     readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
 
-    private client: OpenBBTClient | undefined;
+    private client: AzertioClient | undefined;
     private plugins: PluginContributors[] = [];
 
     constructor(private readonly log: (msg: string) => void = () => {}) {}
 
-    setClient(client: OpenBBTClient): void {
+    setClient(client: AzertioClient): void {
         this.client = client;
         client.onConnected = () => this.refresh();
     }

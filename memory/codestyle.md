@@ -1,4 +1,4 @@
-# OpenBBT Java Code Style Guide
+# Azertio Java Code Style Guide
 
 ## Formatting
 - **Indentation**: 4 spaces (no tabs)
@@ -26,14 +26,14 @@
 Use the custom `Log` wrapper, not `LoggerFactory` directly:
 ```java
 private static final Log log = Log.of();            // default category
-private static final Log log = Log.of("rest");      // subcategory → org.myjtools.openbbt.rest
+private static final Log log = Log.of("rest");      // subcategory → org.azertio.rest
 log.warn("No factory found for {}", type.getSimpleName());
 ```
 
 ## Exceptions
-Custom base: `OpenBBTException extends RuntimeException` with `{}` placeholder formatting:
+Custom base: `AzertioException extends RuntimeException` with `{}` placeholder formatting:
 ```java
-throw new OpenBBTException("Node {} not found in plan {}", nodeId, planId);
+throw new AzertioException("Node {} not found in plan {}", nodeId, planId);
 ```
 - Prefer unchecked exceptions
 - `@Serial private static final long serialVersionUID = 1L;` in serializable exceptions
@@ -83,13 +83,13 @@ provides ConfigProvider with RestConfigProvider;
 
 ## JPMS Module Structure
 ```java
-module org.myjtools.openbbt.mymodule {
-    requires org.myjtools.openbbt.core;
+module org.azertio.mymodule {
+    requires org.azertio.core;
     requires org.myjtools.jexten;
     requires static lombok;               // optional deps = static
 
-    exports org.myjtools.openbbt.mymodule;
-    opens org.myjtools.openbbt.mymodule to org.myjtools.jexten;  // for reflection
+    exports org.azertio.mymodule;
+    opens org.azertio.mymodule to org.myjtools.jexten;  // for reflection
 
     uses SomeExtensionPoint;
     provides SomeExtensionPoint with MyImpl;
@@ -98,7 +98,7 @@ module org.myjtools.openbbt.mymodule {
 
 ## Package Structure
 ```
-org.myjtools.openbbt.<module>
+org.azertio.<module>
 ├── (root)         — public API classes
 ├── .contributors  — extension points / SPI interfaces
 ├── .backend       — execution/engine internals

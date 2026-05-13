@@ -35,7 +35,7 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TestPlanProvider = exports.TestPlanItem = exports.ISSUE_URI_SCHEME = void 0;
 const vscode = __importStar(require("vscode"));
-exports.ISSUE_URI_SCHEME = 'openbbt-node-issue';
+exports.ISSUE_URI_SCHEME = 'azertio-node-issue';
 class TestPlanItem extends vscode.TreeItem {
     nodeId;
     nodeType;
@@ -53,7 +53,7 @@ class TestPlanItem extends vscode.TreeItem {
         }
         if (source) {
             this.command = {
-                command: 'openbbt.openSource',
+                command: 'azertio.openSource',
                 title: 'Open Source Location',
                 arguments: [source],
             };
@@ -90,7 +90,7 @@ class TestPlanProvider {
         this.client = client;
     }
     /**
-     * Called after `openbbt plan` has run and the serve process is ready.
+     * Called after `azertio plan` has run and the serve process is ready.
      * Increments the refresh serial so all tree item IDs change, forcing
      * VSCode to discard its expansion memory and show a clean tree.
      */
@@ -115,7 +115,7 @@ class TestPlanProvider {
             return children.map(n => this.nodeToItem(n));
         }
         catch (err) {
-            vscode.window.showErrorMessage(`OpenBBT: failed to load children — ${err}`);
+            vscode.window.showErrorMessage(`Azertio: failed to load children — ${err}`);
             return [];
         }
     }
@@ -152,7 +152,7 @@ class TestPlanProvider {
         }
         catch (err) {
             this.log(`[tree] fetchRoots error: ${err}`);
-            vscode.window.showErrorMessage(`OpenBBT: failed to load test plan — ${err}`);
+            vscode.window.showErrorMessage(`Azertio: failed to load test plan — ${err}`);
             this.rootItems = [];
             return [];
         }

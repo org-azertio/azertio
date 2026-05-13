@@ -7,5 +7,5 @@ set "APP_HOME=%BIN_DIR%.."
 java ^
   --module-path "%APP_HOME%\lib" ^
   --add-modules ALL-MODULE-PATH ^
-  --module org.myjtools.openbbt.cli/org.myjtools.openbbt.cli.MainCommand ^
+  --module org.azertio.cli/org.azertio.cli.MainCommand ^
   %*

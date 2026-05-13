@@ -1,17 +1,17 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { ExecutionListItem, OpenBBTClient, PlanListItem } from './openbbtClient';
+import { ExecutionListItem, AzertioClient, PlanListItem } from './azertioClient';
 import { ISSUE_URI_SCHEME } from './testPlanProvider';
 
 // ---------------------------------------------------------------------------
-// openbbt.yaml reader
+// azertio.yaml reader
 // ---------------------------------------------------------------------------
 
 function readProjectInfo(workspacePath: string): { organization: string; projectName: string } {
     const defaults = { organization: 'Unknown Organization', projectName: 'Unknown Project' };
     try {
-        const yamlPath = path.join(workspacePath, 'openbbt.yaml');
+        const yamlPath = path.join(workspacePath, 'azertio.yaml');
         const content = fs.readFileSync(yamlPath, 'utf8');
         let inProjectSection = false;
         let organization = defaults.organization;
@@ -65,7 +65,7 @@ export class ExecutionItem extends vscode.TreeItem {
         }
         if (kind === 'execution' && execution) {
             this.command = {
-                command: 'openbbt.executions.openDetail',
+                command: 'azertio.executions.openDetail',
                 title: 'Open Execution Detail',
                 arguments: [execution],
             };
@@ -109,7 +109,7 @@ export class ExecutionProvider implements vscode.TreeDataProvider<ExecutionItem>
     private readonly _onDidChangeTreeData = new vscode.EventEmitter<ExecutionItem | undefined | void>();
     readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
 
-    private client: OpenBBTClient | undefined;
+    private client: AzertioClient | undefined;
     private _expandOnNextLoad = false;
 
     /** executionIds currently being polled */
@@ -120,7 +120,7 @@ export class ExecutionProvider implements vscode.TreeDataProvider<ExecutionItem>
 
     constructor(private readonly workspacePath: string | undefined) {}
 
-    setClient(client: OpenBBTClient): void {
+    setClient(client: AzertioClient): void {
         this.client = client;
     }
 

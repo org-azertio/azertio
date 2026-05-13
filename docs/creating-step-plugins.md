@@ -1,6 +1,6 @@
-# Creating Step Plugins for OpenBBT
+# Creating Step Plugins for Azertio
 
-This guide explains how to build a step plugin for OpenBBT — a self-contained module that contributes new test steps to the framework. The `rest-openbbt-plugin` is used as the reference example throughout.
+This guide explains how to build a step plugin for Azertio — a self-contained module that contributes new test steps to the framework. The `rest-azertio-plugin` is used as the reference example throughout.
 
 ---
 
@@ -14,7 +14,7 @@ A step plugin consists of up to three contributors, each registered via the Java
 | Config provider | `ConfigProvider` | Declares configuration keys |
 | Message provider | `MessageProvider` | Maps step IDs to natural-language expressions |
 
-All three are discovered automatically by OpenBBT through the `jexten` extension framework.
+All three are discovered automatically by Azertio through the `jexten` extension framework.
 
 ---
 
@@ -22,24 +22,24 @@ All three are discovered automatically by OpenBBT through the `jexten` extension
 
 ### Maven POM
 
-Inherit from `openbbt-plugin-starter` to get the compiler annotation processor, the jexten bundle assembler, and the doc generation plugin pre-configured:
+Inherit from `azertio-plugin-starter` to get the compiler annotation processor, the jexten bundle assembler, and the doc generation plugin pre-configured:
 
 ```xml
 <parent>
-    <groupId>org.myjtools.openbbt</groupId>
-    <artifactId>openbbt-plugin-starter</artifactId>
+    <groupId>org.azertio</groupId>
+    <artifactId>azertio-plugin-starter</artifactId>
     <version>1.0.0-alpha1</version>
 </parent>
 
-<groupId>org.myjtools.openbbt.plugins</groupId>
-<artifactId>my-openbbt-plugin</artifactId>
+<groupId>org.azertio.plugins</groupId>
+<artifactId>my-azertio-plugin</artifactId>
 <version>1.0.0-alpha1</version>
 ```
 
 The starter POM automatically:
 - Runs the `jexten-processor` annotation processor to generate the extension manifest
-- Runs `jexten-maven-plugin` to assemble the plugin bundle (excluding `openbbt-core`, which is provided by the host)
-- Runs `openbbt-docgen-maven-plugin` to generate step and config reference docs from YAML
+- Runs `jexten-maven-plugin` to assemble the plugin bundle (excluding `azertio-core`, which is provided by the host)
+- Runs `azertio-docgen-maven-plugin` to generate step and config reference docs from YAML
 
 ### module-info.java
 
@@ -50,18 +50,18 @@ import com.example.MyConfigProvider;
 import com.example.MyMessageProvider;
 import com.example.MyStepProvider;
 
-module org.myjtools.openbbt.plugins.my {
+module org.azertio.plugins.my {
 
     requires org.myjtools.jexten;
-    requires org.myjtools.openbbt.core;
+    requires org.azertio.core;
     requires org.myjtools.imconfig;
 
-    provides org.myjtools.openbbt.core.contributors.StepProvider  with MyStepProvider;
-    provides org.myjtools.openbbt.core.contributors.ConfigProvider with MyConfigProvider;
-    provides org.myjtools.openbbt.core.messages.MessageProvider    with MyMessageProvider;
+    provides org.azertio.core.contributors.StepProvider  with MyStepProvider;
+    provides org.azertio.core.contributors.ConfigProvider with MyConfigProvider;
+    provides org.azertio.core.messages.MessageProvider    with MyMessageProvider;
 
-    exports org.myjtools.openbbt.plugins.my;
-    opens   org.myjtools.openbbt.plugins.my to org.myjtools.jexten;
+    exports org.azertio.plugins.my;
+    opens   org.azertio.plugins.my to org.myjtools.jexten;
 }
 ```
 
@@ -115,7 +115,7 @@ public class MyStepProvider implements StepProvider {
 | `value` | A dot-separated ID that uniquely identifies this step across all plugins (e.g. `rest.request.GET`) |
 | `args` | Inline parameter declarations: `"name:type"`. Recognized types include `text`, `id`, `integer` |
 
-Steps can accept the following special parameter types that OpenBBT resolves automatically:
+Steps can accept the following special parameter types that Azertio resolves automatically:
 
 | Parameter type | Java type | Description |
 |---|---|---|
@@ -236,7 +236,7 @@ public class MyMessageProvider extends StepDocMessageAdapter implements MessageP
 
 ### steps.yaml — canonical step doc
 
-This file documents each step and is consumed by the `openbbt-docgen-maven-plugin` to generate Markdown reference docs. It is also the source of truth for parameter metadata:
+This file documents each step and is consumed by the `azertio-docgen-maven-plugin` to generate Markdown reference docs. It is also the source of truth for parameter metadata:
 
 ```yaml
 'my.step.doSomething':
@@ -269,7 +269,7 @@ Language files map each step ID to the expression that test authors write:
 
 Parameter placeholders in expressions use `{name:type}` syntax. For assertion parameters use `{{integer-assertion}}` or `{{text-assertion}}`.
 
-Multiple language files can be provided; OpenBBT selects the file matching the language configured for the test suite.
+Multiple language files can be provided; Azertio selects the file matching the language configured for the test suite.
 
 ---
 
@@ -285,9 +285,9 @@ Without `@StatisticsProvider`, the framework rejects the step at runtime when be
 ### Implementation
 
 ```java
-import org.myjtools.openbbt.core.backend.Benchmark;
-import org.myjtools.openbbt.core.backend.ExecutionContext;
-import org.myjtools.openbbt.core.contributors.StatisticsProvider;
+import org.azertio.core.backend.Benchmark;
+import org.azertio.core.backend.ExecutionContext;
+import org.azertio.core.contributors.StatisticsProvider;
 
 @StatisticsProvider
 @StepExpression(value = "my.step.measure", args = {"endpoint:text"})
@@ -351,10 +351,10 @@ ExecutionContext.current().setVariable("userId", value);
 
 ## Testing
 
-Use `OpenBBTExtension` with JUnit 5 to run full end-to-end tests against real feature files. WireMock is the recommended tool for mocking HTTP endpoints in REST plugin tests.
+Use `AzertioExtension` with JUnit 5 to run full end-to-end tests against real feature files. WireMock is the recommended tool for mocking HTTP endpoints in REST plugin tests.
 
 ```java
-@ExtendWith(OpenBBTExtension.class)
+@ExtendWith(AzertioExtension.class)
 class TestMySteps {
 
     @RegisterExtension
@@ -372,7 +372,7 @@ class TestMySteps {
 
     @Test
     @FeatureDir("get-200")          // loads feature files from src/test/resources/get-200/
-    void get200_passes(JUnitOpenBBTPlan plan) {
+    void get200_passes(JUnitAzertioPlan plan) {
         plan.withConfig("my.baseURL", "http://localhost:" + wireMock.getPort())
             .execute()
             .assertAllPassed();
@@ -391,8 +391,8 @@ The test module needs access to WireMock (which is non-modular). Add `--add-read
 ## File Layout Summary
 
 ```
-my-openbbt-plugin/
-├── pom.xml                                    (inherits openbbt-plugin-starter)
+my-azertio-plugin/
+├── pom.xml                                    (inherits azertio-plugin-starter)
 └── src/
     ├── main/
     │   ├── java/
