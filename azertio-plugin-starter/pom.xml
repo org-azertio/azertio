@@ -57,24 +57,6 @@
                 <version>${project.version}</version>
                 <executions>
                     <execution>
-                        <id>generate-step-docs</id>
-                        <goals><goal>generate</goal></goals>
-                        <configuration>
-                            <inputFile>${azertio.docgen.stepDocFile}</inputFile>
-                            <outputDirectory>${azertio.docgen.outputDirectory}</outputDirectory>
-                            <title>${azertio.docgen.stepTitle}</title>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>generate-config-docs</id>
-                        <goals><goal>generate-config</goal></goals>
-                        <configuration>
-                            <inputFile>${azertio.docgen.configFile}</inputFile>
-                            <outputDirectory>${azertio.docgen.outputDirectory}</outputDirectory>
-                            <title>${azertio.docgen.configTitle}</title>
-                        </configuration>
-                    </execution>
-                    <execution>
                         <id>generate-step-index</id>
                         <goals><goal>generate-step-index</goal></goals>
                         <configuration>
@@ -103,5 +85,40 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>generate-doc</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.azertio</groupId>
+                        <artifactId>azertio-docgen-maven-plugin</artifactId>
+                        <version>${project.version}</version>
+                        <executions>
+                            <execution>
+                                <id>generate-step-docs</id>
+                                <goals><goal>generate</goal></goals>
+                                <configuration>
+                                    <inputFile>${azertio.docgen.stepDocFile}</inputFile>
+                                    <outputDirectory>${azertio.docgen.outputDirectory}</outputDirectory>
+                                    <title>${azertio.docgen.stepTitle}</title>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>generate-config-docs</id>
+                                <goals><goal>generate-config</goal></goals>
+                                <configuration>
+                                    <inputFile>${azertio.docgen.configFile}</inputFile>
+                                    <outputDirectory>${azertio.docgen.outputDirectory}</outputDirectory>
+                                    <title>${azertio.docgen.configTitle}</title>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>
