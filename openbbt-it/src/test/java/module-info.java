@@ -1,20 +1,20 @@
-import org.myjtools.openbbt.core.contributors.StepProvider;
-import org.myjtools.openbbt.core.contributors.SuiteAssembler;
-import org.myjtools.openbbt.core.messages.MessageProvider;
+import org.azertio.core.contributors.StepProvider;
+import org.azertio.core.contributors.SuiteAssembler;
+import org.azertio.core.messages.MessageProvider;
 
-module org.myjtools.openbbt.it {
-	requires org.myjtools.openbbt.cli;
-	requires org.myjtools.openbbt.core;
-	requires org.myjtools.openbbt.persistence;
+module org.azertio.it {
+	requires org.azertio.cli;
+	requires org.azertio.core;
+	requires org.azertio.persistence;
 	requires org.myjtools.imconfig;
 	requires org.myjtools.jexten;
 	requires info.picocli;
 	requires org.junit.jupiter.api;
 	requires org.assertj.core;
 
-	opens org.myjtools.openbbt.it to org.junit.platform.commons, org.myjtools.jexten, org.myjtools.openbbt.core;
+	opens org.azertio.it to org.junit.platform.commons, org.myjtools.jexten, org.azertio.core;
 
-	provides StepProvider    with org.myjtools.openbbt.it.TestValidationStepProvider;
-	provides SuiteAssembler  with org.myjtools.openbbt.it.TestTreeSuiteAssembler;
-	provides MessageProvider with org.myjtools.openbbt.it.TestValidationStepProviderMessageProvider;
+	provides StepProvider    with org.azertio.it.TestValidationStepProvider;
+	provides SuiteAssembler  with org.azertio.it.TestTreeSuiteAssembler;
+	provides MessageProvider with org.azertio.it.TestValidationStepProviderMessageProvider;
 }

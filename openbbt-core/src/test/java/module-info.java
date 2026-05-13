@@ -1,10 +1,10 @@
-import org.myjtools.openbbt.core.contributors.StepProvider;
-import org.myjtools.openbbt.core.messages.MessageProvider;
+import org.azertio.core.contributors.StepProvider;
+import org.azertio.core.messages.MessageProvider;
 
-module org.myjtools.openbbt.core.test {
+module org.azertio.core.test {
 	requires org.myjtools.jexten;
 	requires org.myjtools.imconfig;
-	requires org.myjtools.openbbt.core;
+	requires org.azertio.core;
 	requires org.junit.jupiter.api;
 	requires org.junit.jupiter.params;
 	requires org.assertj.core;
@@ -12,20 +12,20 @@ module org.myjtools.openbbt.core.test {
 	requires org.hamcrest;
 	requires java.xml.crypto;
 
-	opens org.myjtools.openbbt.core.test to org.junit.platform.commons;
-	opens org.myjtools.openbbt.core.test.backend to org.junit.platform.commons;
-	opens org.myjtools.openbbt.core.test.util to org.junit.platform.commons;
-	opens org.myjtools.openbbt.core.test.assertions to org.junit.platform.commons;
-	opens org.myjtools.openbbt.core.test.datatypes to org.junit.platform.commons;
-	opens org.myjtools.openbbt.core.test.expressions to org.junit.platform.commons;
-	opens org.myjtools.openbbt.core.test.docgen to org.junit.platform.commons;
-	opens org.myjtools.openbbt.core.test.messages to org.junit.platform.commons;
-	opens org.myjtools.openbbt.core.test.execution to org.junit.platform.commons;
-	opens org.myjtools.openbbt.core.test.contenttypes to org.junit.platform.commons;
+	opens org.azertio.core.test to org.junit.platform.commons;
+	opens org.azertio.core.test.backend to org.junit.platform.commons;
+	opens org.azertio.core.test.util to org.junit.platform.commons;
+	opens org.azertio.core.test.assertions to org.junit.platform.commons;
+	opens org.azertio.core.test.datatypes to org.junit.platform.commons;
+	opens org.azertio.core.test.expressions to org.junit.platform.commons;
+	opens org.azertio.core.test.docgen to org.junit.platform.commons;
+	opens org.azertio.core.test.messages to org.junit.platform.commons;
+	opens org.azertio.core.test.execution to org.junit.platform.commons;
+	opens org.azertio.core.test.contenttypes to org.junit.platform.commons;
 
-	exports org.myjtools.openbbt.core.test.backend to org.myjtools.openbbt.core, org.myjtools.jexten;
+	exports org.azertio.core.test.backend to org.azertio.core, org.myjtools.jexten;
 
-	provides StepProvider with org.myjtools.openbbt.core.test.backend.TestStepProvider;
-	provides MessageProvider with org.myjtools.openbbt.core.test.backend.TestStepProviderMessageProvider;
+	provides StepProvider with org.azertio.core.test.backend.TestStepProvider;
+	provides MessageProvider with org.azertio.core.test.backend.TestStepProviderMessageProvider;
 
 }

@@ -1,13 +1,13 @@
-import org.myjtools.openbbt.core.contenttypes.JSONContentType;
-import org.myjtools.openbbt.core.contenttypes.TextContentType;
-import org.myjtools.openbbt.core.contenttypes.XMLContentType;
-import org.myjtools.openbbt.core.contenttypes.YAMLContentType;
-import org.myjtools.openbbt.core.contributors.*;
-import org.myjtools.openbbt.core.validator.DefaultPlanValidator;
-import org.myjtools.openbbt.core.messages.MessageProvider;
-import org.myjtools.openbbt.core.persistence.TestPlanRepository;
+import org.azertio.core.contenttypes.JSONContentType;
+import org.azertio.core.contenttypes.TextContentType;
+import org.azertio.core.contenttypes.XMLContentType;
+import org.azertio.core.contenttypes.YAMLContentType;
+import org.azertio.core.contributors.*;
+import org.azertio.core.validator.DefaultPlanValidator;
+import org.azertio.core.messages.MessageProvider;
+import org.azertio.core.persistence.TestPlanRepository;
 
-module org.myjtools.openbbt.core {
+module org.azertio.core {
 
 	requires com.github.benmanes.caffeine;
 	requires org.slf4j;
@@ -28,44 +28,44 @@ module org.myjtools.openbbt.core {
 	requires com.networknt.schema;
 	requires java.xml;
 
-	exports org.myjtools.openbbt.core;
-	exports org.myjtools.openbbt.core.util;
-	exports org.myjtools.openbbt.core.testplan;
-	exports org.myjtools.openbbt.core.messages;
-	exports org.myjtools.openbbt.core.backend;
-	exports org.myjtools.openbbt.core.contributors;
-	exports org.myjtools.openbbt.core.expressions;
-	exports org.myjtools.openbbt.core.datatypes;
-	exports org.myjtools.openbbt.core.assertions;
-	exports org.myjtools.openbbt.core.docgen;
-	exports org.myjtools.openbbt.core.validator;
-	exports org.myjtools.openbbt.core.steps;
-	exports org.myjtools.openbbt.core.contenttypes;
-	exports org.myjtools.openbbt.core.persistence;
-	exports org.myjtools.openbbt.core.execution;
-	exports org.myjtools.openbbt.core.events;
+	exports org.azertio.core;
+	exports org.azertio.core.util;
+	exports org.azertio.core.testplan;
+	exports org.azertio.core.messages;
+	exports org.azertio.core.backend;
+	exports org.azertio.core.contributors;
+	exports org.azertio.core.expressions;
+	exports org.azertio.core.datatypes;
+	exports org.azertio.core.assertions;
+	exports org.azertio.core.docgen;
+	exports org.azertio.core.validator;
+	exports org.azertio.core.steps;
+	exports org.azertio.core.contenttypes;
+	exports org.azertio.core.persistence;
+	exports org.azertio.core.execution;
+	exports org.azertio.core.events;
 
-	opens org.myjtools.openbbt.core to org.myjtools.jexten;
-	opens org.myjtools.openbbt.core.messages to org.myjtools.jexten;
-	opens org.myjtools.openbbt.core.testplan to org.myjtools.jexten;
-	opens org.myjtools.openbbt.core.contributors to org.myjtools.jexten;
-	opens org.myjtools.openbbt.core.backend to org.myjtools.jexten;
-	opens org.myjtools.openbbt.core.assertions to org.myjtools.jexten;
-	opens org.myjtools.openbbt.core.contenttypes to org.myjtools.jexten;
-	opens org.myjtools.openbbt.core.persistence to org.myjtools.jexten;
-	opens org.myjtools.openbbt.core.execution to org.myjtools.jexten;
-	opens org.myjtools.openbbt.core.validator to org.myjtools.jexten;
-	opens org.myjtools.openbbt.core.steps to org.myjtools.jexten;
+	opens org.azertio.core to org.myjtools.jexten;
+	opens org.azertio.core.messages to org.myjtools.jexten;
+	opens org.azertio.core.testplan to org.myjtools.jexten;
+	opens org.azertio.core.contributors to org.myjtools.jexten;
+	opens org.azertio.core.backend to org.myjtools.jexten;
+	opens org.azertio.core.assertions to org.myjtools.jexten;
+	opens org.azertio.core.contenttypes to org.myjtools.jexten;
+	opens org.azertio.core.persistence to org.myjtools.jexten;
+	opens org.azertio.core.execution to org.myjtools.jexten;
+	opens org.azertio.core.validator to org.myjtools.jexten;
+	opens org.azertio.core.steps to org.myjtools.jexten;
 
-	uses org.myjtools.openbbt.core.contributors.AIIndexProvider;
+	uses org.azertio.core.contributors.AIIndexProvider;
 	uses ContentType;
 	uses AssertionFactoryProvider;
 	uses DataTypeProvider;
 	uses TestPlanRepository;
 	uses ConfigProvider;
-	uses org.myjtools.openbbt.core.messages.MessageProvider;
+	uses org.azertio.core.messages.MessageProvider;
 	uses SuiteAssembler;
-	uses org.myjtools.openbbt.core.contributors.StepProvider;
+	uses org.azertio.core.contributors.StepProvider;
 	uses RepositoryFactory;
 	uses TestPlanValidator;
 	uses ReportBuilder;
@@ -76,13 +76,13 @@ module org.myjtools.openbbt.core {
 			TextContentType,
 			XMLContentType,
 			YAMLContentType;
-	provides ConfigProvider with org.myjtools.openbbt.core.OpenBBTConfig;
-	provides DataTypeProvider with org.myjtools.openbbt.core.datatypes.CoreDataTypes;
+	provides ConfigProvider with org.azertio.core.AzertioConfig;
+	provides DataTypeProvider with org.azertio.core.datatypes.CoreDataTypes;
 	provides MessageProvider with
-		org.myjtools.openbbt.core.assertions.AssertionMessageProvider,
-		org.myjtools.openbbt.core.steps.CoreStepMessageProvider;
-	provides AssertionFactoryProvider with org.myjtools.openbbt.core.assertions.CoreAssertionFactories;
+		org.azertio.core.assertions.AssertionMessageProvider,
+		org.azertio.core.steps.CoreStepMessageProvider;
+	provides AssertionFactoryProvider with org.azertio.core.assertions.CoreAssertionFactories;
 	provides TestPlanValidator with DefaultPlanValidator;
-	provides StepProvider with org.myjtools.openbbt.core.steps.CoreStepProvider;
+	provides StepProvider with org.azertio.core.steps.CoreStepProvider;
 
 }

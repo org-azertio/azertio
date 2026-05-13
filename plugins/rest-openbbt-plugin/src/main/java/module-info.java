@@ -1,21 +1,21 @@
-import org.myjtools.openbbt.plugins.rest.RestAIIndexProvider;
-import org.myjtools.openbbt.plugins.rest.RestConfigProvider;
-import org.myjtools.openbbt.plugins.rest.RestMessageProvider;
-import org.myjtools.openbbt.plugins.rest.RestStepProvider;
+import org.azertio.plugins.rest.RestAIIndexProvider;
+import org.azertio.plugins.rest.RestConfigProvider;
+import org.azertio.plugins.rest.RestMessageProvider;
+import org.azertio.plugins.rest.RestStepProvider;
 
-module org.myjtools.openbbt.plugins.rest {
+module org.azertio.plugins.rest {
 
     requires org.myjtools.jexten;
-    requires org.myjtools.openbbt.core;
+    requires org.azertio.core;
 	requires org.myjtools.imconfig;
 	requires java.net.http;
 
-	provides org.myjtools.openbbt.core.contributors.StepProvider with RestStepProvider;
-    provides org.myjtools.openbbt.core.contributors.ConfigProvider with RestConfigProvider;
-    provides org.myjtools.openbbt.core.messages.MessageProvider with RestMessageProvider;
-    provides org.myjtools.openbbt.core.contributors.AIIndexProvider with RestAIIndexProvider;
+	provides org.azertio.core.contributors.StepProvider with RestStepProvider;
+    provides org.azertio.core.contributors.ConfigProvider with RestConfigProvider;
+    provides org.azertio.core.messages.MessageProvider with RestMessageProvider;
+    provides org.azertio.core.contributors.AIIndexProvider with RestAIIndexProvider;
 
-    exports org.myjtools.openbbt.plugins.rest;
-    opens org.myjtools.openbbt.plugins.rest to org.myjtools.jexten;
+    exports org.azertio.plugins.rest;
+    opens org.azertio.plugins.rest to org.myjtools.jexten;
 
 }

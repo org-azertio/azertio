@@ -1,6 +1,6 @@
-module org.myjtools.openbbt.jsonrpc {
-    exports org.myjtools.openbbt.jsonrpc.serve;
-    requires org.myjtools.openbbt.core;
+module org.azertio.jsonrpc {
+    exports org.azertio.jsonrpc.serve;
+    requires org.azertio.core;
     requires com.google.gson;
     requires org.slf4j;
 }

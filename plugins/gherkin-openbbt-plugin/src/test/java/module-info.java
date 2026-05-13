@@ -1,18 +1,18 @@
-module org.myjtools.openbbt.plugins.gherkin.test {
+module org.azertio.plugins.gherkin.test {
 
 	requires org.junit.jupiter.api;
-	requires org.myjtools.openbbt.core;
+	requires org.azertio.core;
 	requires org.assertj.core;
-	requires org.myjtools.openbbt.plugins.gherkin;
+	requires org.azertio.plugins.gherkin;
 	requires org.myjtools.gherkinparser;
-	requires org.myjtools.openbbt.persistence;
+	requires org.azertio.persistence;
 	requires junit5.memory.check;
 	requires org.myjtools.jexten;
 	requires org.myjtools.imconfig;
 	requires org.myjtools.jexten.maven.artifact.store;
 
 
-	opens org.myjtools.openbbt.plugins.gherkin.test to org.junit.platform.commons;
+	opens org.azertio.plugins.gherkin.test to org.junit.platform.commons;
 
 
 }

@@ -1,16 +1,16 @@
-import org.myjtools.openbbt.plugins.gherkin.GherkinSuiteAssembler;
+import org.azertio.plugins.gherkin.GherkinSuiteAssembler;
 
-module org.myjtools.openbbt.plugins.gherkin {
+module org.azertio.plugins.gherkin {
 
-	exports org.myjtools.openbbt.plugins.gherkin;
+	exports org.azertio.plugins.gherkin;
 	
 	requires org.myjtools.jexten;
-	requires org.myjtools.openbbt.core;
+	requires org.azertio.core;
 	requires org.myjtools.imconfig;
 	requires org.myjtools.gherkinparser;
 
-	provides org.myjtools.openbbt.core.contributors.SuiteAssembler with GherkinSuiteAssembler;
+	provides org.azertio.core.contributors.SuiteAssembler with GherkinSuiteAssembler;
 
-	opens org.myjtools.openbbt.plugins.gherkin to org.myjtools.jexten;
+	opens org.azertio.plugins.gherkin to org.myjtools.jexten;
 
 }

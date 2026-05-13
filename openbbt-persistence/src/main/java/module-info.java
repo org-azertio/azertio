@@ -1,8 +1,8 @@
-import org.myjtools.openbbt.core.contributors.RepositoryFactory;
-import org.myjtools.openbbt.persistence.DefaultRepositoryFactory;
+import org.azertio.core.contributors.RepositoryFactory;
+import org.azertio.persistence.DefaultRepositoryFactory;
 
-module org.myjtools.openbbt.persistence {
-	requires org.myjtools.openbbt.core;
+module org.azertio.persistence {
+	requires org.azertio.core;
 	requires java.sql;
 	requires com.github.f4b6a3.ulid;
 	requires org.jooq;
@@ -12,17 +12,17 @@ module org.myjtools.openbbt.persistence {
 	requires org.myjtools.imconfig;
 	requires org.jspecify;
 
-	exports org.myjtools.openbbt.persistence;
+	exports org.azertio.persistence;
 
-	opens org.myjtools.openbbt.persistence;
-	opens org.myjtools.openbbt.persistence.migration.hsqldb;
-	opens org.myjtools.openbbt.persistence.migration.postgresql;
-	exports org.myjtools.openbbt.persistence.plan;
-	opens org.myjtools.openbbt.persistence.plan;
-	exports org.myjtools.openbbt.persistence.execution;
-	opens org.myjtools.openbbt.persistence.execution;
-	exports org.myjtools.openbbt.persistence.attachment;
-	opens org.myjtools.openbbt.persistence.attachment;
+	opens org.azertio.persistence;
+	opens org.azertio.persistence.migration.hsqldb;
+	opens org.azertio.persistence.migration.postgresql;
+	exports org.azertio.persistence.plan;
+	opens org.azertio.persistence.plan;
+	exports org.azertio.persistence.execution;
+	opens org.azertio.persistence.execution;
+	exports org.azertio.persistence.attachment;
+	opens org.azertio.persistence.attachment;
 
 	requires minio;
 	requires okhttp3;

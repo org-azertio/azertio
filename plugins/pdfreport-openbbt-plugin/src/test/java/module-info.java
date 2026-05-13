@@ -1,8 +1,8 @@
-module org.myjtools.openbbt.plugins.pdfreport.test {
+module org.azertio.plugins.pdfreport.test {
 
-    requires org.myjtools.openbbt.plugins.pdfreport;
-    requires org.myjtools.openbbt.core;
-    requires org.myjtools.openbbt.persistence;
+    requires org.azertio.plugins.pdfreport;
+    requires org.azertio.core;
+    requires org.azertio.persistence;
     requires org.myjtools.imconfig;
     requires org.junit.jupiter.api;
     requires org.assertj.core;

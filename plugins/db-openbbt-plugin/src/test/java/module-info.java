@@ -1,11 +1,11 @@
-module org.myjtools.openbbt.plugins.db.test {
+module org.azertio.plugins.db.test {
 
-    requires org.myjtools.openbbt.plugins.db;
-    requires org.myjtools.openbbt.plugins.gherkin;
-    requires org.myjtools.openbbt.persistence;
-    requires org.myjtools.openbbt.core;
+    requires org.azertio.plugins.db;
+    requires org.azertio.plugins.gherkin;
+    requires org.azertio.persistence;
+    requires org.azertio.core;
     requires org.myjtools.imconfig;
-    requires openbbt.test.support;
+    requires azertio.test.support;
     requires org.junit.jupiter.api;
     requires java.sql;
     requires com.h2database;
