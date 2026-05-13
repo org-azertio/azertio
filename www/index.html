@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Azertio — Open Black-Box Testing</title>
+  <title>Azertio — Open Source Black-Box API &amp; Database Testing Framework</title>
 
   <!-- SEO -->
-  <meta name="description" content="Azertio is an extensible, plugin-based black-box testing platform. Write expressive tests in plain DSL — test REST APIs, databases, and more — with zero boilerplate." />
-  <meta name="keywords" content="black-box testing, BDD, Gherkin, DSL, REST API testing, database testing, JDBC, plugin-based, Java, VS Code, open source, test automation" />
+  <meta name="description" content="Azertio is an open source black-box testing framework. Write expressive Gherkin tests against REST APIs, databases, and any backend — without boilerplate or glue code. Plugin-based, CI-ready." />
+  <meta name="keywords" content="black-box testing, API testing, REST testing, database testing, BDD, Gherkin, DSL, test automation, open source, plugin-based, CI testing, backend testing" />
   <meta name="author" content="azertio" />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://azertio.org/" />
@@ -15,7 +15,7 @@
   <!-- Open Graph -->
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://azertio.org/" />
-  <meta property="og:title" content="Azertio — Open Black-Box Testing" />
+  <meta property="og:title" content="Azertio — Open Source Black-Box API & Database Testing Framework" />
   <meta property="og:description" content="Extensible, plugin-based testing platform. Write expressive tests in plain DSL — test REST APIs, databases, and more — with zero boilerplate." />
   <meta property="og:image" content="https://azertio.org/images/screenshot1.png" />
   <meta property="og:image:width" content="1280" />
@@ -26,7 +26,7 @@
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Azertio — Open Black-Box Testing" />
+  <meta name="twitter:title" content="Azertio — Open Source Black-Box API & Database Testing Framework" />
   <meta name="twitter:description" content="Extensible, plugin-based testing platform. Write expressive tests in plain DSL — test REST APIs, databases, and more — with zero boilerplate." />
   <meta name="twitter:image" content="https://azertio.org/images/screenshot1.png" />
 
@@ -254,7 +254,7 @@
       font-size: clamp(1rem, 2vw, 1.2rem);
       color: var(--muted);
       max-width: 560px;
-      margin-bottom: 2.8rem;
+      margin-bottom: 1.2rem;
       line-height: 1.7;
     }
 
@@ -701,6 +701,26 @@
       margin: 0;
     }
 
+    /* ── Hero proof strip ────────────────────────────────────────── */
+    .hero-proof {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem 0.6rem;
+      margin-bottom: 2.8rem;
+    }
+    .proof-chip {
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0.02em;
+    }
+    .proof-sep {
+      color: var(--border);
+      font-size: 0.75rem;
+    }
+
     /* Animated typing cursor */
     .cursor {
       display: inline-block;
@@ -851,7 +871,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
   <div class="hero-badge">
     <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="#00ffe0"/></svg>
-    Open Source &nbsp;<span>· MIT License</span>
+    Open Source &nbsp;<span>· MIT License · v1.0.0-alpha1</span>
   </div>
 
   <h1>
@@ -860,10 +880,22 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </h1>
 
   <p class="hero-sub">
-    Azertio is an extensible, plugin-based testing platform that lets you
-    write expressive tests in plain DSL — then run them anywhere, against
-    anything.
+    Write expressive Gherkin tests against REST APIs, databases, and any
+    backend — no glue code, no framework lock-in, no matter what your
+    application is built with.
   </p>
+
+  <div class="hero-proof">
+    <span class="proof-chip">REST APIs</span>
+    <span class="proof-sep">·</span>
+    <span class="proof-chip">SQL Databases</span>
+    <span class="proof-sep">·</span>
+    <span class="proof-chip">Gherkin DSL</span>
+    <span class="proof-sep">·</span>
+    <span class="proof-chip">5 official plugins</span>
+    <span class="proof-sep">·</span>
+    <span class="proof-chip">VS Code extension</span>
+  </div>
 
   <div class="hero-cta">
     <a href="https://github.com/org-azertio/azertio" class="btn-primary" target="_blank" rel="noopener">
