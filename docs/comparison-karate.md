@@ -1,12 +1,12 @@
-# OpenBBT vs Karate — A Detailed Comparison
+# Azertio vs Karate — A Detailed Comparison
 
-[Karate](https://github.com/karatelabs/karate) is one of the most popular Java-based API testing frameworks. Both OpenBBT and Karate use `.feature` files and support REST and database testing, but they differ significantly in architecture, philosophy, and extensibility. This document gives an honest side-by-side picture, highlighting the areas where each tool excels.
+[Karate](https://github.com/karatelabs/karate) is one of the most popular Java-based API testing frameworks. Both Azertio and Karate use `.feature` files and support REST and database testing, but they differ significantly in architecture, philosophy, and extensibility. This document gives an honest side-by-side picture, highlighting the areas where each tool excels.
 
 ---
 
 ## Quick Overview
 
-| | **OpenBBT** | **Karate** |
+| | **Azertio** | **Karate** |
 |---|---|---|
 | First release | 2025 | 2017 |
 | Language | Java 21 | Java |
@@ -41,12 +41,12 @@ Karate embeds a JavaScript engine (GraalJS) inside `.feature` files. This gives 
 
 Tests become mini-programs. Non-technical stakeholders cannot read or validate them, and the line between "test" and "glue code" disappears.
 
-### OpenBBT: pure declarative steps, zero scripting
+### Azertio: pure declarative steps, zero scripting
 
-OpenBBT enforces a clean boundary: feature files contain only declarative steps, and all logic lives in typed Java step providers. Variables are passed between steps via a typed context — no scripting language, no embedded JS:
+Azertio enforces a clean boundary: feature files contain only declarative steps, and all logic lives in typed Java step providers. Variables are passed between steps via a typed context — no scripting language, no embedded JS:
 
 ```gherkin
-# OpenBBT: plain English, no programming constructs
+# Azertio: plain English, no programming constructs
 When I make a POST request to "posts" with body:
   """json
   { "title": "My post", "userId": 1 }
@@ -67,9 +67,9 @@ Any business analyst can read this. The step implementations are reusable, testa
 
 Karate ships as a single all-or-nothing dependency. Protocols and features are baked in; adding a custom transport requires writing Java code and wiring it through Karate's API. Changing the behavior of built-in steps is not possible without forking.
 
-### OpenBBT: modular plugin system (JPMS)
+### Azertio: modular plugin system (JPMS)
 
-Every capability in OpenBBT is a plugin: an isolated Java module loaded at runtime via the Java Platform Module System. Plugins are distributed as Maven artifacts and declared in `openbbt.yaml`:
+Every capability in Azertio is a plugin: an isolated Java module loaded at runtime via the Java Platform Module System. Plugins are distributed as Maven artifacts and declared in `azertio.yaml`:
 
 ```yaml
 plugins:
@@ -100,7 +100,7 @@ Then status 201
 And match response.title == 'foo'
 ```
 
-**OpenBBT:**
+**Azertio:**
 ```gherkin
 When I make a POST request to "posts" with body:
   """json
@@ -113,7 +113,7 @@ And the response body contains:
   """
 ```
 
-The key difference is that in OpenBBT the base URL, timeout, and other settings are declared once in `openbbt.yaml`, not scattered across feature files. Feature files contain only the test intent, not the infrastructure configuration.
+The key difference is that in Azertio the base URL, timeout, and other settings are declared once in `azertio.yaml`, not scattered across feature files. Feature files contain only the test intent, not the infrastructure configuration.
 
 ---
 
@@ -135,7 +135,7 @@ Karate has basic JDBC support via `karate-jdbc`, but it's not a first-class citi
 * match rows[0].name == 'Alice'
 ```
 
-### OpenBBT
+### Azertio
 
 Database testing is a dedicated first-class plugin with a complete step vocabulary:
 
@@ -153,7 +153,7 @@ Database testing is a dedicated first-class plugin with a complete step vocabula
 * db has XLS "expected/all-data.xlsx"
 ```
 
-The JDBC driver is declared as a runtime dependency in `openbbt.yaml` and downloaded automatically — no build file changes:
+The JDBC driver is declared as a runtime dependency in `azertio.yaml` and downloaded automatically — no build file changes:
 
 ```yaml
 plugins:
@@ -176,9 +176,9 @@ Karate integrates with [Gatling](https://gatling.io) for performance testing, wh
 - A separate reporting pipeline.
 - Gatling is a full load testing tool, with more setup overhead than most functional teams need.
 
-### OpenBBT: benchmark mode built in
+### Azertio: benchmark mode built in
 
-OpenBBT has native benchmark support that works directly on any benchmarkable step, in the same `.feature` file as your functional tests:
+Azertio has native benchmark support that works directly on any benchmarkable step, in the same `.feature` file as your functional tests:
 
 ```gherkin
 Scenario: API meets performance SLA
@@ -200,9 +200,9 @@ Benchmark runs use virtual threads for high concurrency with low resource overhe
 
 There is no official VS Code extension for Karate. Community extensions exist for syntax highlighting, but there is no native integration for running tests, browsing results, or inspecting execution history from within the IDE.
 
-### OpenBBT
+### Azertio
 
-OpenBBT ships a dedicated VS Code extension that connects to the CLI via a JSON-RPC server. From the IDE you can:
+Azertio ships a dedicated VS Code extension that connects to the CLI via a JSON-RPC server. From the IDE you can:
 
 - **Browse past executions** with date, duration, and overall pass/fail status.
 - **Drill into the result tree**: test plan → suite → scenario → step, with individual timings and statuses.
@@ -220,9 +220,9 @@ All of this without leaving VS Code or touching a terminal.
 
 Karate has its own fixed DSL. Steps must be written in Karate syntax; there is no mechanism to write the same step in a different natural language, and the compact shorthand is tied to Karate keywords (`url`, `request`, `method`, `match`).
 
-### OpenBBT
+### Azertio
 
-OpenBBT separates step logic from step language. Every plugin ships with multiple language files. The same step can be expressed in:
+Azertio separates step logic from step language. Every plugin ships with multiple language files. The same step can be expressed in:
 
 | Language | Expression |
 |---|---|
@@ -247,7 +247,7 @@ Custom logic in Karate is added by calling Java from inside feature files, or by
 
 There is no first-class plugin API. Custom step implementations cannot be packaged and distributed independently as Maven artifacts.
 
-### OpenBBT
+### Azertio
 
 Custom plugins are standard Maven modules that implement a clean Java API:
 
@@ -262,7 +262,7 @@ public class MyStepProvider implements StepProvider {
 }
 ```
 
-The plugin is published to any Maven repository and declared in `openbbt.yaml` — users get it automatically without any code changes. The JPMS isolation ensures it cannot break other plugins.
+The plugin is published to any Maven repository and declared in `azertio.yaml` — users get it automatically without any code changes. The JPMS isolation ensures it cannot break other plugins.
 
 ---
 
@@ -282,7 +282,7 @@ function fn() {
 }
 ```
 
-### OpenBBT
+### Azertio
 
 Configuration is pure YAML, with first-class profile support:
 
@@ -301,7 +301,7 @@ profiles:
     base-url: https://api.example.com
 ```
 
-Switching profiles is a CLI flag: `openbbt run -p staging`. No JavaScript, no conditionals, no build-time changes.
+Switching profiles is a CLI flag: `azertio run -p staging`. No JavaScript, no conditionals, no build-time changes.
 
 ---
 
@@ -311,9 +311,9 @@ Switching profiles is a CLI flag: `openbbt run -p staging`. No JavaScript, no co
 
 Karate supports tags for filtering, but the tag system is basic — you can include or exclude tags, but complex boolean expressions are limited and the configuration varies depending on how you run tests (Maven Surefire, JUnit runner, CLI).
 
-### OpenBBT
+### Azertio
 
-Suites in OpenBBT are named sets of boolean tag expressions defined in `openbbt.yaml`, making them reproducible and version-controlled:
+Suites in Azertio are named sets of boolean tag expressions defined in `azertio.yaml`, making them reproducible and version-controlled:
 
 ```yaml
 test-suites:
@@ -325,7 +325,7 @@ test-suites:
     tag-expression: "GET or POST or PUT or DELETE and not DB"
 ```
 
-Running a specific suite is a single flag: `openbbt run -s regression`. Suites can be combined in the same run.
+Running a specific suite is a single flag: `azertio run -s regression`. Suites can be combined in the same run.
 
 ---
 
@@ -335,24 +335,24 @@ Running a specific suite is a single flag: `openbbt run -s regression`. Suites c
 
 Karate produces JUnit XML and HTML reports at the end of each run. These reports are written to the `target/` directory and discarded with the next build. There is no persistent store of past executions: you cannot browse a historical run from two weeks ago, compare results across runs, or re-execute a specific past run by ID. If you need long-term result tracking, you must integrate an external tool (Allure, ReportPortal, a CI dashboard) and configure the export yourself.
 
-### OpenBBT: three persistence modes
+### Azertio: three persistence modes
 
-OpenBBT has a built-in persistence layer with three configurable modes, covering the full spectrum from ephemeral CI runs to team-wide shared history:
+Azertio has a built-in persistence layer with three configurable modes, covering the full spectrum from ephemeral CI runs to team-wide shared history:
 
 | Mode | Backend | Attachments | Use case |
 |---|---|---|---|
 | `transient` | Temp HSQLDB file (deleted on exit) | Temp directory | CI pipelines that only need pass/fail |
-| `file` | HSQLDB file in `.openbbt/` | Local filesystem | Developer workstation, browsable in VS Code |
+| `file` | HSQLDB file in `.azertio/` | Local filesystem | Developer workstation, browsable in VS Code |
 | `remote` | PostgreSQL | MinIO (S3-compatible) | Shared team history across CI and all developers |
 
-Configuration is a single block in `openbbt.yaml`:
+Configuration is a single block in `azertio.yaml`:
 
 ```yaml
 configuration:
   core:
     persistence.mode: remote
-    persistence.db.url: jdbc:postgresql://db-server:5432/openbbt
-    persistence.db.username: openbbt
+    persistence.db.url: jdbc:postgresql://db-server:5432/azertio
+    persistence.db.username: azertio
     persistence.db.password: '{{DB_PASSWORD}}'
     attachment.server.url: http://minio-server:9000
     attachment.server.username: minio-user
@@ -373,9 +373,9 @@ Karate has no concept of separating test intent from test implementation. A Kara
 
 Teams that want this separation in Karate typically resort to calling reusable `.feature` files as functions — but the caller file is itself a technical Karate script, not a business-readable specification.
 
-### OpenBBT: definition / implementation
+### Azertio: definition / implementation
 
-OpenBBT has first-class support for a two-level scenario model. A **definition** feature (tagged `@definition`) declares abstract, business-readable scenarios identified by `@ID-*` tags. An **implementation** feature (tagged `@implementation`) provides the concrete, executable steps for each scenario, matched by identifier.
+Azertio has first-class support for a two-level scenario model. A **definition** feature (tagged `@definition`) declares abstract, business-readable scenarios identified by `@ID-*` tags. An **implementation** feature (tagged `@implementation`) provides the concrete, executable steps for each scenario, matched by identifier.
 
 ```gherkin
 # definition.feature — written and owned by the business
@@ -426,11 +426,11 @@ This is particularly valuable for:
 ### Choose Karate if
 
 - Your team is already heavily invested in the Karate ecosystem.
-- You need WebSocket or gRPC support out of the box (not yet in OpenBBT).
+- You need WebSocket or gRPC support out of the box (not yet in Azertio).
 - You need to call Java or JavaScript logic directly from feature files.
 - You prefer a large, established community with abundant StackOverflow answers.
 
-### Choose OpenBBT if
+### Choose Azertio if
 
 - You want feature files that non-developers can read, review, and write.
 - You need to test multiple databases with different JDBC drivers — especially if you don't control the build file.
@@ -442,4 +442,4 @@ This is particularly valuable for:
 
 ---
 
-> **Note:** OpenBBT is under active development. Some features available in Karate (GraphQL, gRPC, WebSocket testing) are planned for future plugins but not yet available. Check the [release page](https://github.com/org-myjtools/openbbt/releases) for the current plugin catalogue.
+> **Note:** Azertio is under active development. Some features available in Karate (GraphQL, gRPC, WebSocket testing) are planned for future plugins but not yet available. Check the [release page](https://github.com/org-myjtools/azertio/releases) for the current plugin catalogue.

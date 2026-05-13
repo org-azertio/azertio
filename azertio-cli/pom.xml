@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.azertio</groupId>
+        <artifactId>azertio</artifactId>
+        <version>1.0.0-alpha1</version>
+    </parent>
+
+    <artifactId>azertio-cli</artifactId>
+    <name>Azertio Command Line Interpeter</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>info.picocli</groupId>
+            <artifactId>picocli</artifactId>
+            <version>4.7.7</version>
+        </dependency>
+        <dependency>
+            <groupId>org.azertio</groupId>
+            <artifactId>azertio-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.azertio</groupId>
+            <artifactId>azertio-persistence</artifactId>
+            <version>${project.version}</version>
+            <exclusions>
+                <!-- okio (metadata-only KMP wrapper) conflicts with okio-jvm in JPMS module path -->
+                <exclusion>
+                    <groupId>com.squareup.okio</groupId>
+                    <artifactId>okio</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.azertio</groupId>
+            <artifactId>azertio-lsp</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.5.25</version>
+        </dependency>
+        <dependency>
+            <groupId>org.azertio</groupId>
+            <artifactId>azertio-jsonrpc</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.11.0</version>
+        </dependency>
+        <!-- Test dependencies -->
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/assembly/dist.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-dist</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <classpathDependencyExcludes>
+                        <classpathDependencyExclude>org.slf4j:slf4j-simple</classpathDependencyExclude>
+                    </classpathDependencyExcludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>install-system</id>
+            <activation>
+                <os><family>unix</family></os>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>3.1.0</version>
+                        <executions>
+                            <execution>
+                                <id>install-cli-system</id>
+                                <phase>install</phase>
+                                <goals><goal>run</goal></goals>
+                                <configuration>
+                                    <target>
+                                        <property name="dist.zip"
+                                                  value="${project.build.directory}/${project.artifactId}-${project.version}-dist.zip"/>
+                                        <property name="install.dir" value="${user.home}/.local/share/azertio"/>
+                                        <property name="bin.dir"     value="${user.home}/.local/bin"/>
+
+                                        <!-- Clean previous installation -->
+                                        <delete dir="${install.dir}" quiet="true"/>
+                                        <mkdir dir="${user.home}/.local/share"/>
+                                        <mkdir dir="${bin.dir}"/>
+
+                                        <!-- Extract zip; creates ${project.artifactId}-${project.version}/ -->
+                                        <unzip src="${dist.zip}" dest="${user.home}/.local/share"/>
+                                        <move file="${user.home}/.local/share/${project.artifactId}-${project.version}"
+                                              tofile="${install.dir}" overwrite="true"/>
+
+                                        <!-- Ensure launcher is executable -->
+                                        <chmod file="${install.dir}/bin/azertio" perm="755"/>
+
+                                        <!-- Symlink into bin dir -->
+                                        <exec executable="ln" failonerror="true">
+                                            <arg value="-sf"/>
+                                            <arg value="${install.dir}/bin/azertio"/>
+                                            <arg value="${bin.dir}/azertio"/>
+                                        </exec>
+
+                                        <echo message=""/>
+                                        <echo message="=============================================="/>
+                                        <echo message=" Azertio installed at: ${install.dir}"/>
+                                        <echo message=" Executable linked at: ${bin.dir}/azertio"/>
+                                        <echo message=" Make sure ${bin.dir} is in your PATH"/>
+                                        <echo message="=============================================="/>
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+</project>

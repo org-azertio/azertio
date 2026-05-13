@@ -11,7 +11,7 @@ Relative paths are resolved from the working directory.
 
 **Type** text
 
-**Default value** `.openbbt/reports`
+**Default value** `.azertio/reports`
 
 
 

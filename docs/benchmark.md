@@ -7,7 +7,7 @@ Benchmark mode lets you measure the performance of any test step by running it r
 ## How it works
 
 1. **Enable** benchmark mode immediately before the step you want to measure, specifying the total number of executions and the number of parallel threads.
-2. **Run** the target step. OpenBBT executes it the requested number of times using virtual threads, bounded to the configured parallelism. The step is responsible for marking its own start and finish times.
+2. **Run** the target step. Azertio executes it the requested number of times using virtual threads, bounded to the configured parallelism. The step is responsible for marking its own start and finish times.
 3. **Assert** on one or more statistics produced by the benchmark run.
 
 The benchmarked step always reports `PASSED` regardless of individual iteration errors; error count is captured in the `errorRate` statistic instead.

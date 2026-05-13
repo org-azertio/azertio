@@ -1,0 +1,28 @@
+org.myjtools.openbbt.core.OpenBBTException: org.jooq.exception.DataAccessException: Cannot acquire connection to jdbc:mysql://mysql-rfam-public.ebi.ac.uk:4497/Rfam
+	at org.myjtools.openbbt.core@1.0.0-alpha1/org.myjtools.openbbt.core.backend.StepProviderBackend.run(StepProviderBackend.java:119)
+	at org.myjtools.openbbt.core@1.0.0-alpha1/org.myjtools.openbbt.core.execution.BackendExecutor.lambda$submitStepExecution$1(BackendExecutor.java:75)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: org.jooq.exception.DataAccessException: Cannot acquire connection to jdbc:mysql://mysql-rfam-public.ebi.ac.uk:4497/Rfam
+	at org.jooq_3.19.18.MYSQL.debug(Unknown Source)
+	at org.myjtools.openbbt.plugins.db@1.0.0-alpha1/org.myjtools.openbbt.plugins.db.jooq.JooqDbEngine$SimpleConnectionProvider.acquire(JooqDbEngine.java:248)
+	at org.jooq@3.19.18/org.jooq.impl.DefaultExecuteContext.connection(DefaultExecuteContext.java:651)
+	at org.jooq@3.19.18/org.jooq.impl.AbstractQuery.connection(AbstractQuery.java:388)
+	at org.jooq@3.19.18/org.jooq.impl.AbstractQuery.execute(AbstractQuery.java:308)
+	at org.jooq@3.19.18/org.jooq.impl.AbstractResultQuery.fetch(AbstractResultQuery.java:290)
+	at org.myjtools.openbbt.plugins.db@1.0.0-alpha1/org.myjtools.openbbt.plugins.db.jooq.JooqDbEngine.executeQuery(JooqDbEngine.java:191)
+	at org.myjtools.openbbt.plugins.db@1.0.0-alpha1/org.myjtools.openbbt.plugins.db.DbStepProvider.lambda$executeQuery$3(DbStepProvider.java:104)
+	at org.myjtools.openbbt.core@1.0.0-alpha1/org.myjtools.openbbt.core.backend.ExecutionContext.runWithinBenchmark(ExecutionContext.java:112)
+	at org.myjtools.openbbt.plugins.db@1.0.0-alpha1/org.myjtools.openbbt.plugins.db.DbStepProvider.executeQuery(DbStepProvider.java:103)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.myjtools.openbbt.core@1.0.0-alpha1/org.myjtools.openbbt.core.backend.StepProviderMethod.run(StepProviderMethod.java:113)
+	at org.myjtools.openbbt.core@1.0.0-alpha1/org.myjtools.openbbt.core.backend.StepProviderBackend.run(StepProviderBackend.java:113)
+	... 5 more
+Caused by: java.sql.SQLException: No suitable driver found for jdbc:mysql://mysql-rfam-public.ebi.ac.uk:4497/Rfam
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:708)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:191)
+	at org.myjtools.openbbt.plugins.db@1.0.0-alpha1/org.myjtools.openbbt.plugins.db.jooq.JooqDbEngine$SimpleConnectionProvider.acquire(JooqDbEngine.java:243)
+	... 17 more

@@ -1,6 +1,6 @@
-# Contributing to OpenBBT
+# Contributing to Azertio
 
-Thank you for your interest in contributing to OpenBBT!
+Thank you for your interest in contributing to Azertio!
 
 ## How to contribute
 
@@ -10,7 +10,7 @@ Open an issue using the **Bug Report** template. Include:
 - A clear description of the problem
 - Steps to reproduce
 - Expected vs actual behavior
-- OpenBBT version and Java version
+- Azertio version and Java version
 
 ### Suggesting features
 

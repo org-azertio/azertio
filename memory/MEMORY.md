@@ -1,8 +1,8 @@
-# OpenBBT Project Memory
+# Azertio Project Memory
 
 ## Project Overview
-**OpenBBT** — Java-based BDD testing framework with pluggable architecture.
-- Org: `org.myjtools.openbbt` | Version: `1.0.0-alpha1` | License: MIT
+**Azertio** — Java-based BDD testing framework with pluggable architecture.
+- Org: `org.azertio` | Version: `1.0.0-alpha1` | License: MIT
 - Java 21 + Maven 3.x | JPMS modules throughout
 - Branch strategy: `main` (stable) ← `develop` (integration) ← `feature/*` / `fix/*`
 - PRs target `develop`, not `main`
@@ -12,26 +12,26 @@ See `memory/codestyle.md` — covers: 4-space indent, K&R braces, Optional-first
 
 ## Architecture (see architecture.md for details)
 Multi-module Maven monorepo. Key modules:
-- **openbbt-core** — Core BDD runtime, step execution, expression matching, assertions
-- **openbbt-persistence** — jOOQ + Flyway + HSQLDB/PostgreSQL
-- **openbbt-cli** — PicoCLI CLI, subcommands: browse, init, install, version, purge, plan, serve, show-config, tui, lsp
-- **openbbt-lsp** — Eclipse LSP4J language server
-- **openbbt-tui** — Lanterna terminal UI
-- **openbbt-vscode** — TypeScript VS Code extension (npm build, separate from Maven)
-- **openbbt-plugin-starter** — Template POM for plugin development
-- **openbbt-it** — Integration tests (TestContainers)
-- **openbbt-docgen-maven-plugin** — Doc generation from code
-- **plugins/gherkin-openbbt-plugin** — Gherkin feature file support (built via `plugins` profile)
-- **plugins/rest-openbbt-plugin** — REST-assured HTTP testing steps
-- **plugins/markdown-plan-openbbt-plugin** — Markdown-based test plan definitions
+- **azertio-core** — Core BDD runtime, step execution, expression matching, assertions
+- **azertio-persistence** — jOOQ + Flyway + HSQLDB/PostgreSQL
+- **azertio-cli** — PicoCLI CLI, subcommands: browse, init, install, version, purge, plan, serve, show-config, tui, lsp
+- **azertio-lsp** — Eclipse LSP4J language server
+- **azertio-tui** — Lanterna terminal UI
+- **azertio-vscode** — TypeScript VS Code extension (npm build, separate from Maven)
+- **azertio-plugin-starter** — Template POM for plugin development
+- **azertio-it** — Integration tests (TestContainers)
+- **azertio-docgen-maven-plugin** — Doc generation from code
+- **plugins/gherkin-azertio-plugin** — Gherkin feature file support (built via `plugins` profile)
+- **plugins/rest-azertio-plugin** — REST-assured HTTP testing steps
+- **plugins/markdown-plan-azertio-plugin** — Markdown-based test plan definitions
 
 ## Key Files
 - `pom.xml` — Root POM, parent: `myjtools-parent:1.4.0`, Java 21
-- `openbbt-core/src/main/java/org/myjtools/openbbt/core/OpenBBTRuntime.java` — Central runtime
-- `openbbt-core/src/main/java/org/myjtools/openbbt/core/OpenBBTFile.java` — Config file parser
-- `openbbt-core/src/main/java/org/myjtools/openbbt/core/OpenBBTConfig.java` — Config keys/provider
-- `openbbt-persistence/src/main/java/...JooqRepositoryFactory.java` — 3-mode persistence factory
-- `openbbt-cli/src/main/java/.../MainCommand.java` — CLI entry point
+- `azertio-core/src/main/java/org/azertio/core/AzertioRuntime.java` — Central runtime
+- `azertio-core/src/main/java/org/azertio/core/AzertioFile.java` — Config file parser
+- `azertio-core/src/main/java/org/azertio/core/AzertioConfig.java` — Config keys/provider
+- `azertio-persistence/src/main/java/...JooqRepositoryFactory.java` — 3-mode persistence factory
+- `azertio-cli/src/main/java/.../MainCommand.java` — CLI entry point
 - `.github/workflows/verify.yml` — CI: build+test+SonarCloud on push/PR to main
 - `.github/workflows/publish.yml` — CD: deploy to GitHub Packages on `v*` tags
 - `docs/getting-started.md` / `docs/rest-config.md` — User docs
@@ -54,7 +54,7 @@ Multi-module Maven monorepo. Key modules:
 | Code gen | Lombok 1.18.38 |
 | Testing | JUnit 5, AssertJ 3.27.7, TestContainers 1.21.3 |
 
-## Configuration (openbbt.yaml)
+## Configuration (azertio.yaml)
 ```yaml
 project:
   name: string

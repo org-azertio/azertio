@@ -1,5 +1,5 @@
 name: Bug Report
-description: Report a bug in OpenBBT
+description: Report a bug in Azertio
 labels: [bug]
 body:
   - type: markdown
@@ -10,7 +10,7 @@ body:
   - type: input
     id: version
     attributes:
-      label: OpenBBT version
+      label: Azertio version
       placeholder: e.g. 1.0.0-alpha1
     validations:
       required: true

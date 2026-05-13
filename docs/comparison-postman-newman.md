@@ -1,13 +1,13 @@
-# OpenBBT vs Postman / Newman — A Detailed Comparison
+# Azertio vs Postman / Newman — A Detailed Comparison
 
-[Postman](https://www.postman.com/) is the most widely used tool for API testing, and [Newman](https://github.com/postmanlabs/newman) is its CLI runner for CI pipelines. They cover the full lifecycle from exploration to automated testing. OpenBBT targets a narrower scope — automated black-box testing — but does so with a fundamentally different approach. This document compares the two honestly, focusing on teams that have outgrown manual Postman testing and need a robust, version-controlled test suite.
+[Postman](https://www.postman.com/) is the most widely used tool for API testing, and [Newman](https://github.com/postmanlabs/newman) is its CLI runner for CI pipelines. They cover the full lifecycle from exploration to automated testing. Azertio targets a narrower scope — automated black-box testing — but does so with a fundamentally different approach. This document compares the two honestly, focusing on teams that have outgrown manual Postman testing and need a robust, version-controlled test suite.
 
 ---
 
 ## Quick Overview
 
 
-|                            | **OpenBBT**                 | **Postman / Newman**                    |
+|                            | **Azertio**                 | **Postman / Newman**                    |
 | -------------------------- | --------------------------- | --------------------------------------- |
 | First release              | 2025                        | 2012 / 2014                             |
 | Primary interface          | CLI + VS Code extension     | GUI (Postman app) + CLI (Newman)        |
@@ -24,7 +24,7 @@
 | Definition / implementation | ✅ two-level scenario model | ❌ |
 | Execution history           | ✅ transient / file / remote DB | ❌ no persistence between runs     |
 | Cost                       | Free / open source          | Freemium (team features are paid)       |
-| CI integration             | `openbbt run`               | `newman run`                            |
+| CI integration             | `azertio run`               | `newman run`                            |
 
 ---
 
@@ -41,9 +41,9 @@ This model is excellent for exploration and for teams where the primary persona 
 - Business stakeholders need to read or contribute to test scenarios.
 - Teams need to run tests without a Postman account or internet connectivity.
 
-### OpenBBT: automated black-box testing as code
+### Azertio: automated black-box testing as code
 
-OpenBBT starts from the opposite direction: tests are plain text files, written in a domain-specific language, version-controlled alongside the system under test, and run entirely from the CLI. There is no GUI for authoring — the IDE is any text editor (VS Code recommended). The recommended VS Code extension is also for *inspecting results*, not only for writing tests.
+Azertio starts from the opposite direction: tests are plain text files, written in a domain-specific language, version-controlled alongside the system under test, and run entirely from the CLI. There is no GUI for authoring — the IDE is any text editor (VS Code recommended). The recommended VS Code extension is also for *inspecting results*, not only for writing tests.
 
 ---
 
@@ -83,7 +83,7 @@ A Postman collection is a deeply nested JSON file. The format is proprietary and
 
 A `git diff` on this file when a single assertion changes is nearly unreadable. Merge conflicts between two engineers editing the same collection simultaneously are painful. Collections exported from the Postman app often contain generated IDs and timestamps that produce meaningless diffs.
 
-### OpenBBT: plain text feature files
+### Azertio: plain text feature files
 
 Every test is a `.feature` file — plain text, minimal syntax, fully diffable:
 
@@ -129,9 +129,9 @@ pm.test('Title matches', () => {
 
 This is code. Non-developer QA engineers, business analysts, and product managers cannot read it, let alone write it. As collections grow, they effectively become JavaScript codebases maintained inside a GUI tool — without linting, without IDE support, without unit testing.
 
-### OpenBBT: declarative steps, no scripting
+### Azertio: declarative steps, no scripting
 
-Every action in OpenBBT is a named step. There is no scripting language. Business analysts can read and validate every line:
+Every action in Azertio is a named step. There is no scripting language. Business analysts can read and validate every line:
 
 ```gherkin
 When I make a POST request to "posts" with body:
@@ -156,7 +156,7 @@ Steps are implemented once in Java (inside a plugin) and reused across all proje
 
 Postman has no database support. It is an HTTP client. If a test scenario requires verifying that an API call correctly persisted data to a database, the only option is to query the database through another API endpoint — if one exists. There is no way to run SQL, assert table contents, or load database fixtures from a Postman collection.
 
-### OpenBBT
+### Azertio
 
 Database testing is a first-class plugin:
 
@@ -194,7 +194,7 @@ Postman has a "Performance" tab (available on paid plans) that runs a collection
 
 For serious performance testing against a CI gate, teams typically export Postman collections to k6 or use Gatling independently, which means maintaining the test logic in two places.
 
-### OpenBBT: benchmark mode built in
+### Azertio: benchmark mode built in
 
 Benchmark testing is integrated directly into the functional test suite. The same step used for functional testing is benchmarked with a single `Given`:
 
@@ -225,9 +225,9 @@ Environments in Postman are key-value stores managed through the GUI and exporte
 
 Environments are flat maps — there is no hierarchy or composition. Sensitive values (passwords, tokens) often end up committed to the repository inside the environment JSON file, or managed out-of-band and injected via CI variables.
 
-### OpenBBT
+### Azertio
 
-Profiles are declared in `openbbt.yaml` alongside the test configuration, as structured YAML with template substitution:
+Profiles are declared in `azertio.yaml` alongside the test configuration, as structured YAML with template substitution:
 
 ```yaml
 configuration:
@@ -253,7 +253,7 @@ profiles:
     db-password: '{{DB_PASSWORD}}'   # injected from CI secret
 ```
 
-Switching profiles: `openbbt run -p staging`. Sensitive values can be left as placeholders and overridden at runtime with `-D key=value`, keeping secrets out of the repository entirely.
+Switching profiles: `azertio run -p staging`. Sensitive values can be left as placeholders and overridden at runtime with `-D key=value`, keeping secrets out of the repository entirely.
 
 ---
 
@@ -263,26 +263,26 @@ Switching profiles: `openbbt run -p staging`. Sensitive values can be left as pl
 
 Newman produces a test report (JUnit XML, JSON, or HTML) at the end of each run. There is no persistent store of executions. To compare two runs, you must save the report files externally. Re-running an exact past execution — same requests, same environment snapshot — is not possible without manual reconstruction.
 
-### OpenBBT
+### Azertio
 
-OpenBBT has a built-in persistence layer with three modes that cover the full spectrum from ephemeral CI to team-wide shared history:
+Azertio has a built-in persistence layer with three modes that cover the full spectrum from ephemeral CI to team-wide shared history:
 
 | Mode | Backend | Attachments | Use case |
 |---|---|---|---|
 | `transient` | Temp HSQLDB (deleted on exit) | Temp directory | CI pipelines that only need pass/fail |
-| `file` | HSQLDB file in `.openbbt/` | Local filesystem | Developer workstation, full history in VS Code |
+| `file` | HSQLDB file in `.azertio/` | Local filesystem | Developer workstation, full history in VS Code |
 | `remote` | PostgreSQL | MinIO (S3-compatible) | Shared history across CI and all developers |
 
 In **`file` mode** (the default for server mode), every execution is persisted locally. From VS Code you can browse all past runs, drill into the full result tree (suite → scenario → step), view step-level attachments (response bodies, CSV query results), and re-run any past execution with one click.
 
-In **`remote` mode**, CI writes to a shared PostgreSQL database and MinIO object store. Every developer's VS Code connects to the same backend and can immediately browse, inspect, and re-run any CI execution — including runs from other team members or other branches. Configuration is a single block in `openbbt.yaml`:
+In **`remote` mode**, CI writes to a shared PostgreSQL database and MinIO object store. Every developer's VS Code connects to the same backend and can immediately browse, inspect, and re-run any CI execution — including runs from other team members or other branches. Configuration is a single block in `azertio.yaml`:
 
 ```yaml
 configuration:
   core:
     persistence.mode: remote
-    persistence.db.url: jdbc:postgresql://db-server:5432/openbbt
-    persistence.db.username: openbbt
+    persistence.db.url: jdbc:postgresql://db-server:5432/azertio
+    persistence.db.username: azertio
     persistence.db.password: '{{DB_PASSWORD}}'
     attachment.server.url: http://minio-server:9000
     attachment.server.username: minio-user
@@ -295,7 +295,7 @@ From the CLI:
 
 ```bash
 # Re-run a specific past execution by ID
-openbbt run --rerun <execution-id>
+azertio run --rerun <execution-id>
 ```
 
 ---
@@ -316,27 +316,27 @@ newman run collection.json \
 
 The collection and environment files must be either committed to the repository (with the diffs and merge conflict problems described earlier) or retrieved from the Postman API (requires an API key and internet access).
 
-### OpenBBT
+### Azertio
 
-OpenBBT is a self-contained Java distribution. No Node.js, no npm, no Postman API key:
+Azertio is a self-contained Java distribution. No Node.js, no npm, no Postman API key:
 
 ```bash
 # Download and extract the distribution once
-export PATH="$OPENBBT_HOME/bin:$PATH"
+export PATH="$AZERTIO_HOME/bin:$PATH"
 
 # Run in CI
-openbbt install
-openbbt run -s regression -p staging
+azertio install
+azertio run -s regression -p staging
 ```
 
-The `openbbt.yaml` and `.feature` files are committed to the repository like any other source file. The run is fully reproducible and offline (after the initial plugin download).
+The `azertio.yaml` and `.feature` files are committed to the repository like any other source file. The run is fully reproducible and offline (after the initial plugin download).
 
 ---
 
 ## Cost and Licensing
 
 
-|                    | **OpenBBT**       | **Postman**                                   |
+|                    | **Azertio**       | **Postman**                                   |
 | ------------------ | ----------------- | --------------------------------------------- |
 | License            | MIT (open source) | Proprietary (freemium)                        |
 | Free tier          | Unlimited         | Limited collaboration, limited mock calls     |
@@ -344,7 +344,7 @@ The `openbbt.yaml` and `.feature` files are committed to the repository like any
 | Offline use        | ✅ fully offline  | ⚠️ some features require cloud connectivity |
 | Self-hosting       | N/A (CLI tool)    | ⚠️ enterprise plan required                 |
 
-Postman's free tier is generous for individual use, but teams that need shared workspaces, private APIs, or advanced monitoring quickly hit the paid tier. OpenBBT has no paid tier — it is MIT-licensed and entirely self-hosted.
+Postman's free tier is generous for individual use, but teams that need shared workspaces, private APIs, or advanced monitoring quickly hit the paid tier. Azertio has no paid tier — it is MIT-licensed and entirely self-hosted.
 
 ---
 
@@ -356,9 +356,9 @@ Postman has no concept of separating test intent from test execution. A collecti
 
 Some teams add a "description" field to requests, but this is free text with no structural meaning — it is not executable, not validated, and not visible in CI reports.
 
-### OpenBBT: definition / implementation
+### Azertio: definition / implementation
 
-OpenBBT introduces a two-level scenario model unique among testing tools. A **definition** feature (tagged `@definition`) is a plain-English, business-readable specification of test intent. An **implementation** feature (tagged `@implementation`) is the concrete execution, matched to the definition by scenario identifier.
+Azertio introduces a two-level scenario model unique among testing tools. A **definition** feature (tagged `@definition`) is a plain-English, business-readable specification of test intent. An **implementation** feature (tagged `@implementation`) is the concrete execution, matched to the definition by scenario identifier.
 
 ```gherkin
 # definition.feature — readable by anyone
@@ -414,7 +414,7 @@ Scenario: An expired card is rejected
   And the response body field "message" contains "expired"
 ```
 
-Unlike Postman's request descriptions — which are free text that no tool validates or enforces — OpenBBT's definition features are structural: they drive the test plan, appear in the result tree, and provide the vocabulary that stakeholders sign off on. The implementation is hidden from business review but fully visible to engineers in the execution detail.
+Unlike Postman's request descriptions — which are free text that no tool validates or enforces — Azertio's definition features are structural: they drive the test plan, appear in the result tree, and provide the vocabulary that stakeholders sign off on. The implementation is hidden from business review but fully visible to engineers in the execution detail.
 
 This enables a workflow impossible in Postman: a product owner reviews and approves the definition feature files in a pull request, without ever seeing the technical implementation details. The CI pipeline runs the implementation and reports results against the business-defined structure.
 
@@ -429,7 +429,7 @@ This enables a workflow impossible in Postman: a product owner reviews and appro
 - You need **API monitoring** with cloud-hosted scheduled runs.
 - Your QA team has no familiarity with text-based tooling and a GUI is essential.
 
-### Choose OpenBBT if
+### Choose Azertio if
 
 - You want tests that live in git, are reviewed in pull requests, and are as readable as documentation.
 - You need to test more than HTTP — **database state, query results, cross-system assertions**.
@@ -440,4 +440,4 @@ This enables a workflow impossible in Postman: a product owner reviews and appro
 
 ---
 
-> **Note:** Postman and OpenBBT are not mutually exclusive. Many teams use Postman for initial API exploration and request prototyping, then translate their validated scenarios into OpenBBT `.feature` files for the automated regression suite. Postman excels at the discovery phase; OpenBBT excels at the automation phase.
+> **Note:** Postman and Azertio are not mutually exclusive. Many teams use Postman for initial API exploration and request prototyping, then translate their validated scenarios into Azertio `.feature` files for the automated regression suite. Postman excels at the discovery phase; Azertio excels at the automation phase.

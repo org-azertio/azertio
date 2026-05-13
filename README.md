@@ -1,6 +1,6 @@
-# OpenBBT — Open Black-Box Testing
+# Azertio — Open Black-Box Testing
 
-OpenBBT is an extensible, plugin-based black-box testing platform for Java. Write expressive tests in plain DSL, run them against REST APIs, databases, or any custom system — with zero boilerplate and zero glue code.
+Azertio is an extensible, plugin-based black-box testing platform for Java. Write expressive tests in plain DSL, run them against REST APIs, databases, or any custom system — with zero boilerplate and zero glue code.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Java 21+](https://img.shields.io/badge/Java-21%2B-blue.svg)](https://openjdk.org/projects/jdk/21/)
@@ -17,7 +17,7 @@ OpenBBT is an extensible, plugin-based black-box testing platform for Java. Writ
 - **Benchmark mode** — run any step N times across T virtual threads and assert on min/max/mean/P50/P95/P99/throughput/errorRate — in the same `.feature` file as functional tests.
 - **Configurable persistence** — three modes: transient (CI), local file (developer workstation), or remote PostgreSQL + MinIO (team-shared execution history).
 - **VS Code extension** — browse executions, inspect result trees, view attachments, and re-run past executions directly from the editor.
-- **Profiles** — named environment configurations in `openbbt.yaml`, switched with a single CLI flag.
+- **Profiles** — named environment configurations in `azertio.yaml`, switched with a single CLI flag.
 - **Tag-based suite filtering** — boolean tag expressions (`GET and not slow`) define named test suites in configuration.
 
 ---
@@ -34,7 +34,7 @@ See the **[Getting Started guide](docs/getting-started.md)** for installation, P
 ### Quick example
 
 ```yaml
-# openbbt.yaml
+# azertio.yaml
 project:
   name: My API Tests
   test-suites:
@@ -62,8 +62,8 @@ Scenario: Health check returns 200
 ```
 
 ```bash
-openbbt install
-openbbt run -s smoke -p staging
+azertio install
+azertio run -s smoke -p staging
 ```
 
 ---
@@ -71,19 +71,19 @@ openbbt run -s smoke -p staging
 ## Project Structure
 
 ```
-openbbt/
-├── openbbt-core/                       # Core interfaces, execution engine, persistence contracts
-├── openbbt-cli/                        # CLI entry point (picocli)
-├── openbbt-persistence/                # Persistence layer (HSQLDB / PostgreSQL via jOOQ, MinIO)
-├── openbbt-jsonrpc/                    # JSON-RPC 2.0 server over stdio (VS Code ↔ CLI bridge)
-├── openbbt-lsp/                        # Language Server Protocol support
-├── openbbt-docgen-maven-plugin/        # Maven plugin for step/config reference doc generation
-├── openbbt-vscode/                     # VS Code extension (TypeScript)
+azertio/
+├── azertio-core/                       # Core interfaces, execution engine, persistence contracts
+├── azertio-cli/                        # CLI entry point (picocli)
+├── azertio-persistence/                # Persistence layer (HSQLDB / PostgreSQL via jOOQ, MinIO)
+├── azertio-jsonrpc/                    # JSON-RPC 2.0 server over stdio (VS Code ↔ CLI bridge)
+├── azertio-lsp/                        # Language Server Protocol support
+├── azertio-docgen-maven-plugin/        # Maven plugin for step/config reference doc generation
+├── azertio-vscode/                     # VS Code extension (TypeScript)
 ├── plugins/
-│   ├── gherkin-openbbt-plugin/         # Gherkin .feature file parser and suite assembler
-│   ├── rest-openbbt-plugin/            # REST API step provider
-│   ├── db-openbbt-plugin/              # Database step provider (JDBC)
-│   └── markdown-plan-openbbt-plugin/   # Markdown-based test plan format
+│   ├── gherkin-azertio-plugin/         # Gherkin .feature file parser and suite assembler
+│   ├── rest-azertio-plugin/            # REST API step provider
+│   ├── db-azertio-plugin/              # Database step provider (JDBC)
+│   └── markdown-plan-azertio-plugin/   # Markdown-based test plan format
 └── examples/
     └── test-plan/                      # Working example against JSONPlaceholder + Rfam MySQL
 ```
@@ -94,7 +94,7 @@ openbbt/
 
 ### Plugins
 
-Plugins are Maven artifacts declared in `openbbt.yaml`. They are downloaded and loaded at runtime — no `pom.xml` needed in your test project:
+Plugins are Maven artifacts declared in `azertio.yaml`. They are downloaded and loaded at runtime — no `pom.xml` needed in your test project:
 
 ```yaml
 plugins:
@@ -108,7 +108,7 @@ Each plugin runs in its own JPMS module layer, isolated from other plugins and f
 
 ### Test Suites and Tag Filtering
 
-Suites are named boolean tag expressions defined once in `openbbt.yaml` and selected at runtime:
+Suites are named boolean tag expressions defined once in `azertio.yaml` and selected at runtime:
 
 ```yaml
 project:
@@ -122,7 +122,7 @@ project:
 ```
 
 ```bash
-openbbt run -s regression -p staging
+azertio run -s regression -p staging
 ```
 
 ### Profiles
@@ -163,7 +163,7 @@ Scenario: POST /orders meets latency SLA
 
 ## Two-Level Scenarios
 
-OpenBBT supports a **definition / implementation** model that separates test intent from technical execution — optionally in different natural languages.
+Azertio supports a **definition / implementation** model that separates test intent from technical execution — optionally in different natural languages.
 
 A **definition** feature (tagged `@definition`) describes *what* the test does in business-readable language. An **implementation** feature (tagged `@implementation`) describes *how* it does it, matched to the definition by `@ID-*` tag.
 
@@ -211,16 +211,16 @@ Every test execution — plan structure, result tree, step timings, and binary a
 | Mode | Plan & results | Attachments | Use case |
 |---|---|---|---|
 | `transient` | Temp HSQLDB (deleted on exit) | Temp directory | CI: fast, no disk I/O, ephemeral |
-| `file` | HSQLDB file in `.openbbt/` | Local filesystem | Developer: full history in VS Code |
+| `file` | HSQLDB file in `.azertio/` | Local filesystem | Developer: full history in VS Code |
 | `remote` | PostgreSQL | MinIO (S3-compatible) | Team: CI writes, all developers read |
 
 ```yaml
-# openbbt.yaml — remote mode example
+# azertio.yaml — remote mode example
 configuration:
   core:
     persistence.mode: remote
-    persistence.db.url: jdbc:postgresql://db-server:5432/openbbt
-    persistence.db.username: openbbt
+    persistence.db.url: jdbc:postgresql://db-server:5432/azertio
+    persistence.db.username: azertio
     persistence.db.password: '{{DB_PASSWORD}}'
     attachment.server.url: http://minio-server:9000
     attachment.server.username: minio-user
@@ -241,7 +241,7 @@ The VS Code extension connects to the CLI via a JSON-RPC 2.0 server over stdio a
 - **Benchmark statistics** — P50/P95/P99/throughput/errorRate visible per step.
 - **One-click re-run** — replay any past execution against its original test plan and profile.
 
-![OpenBBT VS Code Extension](images/screenshot1.png)
+![Azertio VS Code Extension](images/screenshot1.png)
 
 ---
 
@@ -262,21 +262,21 @@ The VS Code extension connects to the CLI via a JSON-RPC 2.0 server over stdio a
 
 | Comparison | Summary |
 |---|---|
-| [OpenBBT vs Karate](docs/comparison-karate.md) | Plugin architecture, multilingual DSL, built-in benchmarking, VS Code integration vs Karate's embedded JS engine |
-| [OpenBBT vs Cucumber + RestAssured](docs/comparison-cucumber-restassured.md) | Zero glue code, database testing, definition/implementation model vs Cucumber's step definition boilerplate |
-| [OpenBBT vs Postman / Newman](docs/comparison-postman-newman.md) | Git-friendly plain text, database support, persistent execution history vs Postman's GUI-centric JSON collections |
+| [Azertio vs Karate](docs/comparison-karate.md) | Plugin architecture, multilingual DSL, built-in benchmarking, VS Code integration vs Karate's embedded JS engine |
+| [Azertio vs Cucumber + RestAssured](docs/comparison-cucumber-restassured.md) | Zero glue code, database testing, definition/implementation model vs Cucumber's step definition boilerplate |
+| [Azertio vs Postman / Newman](docs/comparison-postman-newman.md) | Git-friendly plain text, database support, persistent execution history vs Postman's GUI-centric JSON collections |
 
 ---
 
 ## Building from Source
 
 ```bash
-git clone https://github.com/org-myjtools/openbbt.git
-cd openbbt
+git clone https://github.com/org-myjtools/azertio.git
+cd azertio
 mvn install -DskipTests
 ```
 
-The CLI distribution ZIP is produced at `openbbt-cli/target/openbbt-cli-<version>-dist.zip`.
+The CLI distribution ZIP is produced at `azertio-cli/target/azertio-cli-<version>-dist.zip`.
 
 ---
 
