@@ -21,7 +21,6 @@
     <properties>
         <azertio.docgen.stepDocFile>${project.basedir}/src/main/resources/steps.yaml</azertio.docgen.stepDocFile>
         <azertio.docgen.configFile>${project.basedir}/src/main/resources/config.yaml</azertio.docgen.configFile>
-        <azertio.docgen.outputDirectory>${project.basedir}/../../docs</azertio.docgen.outputDirectory>
         <azertio.docgen.stepTitle>REST Plugin — Step Reference</azertio.docgen.stepTitle>
         <azertio.docgen.configTitle>REST Plugin — Configuration Reference</azertio.docgen.configTitle>
     </properties>

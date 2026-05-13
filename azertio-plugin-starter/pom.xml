@@ -22,7 +22,7 @@
         <!-- Doc generation: override in child pom to customise paths and titles -->
         <azertio.docgen.stepDocFile>${project.basedir}/src/main/resources/steps.yaml</azertio.docgen.stepDocFile>
         <azertio.docgen.configFile>${project.basedir}/src/main/resources/config.yaml</azertio.docgen.configFile>
-        <azertio.docgen.outputDirectory>${project.basedir}/docs</azertio.docgen.outputDirectory>
+        <azertio.docgen.outputDirectory>${maven.multiModuleProjectDirectory}/www/docs/plugins/${project.artifactId}</azertio.docgen.outputDirectory>
         <azertio.docgen.stepTitle>Step Reference</azertio.docgen.stepTitle>
         <azertio.docgen.configTitle>Configuration Reference</azertio.docgen.configTitle>
     </properties>

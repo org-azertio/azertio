@@ -123,6 +123,34 @@
 
 	<profiles>
 		<profile>
+			<id>generate-doc</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-resources-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>copy-docs-to-www</id>
+								<phase>generate-resources</phase>
+								<goals><goal>copy-resources</goal></goals>
+								<configuration>
+									<outputDirectory>${project.basedir}/www/docs</outputDirectory>
+									<resources>
+										<resource>
+											<directory>${project.basedir}/docs</directory>
+											<filtering>false</filtering>
+										</resource>
+									</resources>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
 			<id>plugins</id>
 			<modules>
 				<module>azertio-plugin-starter</module>

@@ -22,7 +22,6 @@
         <!-- No step doc: this plugin provides no steps -->
         <azertio.docgen.skip>true</azertio.docgen.skip>
         <azertio.docgen.configFile>${project.basedir}/src/main/resources/config.yaml</azertio.docgen.configFile>
-        <azertio.docgen.outputDirectory>${project.basedir}/../../docs</azertio.docgen.outputDirectory>
         <azertio.docgen.configTitle>PDF Report Plugin — Configuration Reference</azertio.docgen.configTitle>
     </properties>
 
