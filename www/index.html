@@ -861,6 +861,33 @@
       padding: 0.1em 0.4em; border-radius: 4px;
     }
 
+    /* ── Mobile ──────────────────────────────────────────────────── */
+    @media (max-width: 640px) {
+      /* Nav: hide text links, keep logo + GitHub button */
+      nav { padding: 0.75rem 1.2rem; }
+      .nav-links a:not(.btn-nav) { display: none; }
+      .nav-links { gap: 0; }
+      .btn-nav { padding: 0.4rem 0.9rem; font-size: 0.8rem; }
+
+      /* Hero */
+      .hero-logo img { width: 200px; }
+      #hero { padding: 6rem 1.2rem 4rem; }
+      .hero-cta { flex-direction: column; align-items: center; gap: 0.8rem; }
+      .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
+
+      /* Proof chips */
+      .hero-proof { gap: 0.5rem; }
+      .proof-chip { font-size: 0.72rem; padding: 0.3rem 0.7rem; }
+
+      /* Section padding */
+      #features, #example, #plugins, #vscode, #quickstart, #comparisons { padding: 4rem 0; }
+      .container { padding: 0 1.2rem; }
+
+      /* VS Code Marketplace buttons */
+      .vscode-cta { flex-direction: column; align-items: stretch; }
+      .vscode-cta a { justify-content: center; }
+    }
+
     /* Scroll fade-in */
     .reveal {
       opacity: 0;
@@ -1351,7 +1378,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           The Azertio extension connects to a local JSON-RPC server and gives
           you a full testing workflow inside VS Code — no terminal juggling required.
         </p>
-        <div style="display:flex;gap:0.8rem;flex-wrap:wrap;justify-content:center;margin-top:1.8rem">
+        <div class="vscode-cta" style="display:flex;gap:0.8rem;flex-wrap:wrap;justify-content:center;margin-top:1.8rem">
           <a href="vscode:extension/azertio.azertio" class="btn-primary" style="font-size:0.88rem;padding:0.7rem 1.5rem">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M23.15 2.587L18.21.21a1.494 1.494 0 0 0-1.705.29l-9.46 8.63-4.12-3.128a.999.999 0 0 0-1.276.057L.327 7.261A1 1 0 0 0 .326 8.74L3.899 12 .326 15.26a1 1 0 0 0 .001 1.479L1.65 17.94a.999.999 0 0 0 1.276.057l4.12-3.128 9.46 8.63a1.492 1.492 0 0 0 1.704.29l4.942-2.377A1.5 1.5 0 0 0 24 19.851V4.149a1.5 1.5 0 0 0-.85-1.562zM18 14.333L11.37 12 18 9.667v4.666z"/></svg>
             Install in VS Code
