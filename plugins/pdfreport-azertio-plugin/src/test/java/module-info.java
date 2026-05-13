@@ -8,6 +8,6 @@ module org.azertio.plugins.pdfreport.test {
     requires org.assertj.core;
     requires java.desktop;
 
-    opens org.myjtools.plugins.pdfreport.test to org.junit.platform.commons;
+    opens org.azertio.plugins.pdfreport.test to org.junit.platform.commons;
 
 }

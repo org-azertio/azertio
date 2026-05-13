@@ -15,6 +15,6 @@ module org.azertio.plugins.db.test {
     requires org.apache.poi.poi;
     requires org.apache.poi.ooxml;
 
-    opens org.myjtools.plugins.db.test to org.junit.platform.commons;
+    opens org.azertio.plugins.db.test to org.junit.platform.commons;
 
 }

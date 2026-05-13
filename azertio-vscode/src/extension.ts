@@ -66,7 +66,7 @@ function updateDiagnostics(document: vscode.TextDocument): void {
     }
 }
 
-class OpenbbtYamlCodeLensProvider implements vscode.CodeLensProvider {
+class AzertioYamlCodeLensProvider implements vscode.CodeLensProvider {
     provideCodeLenses(document: vscode.TextDocument): vscode.CodeLens[] {
         if (document.getText().trim() === '') {
             return [];
@@ -88,7 +88,7 @@ class OpenbbtYamlCodeLensProvider implements vscode.CodeLensProvider {
     }
 }
 
-class OpenbbtYamlCodeActionProvider implements vscode.CodeActionProvider {
+class AzertioYamlCodeActionProvider implements vscode.CodeActionProvider {
     static readonly providedCodeActionKinds = [vscode.CodeActionKind.QuickFix];
 
     provideCodeActions(
@@ -571,12 +571,12 @@ export function activate(context: vscode.ExtensionContext): void {
         }),
         vscode.languages.registerCodeLensProvider(
             { scheme: 'file', pattern: '**/azertio.yaml' },
-            new OpenbbtYamlCodeLensProvider()
+            new AzertioYamlCodeLensProvider()
         ),
         vscode.languages.registerCodeActionsProvider(
             { scheme: 'file', pattern: '**/azertio.yaml' },
-            new OpenbbtYamlCodeActionProvider(),
-            { providedCodeActionKinds: OpenbbtYamlCodeActionProvider.providedCodeActionKinds }
+            new AzertioYamlCodeActionProvider(),
+            { providedCodeActionKinds: AzertioYamlCodeActionProvider.providedCodeActionKinds }
         ),
         vscode.workspace.onDidOpenTextDocument(updateDiagnostics),
         vscode.workspace.onDidChangeTextDocument(e => updateDiagnostics(e.document)),

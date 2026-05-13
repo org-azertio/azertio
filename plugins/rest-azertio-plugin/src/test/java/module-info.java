@@ -9,6 +9,6 @@ module org.azertio.plugins.rest.test {
 	requires org.azertio.core;
 	requires azertio.test.support;
 
-	opens org.myjtools.plugins.rest.test to org.junit.platform.commons;
+	opens org.azertio.plugins.rest.test to org.junit.platform.commons;
 
 }

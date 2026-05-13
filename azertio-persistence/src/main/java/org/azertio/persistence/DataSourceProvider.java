@@ -130,7 +130,7 @@ public class DataSourceProvider {
 		config.setMaximumPoolSize(10);
 		DataSource dataSource = new HikariDataSource(config);
 
-		String migrationLocation = "classpath:org/myjtools/azertio/persistence/migration/"
+		String migrationLocation = "classpath:org/azertio/persistence/migration/"
 			+ jdbcUrlProvider.databaseType().migrationFolder;
 
 		Flyway flyway = Flyway.configure(getClass().getClassLoader())

@@ -45,7 +45,6 @@
 		<module>azertio-test-support</module>
 		<module>azertio-jsonrpc</module>
 		<module>azertio-cli</module>
-		<module>azertio-it</module>
 		<module>azertio-docgen-maven-plugin</module>
 		<module>azertio-lsp</module>
 	</modules>
@@ -132,6 +131,7 @@
 				<module>plugins/rest-azertio-plugin</module>
 				<module>plugins/db-azertio-plugin</module>
 				<module>plugins/pdfreport-azertio-plugin</module>
+				<module>azertio-it</module>
 			</modules>
 		</profile>
 	</profiles>
