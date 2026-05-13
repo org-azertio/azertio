@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg version="1.1" viewBox="-29.257 2.669 127.522 32.401" xmlns="http://www.w3.org/2000/svg">
+  <g transform="matrix(1,0,0,1,-479.346191,-615.663147)">
+    <polygon points="477,627.217 464.5,620 452,627.217 464.5,634.434" style="fill:#00ffe0;opacity:0.9"/>
+    <polygon points="464,635.434 452,628.506 452,642.506 464,649.434" style="fill:#00c4ab;opacity:0.75"/>
+    <polygon points="465,635.434 477,628.506 477,642.506 465,649.434" style="fill:#00ffe0;opacity:0.55"/>
+  </g>
+  <g style="fill:#00ffe0" transform="matrix(0.112487,-0.045039,0.038156,0.095297,-14.488243,21.151979)">
+    <path d="m 0,43 c 2,-4 6,-9 13,-7 6,2 10,8 13,16 C 50,25 70,6 94,0 97,0 98,0 96,2 70,20 45,47 25,82 24,83 23,83 22,82 18,72 15,62 10,52 8,47 5,43 0,43 Z"/>
+  </g>
+  <text style="fill:#00ffe0;font-family:Baumans,sans-serif;font-size:28px;font-weight:700;letter-spacing:-1px" x="0.504" y="25.459">azertio</text>
+</svg>

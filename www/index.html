@@ -3,52 +3,60 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>OpenBBT — Open Black-Box Testing</title>
+  <title>Azertio — Open Black-Box Testing</title>
 
   <!-- SEO -->
-  <meta name="description" content="OpenBBT is an extensible, plugin-based black-box testing platform. Write expressive tests in plain DSL — test REST APIs, databases, and more — with zero boilerplate." />
+  <meta name="description" content="Azertio is an extensible, plugin-based black-box testing platform. Write expressive tests in plain DSL — test REST APIs, databases, and more — with zero boilerplate." />
   <meta name="keywords" content="black-box testing, BDD, Gherkin, DSL, REST API testing, database testing, JDBC, plugin-based, Java, VS Code, open source, test automation" />
-  <meta name="author" content="myjtools" />
+  <meta name="author" content="azertio" />
   <meta name="robots" content="index, follow" />
-  <link rel="canonical" href="https://myjtools.org/openbbt/" />
+  <link rel="canonical" href="https://azertio.org/" />
 
   <!-- Open Graph -->
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://myjtools.org/openbbt/" />
-  <meta property="og:title" content="OpenBBT — Open Black-Box Testing" />
+  <meta property="og:url" content="https://azertio.org/" />
+  <meta property="og:title" content="Azertio — Open Black-Box Testing" />
   <meta property="og:description" content="Extensible, plugin-based testing platform. Write expressive tests in plain DSL — test REST APIs, databases, and more — with zero boilerplate." />
-  <meta property="og:image" content="https://myjtools.org/openbbt/images/screenshot1.png" />
+  <meta property="og:image" content="https://azertio.org/images/screenshot1.png" />
   <meta property="og:image:width" content="1280" />
   <meta property="og:image:height" content="720" />
-  <meta property="og:image:alt" content="OpenBBT VS Code extension showing test execution results" />
-  <meta property="og:site_name" content="OpenBBT" />
+  <meta property="og:image:alt" content="Azertio VS Code extension showing test execution results" />
+  <meta property="og:site_name" content="Azertio" />
   <meta property="og:locale" content="en_US" />
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="OpenBBT — Open Black-Box Testing" />
+  <meta name="twitter:title" content="Azertio — Open Black-Box Testing" />
   <meta name="twitter:description" content="Extensible, plugin-based testing platform. Write expressive tests in plain DSL — test REST APIs, databases, and more — with zero boilerplate." />
-  <meta name="twitter:image" content="https://myjtools.org/openbbt/images/screenshot1.png" />
+  <meta name="twitter:image" content="https://azertio.org/images/screenshot1.png" />
 
   <!-- Structured data -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    "name": "OpenBBT",
+    "name": "Azertio",
     "description": "Extensible, plugin-based black-box testing platform. Write expressive tests in plain DSL — test REST APIs, databases, and more — with zero boilerplate.",
-    "url": "https://myjtools.org/openbbt/",
+    "url": "https://azertio.org/",
     "applicationCategory": "DeveloperApplication",
     "operatingSystem": "Linux, Windows, macOS",
     "license": "https://opensource.org/licenses/MIT",
-    "codeRepository": "https://github.com/org-myjtools/openbbt",
+    "codeRepository": "https://github.com/org-azertio/azertio",
     "author": {
       "@type": "Organization",
-      "name": "myjtools",
-      "url": "https://myjtools.org"
+      "name": "azertio",
+      "url": "https://azertio.org"
     }
   }
   </script>
+
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-NDFJJ357');</script>
+  <!-- End Google Tag Manager -->
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -125,9 +133,9 @@
       gap: 0.6rem;
     }
 
-    .nav-logo svg { width: 120px; height: auto; }
+    .nav-logo svg, .nav-logo img { width: 120px; height: auto; }
 
-    .hero-logo svg { width: 320px; height: auto; margin-bottom: 2rem; filter: drop-shadow(0 0 32px rgba(0,255,224,0.3)); }
+    .hero-logo svg, .hero-logo img { width: 320px; height: auto; margin-bottom: 2rem; filter: drop-shadow(0 0 32px rgba(0,255,224,0.3)); }
 
     .nav-links {
       display: flex;
@@ -653,7 +661,7 @@
     }
 
     .footer-logo { display: flex; align-items: center; gap: 0.6rem; }
-    .footer-logo svg { width: 100px; height: auto; }
+    .footer-logo svg, .footer-logo img { width: 100px; height: auto; }
     .footer-tagline { font-size: 0.8rem; color: var(--muted); margin-top: 0.3rem; }
 
     .footer-links {
@@ -797,30 +805,24 @@
 </head>
 <body>
 
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NDFJJ357"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
 <canvas id="particles-bg"></canvas>
 
 <!-- ── Nav ──────────────────────────────────────────────────────── -->
 <nav>
-  <a href="#" class="nav-logo" aria-label="OpenBBT home">
-    <svg viewBox="-29.257 2.669 127.522 32.401" xmlns="http://www.w3.org/2000/svg">
-      <g transform="matrix(1,0,0,1,-479.346191,-615.663147)">
-        <polygon points="477,627.217 464.5,620 452,627.217 464.5,634.434" style="fill:#00ffe0;opacity:0.9"/>
-        <polygon points="464,635.434 452,628.506 452,642.506 464,649.434" style="fill:#00c4ab;opacity:0.75"/>
-        <polygon points="465,635.434 477,628.506 477,642.506 465,649.434" style="fill:#00ffe0;opacity:0.55"/>
-      </g>
-      <g style="fill:#ffffff" transform="matrix(0.112487,-0.045039,0.038156,0.095297,-14.488243,21.151979)">
-        <path d="m 0,43 c 2,-4 6,-9 13,-7 6,2 10,8 13,16 C 50,25 70,6 94,0 97,0 98,0 96,2 70,20 45,47 25,82 24,83 23,83 22,82 18,72 15,62 10,52 8,47 5,43 0,43 Z" style="fill:#00ffe0"/>
-      </g>
-      <text style="fill:#00ffe0;font-family:Baumans,sans-serif;font-size:28px;font-weight:700;letter-spacing:-1.6px" x="0.504" y="25.459">open</text>
-      <text style="fill:#ffffff;font-family:Baumans,sans-serif;font-size:28px;font-weight:700;letter-spacing:-1.6px" x="56.649" y="25.597">bbt</text>
-    </svg>
+  <a href="#" class="nav-logo" aria-label="Azertio home">
+    <img src="logo.svg" alt="Azertio" />
   </a>
   <nav class="nav-links">
     <a href="#features">Features</a>
     <a href="#example">DSL</a>
     <a href="#plugins">Plugins</a>
     <a href="#vscode">VS Code</a>
-    <a href="https://github.com/org-myjtools/openbbt" class="btn-nav" target="_blank" rel="noopener">
+    <a href="https://github.com/org-azertio/azertio" class="btn-nav" target="_blank" rel="noopener">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
       GitHub
     </a>
@@ -830,18 +832,7 @@
 <!-- ── Hero ─────────────────────────────────────────────────────── -->
 <section id="hero">
   <div class="hero-logo">
-    <svg viewBox="-29.257 2.669 127.522 32.401" xmlns="http://www.w3.org/2000/svg">
-      <g transform="matrix(1,0,0,1,-479.346191,-615.663147)">
-        <polygon points="477,627.217 464.5,620 452,627.217 464.5,634.434" style="fill:#00ffe0;opacity:0.9"/>
-        <polygon points="464,635.434 452,628.506 452,642.506 464,649.434" style="fill:#00c4ab;opacity:0.75"/>
-        <polygon points="465,635.434 477,628.506 477,642.506 465,649.434" style="fill:#00ffe0;opacity:0.55"/>
-      </g>
-      <g style="fill:#ffffff" transform="matrix(0.112487,-0.045039,0.038156,0.095297,-14.488243,21.151979)">
-        <path d="m 0,43 c 2,-4 6,-9 13,-7 6,2 10,8 13,16 C 50,25 70,6 94,0 97,0 98,0 96,2 70,20 45,47 25,82 24,83 23,83 22,82 18,72 15,62 10,52 8,47 5,43 0,43 Z" style="fill:#00ffe0"/>
-      </g>
-      <text style="fill:#00ffe0;font-family:Baumans,sans-serif;font-size:28px;font-weight:700;letter-spacing:-1.6px" x="0.504" y="25.459">open</text>
-      <text style="fill:#ffffff;font-family:Baumans,sans-serif;font-size:28px;font-weight:700;letter-spacing:-1.6px" x="56.649" y="25.597">bbt</text>
-    </svg>
+    <img src="logo.svg" alt="Azertio" />
   </div>
 
   <div class="hero-badge">
@@ -855,13 +846,13 @@
   </h1>
 
   <p class="hero-sub">
-    OpenBBT is an extensible, plugin-based testing platform that lets you
+    Azertio is an extensible, plugin-based testing platform that lets you
     write expressive tests in plain DSL — then run them anywhere, against
     anything.
   </p>
 
   <div class="hero-cta">
-    <a href="https://github.com/org-myjtools/openbbt" class="btn-primary" target="_blank" rel="noopener">
+    <a href="https://github.com/org-azertio/azertio" class="btn-primary" target="_blank" rel="noopener">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
       View on GitHub
     </a>
@@ -876,10 +867,10 @@
       <div class="dot dot-r"></div>
       <div class="dot dot-y"></div>
       <div class="dot dot-g"></div>
-      <span class="terminal-title">openbbt — exec</span>
+      <span class="terminal-title">azertio — exec</span>
     </div>
     <div class="terminal-body">
-      <div><span class="t-prompt">❯</span> <span class="t-cmd">openbbt exec --suite "REST API"</span></div>
+      <div><span class="t-prompt">❯</span> <span class="t-cmd">azertio exec --suite "REST API"</span></div>
       <div class="t-info">  Building test plan…</div>
       <div class="t-info">  Installing plugins: gherkin, rest</div>
       <div class="t-dim">  ────────────────────────────────────</div>
@@ -899,7 +890,7 @@
 <section id="features">
   <div class="container">
     <div class="features-head reveal">
-      <span class="section-label">Why OpenBBT</span>
+      <span class="section-label">Why Azertio</span>
       <h2>Everything you need to test, nothing you don't</h2>
       <p class="section-intro">
         A lightweight runtime with a powerful extension model. Bring your own
@@ -924,7 +915,7 @@
       <div class="feature-card reveal">
         <div class="feature-icon">🔌</div>
         <h3>Any JDBC database</h3>
-        <p>Connect to MySQL, PostgreSQL, SQLite, H2, DuckDB or any JDBC driver — just add it as a runtime dependency in <code style="font-family:var(--mono);color:var(--cyan);font-size:0.85em">openbbt.yaml</code>.</p>
+        <p>Connect to MySQL, PostgreSQL, SQLite, H2, DuckDB or any JDBC driver — just add it as a runtime dependency in <code style="font-family:var(--mono);color:var(--cyan);font-size:0.85em">azertio.yaml</code>.</p>
       </div>
 
       <div class="feature-card reveal">
@@ -999,7 +990,7 @@
         <span class="section-label">The DSL</span>
         <h2>Tests as close to English as it gets</h2>
         <p style="color:var(--muted);margin-bottom:2rem;line-height:1.7">
-          Write scenarios in plain language. OpenBBT matches each line to a
+          Write scenarios in plain language. Azertio matches each line to a
           step implementation at runtime — zero boilerplate, zero glue code.
         </p>
         <ul class="example-points">
@@ -1046,7 +1037,7 @@
         <span class="section-label">Plugins</span>
         <h2>Install only what you need</h2>
       </div>
-      <p class="plugin-note">Declare in <code>openbbt.yaml</code> → resolved from Maven at runtime</p>
+      <p class="plugin-note">Declare in <code>azertio.yaml</code> → resolved from Maven at runtime</p>
     </div>
 
     <div class="plugins-grid">
@@ -1118,7 +1109,7 @@
           <span class="plugin-name">Build your own</span>
         </div>
         <p class="plugin-desc">
-          Implement <code style="font-family:var(--mono);color:#a78bfa;font-size:0.82em">StepProvider</code> and publish to Maven. OpenBBT resolves and loads it at startup — no forks, no rebuilds.
+          Implement <code style="font-family:var(--mono);color:#a78bfa;font-size:0.82em">StepProvider</code> and publish to Maven. Azertio resolves and loads it at startup — no forks, no rebuilds.
         </p>
         <div class="plugin-tags">
           <span class="tag-chip">Java SPI</span>
@@ -1141,7 +1132,7 @@
 
       <div class="vscode-screenshot reveal">
         <a href="images/screenshot1.png" target="_blank" rel="noopener">
-          <img src="images/screenshot1.png" alt="OpenBBT VS Code extension showing execution results" style="cursor:zoom-in" />
+          <img src="images/screenshot1.png" alt="Azertio VS Code extension showing execution results" style="cursor:zoom-in" />
         </a>
       </div>
 
@@ -1153,7 +1144,7 @@
         <span class="section-label">IDE Integration</span>
         <h2>Run and inspect tests without leaving the editor</h2>
         <p style="color:var(--muted);margin-top:1rem;line-height:1.7;max-width:640px;margin-inline:auto">
-          The OpenBBT extension connects to a local JSON-RPC server and gives
+          The Azertio extension connects to a local JSON-RPC server and gives
           you a full testing workflow inside VS Code — no terminal juggling required.
         </p>
       </div>
@@ -1202,30 +1193,19 @@
   <div class="container">
     <div class="footer-inner">
       <div class="footer-logo">
-        <svg viewBox="-29.257 2.669 127.522 32.401" xmlns="http://www.w3.org/2000/svg">
-          <g transform="matrix(1,0,0,1,-479.346191,-615.663147)">
-            <polygon points="477,627.217 464.5,620 452,627.217 464.5,634.434" style="fill:#00ffe0;opacity:0.9"/>
-            <polygon points="464,635.434 452,628.506 452,642.506 464,649.434" style="fill:#00c4ab;opacity:0.75"/>
-            <polygon points="465,635.434 477,628.506 477,642.506 465,649.434" style="fill:#00ffe0;opacity:0.55"/>
-          </g>
-          <g style="fill:#ffffff" transform="matrix(0.112487,-0.045039,0.038156,0.095297,-14.488243,21.151979)">
-            <path d="m 0,43 c 2,-4 6,-9 13,-7 6,2 10,8 13,16 C 50,25 70,6 94,0 97,0 98,0 96,2 70,20 45,47 25,82 24,83 23,83 22,82 18,72 15,62 10,52 8,47 5,43 0,43 Z" style="fill:#00ffe0"/>
-          </g>
-          <text style="fill:#00ffe0;font-family:Baumans,sans-serif;font-size:28px;font-weight:700;letter-spacing:-1.6px" x="0.504" y="25.459">open</text>
-          <text style="fill:#ffffff;font-family:Baumans,sans-serif;font-size:28px;font-weight:700;letter-spacing:-1.6px" x="56.649" y="25.597">bbt</text>
-        </svg>
+        <img src="logo.svg" alt="Azertio" />
         <div>
           <div class="footer-tagline">Open Black-Box Testing · MIT License</div>
         </div>
       </div>
 
       <nav class="footer-links">
-        <a href="https://github.com/org-myjtools/openbbt" target="_blank" rel="noopener">GitHub</a>
-        <a href="https://github.com/org-myjtools/openbbt/issues" target="_blank" rel="noopener">Issues</a>
-        <a href="https://github.com/org-myjtools/openbbt/blob/main/LICENSE" target="_blank" rel="noopener">License</a>
+        <a href="https://github.com/org-azertio/azertio" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://github.com/org-azertio/azertio/issues" target="_blank" rel="noopener">Issues</a>
+        <a href="https://github.com/org-azertio/azertio/blob/main/LICENSE" target="_blank" rel="noopener">License</a>
       </nav>
     </div>
-    <p class="footer-copy">© 2025 OpenBBT contributors. Released under the MIT License.</p>
+    <p class="footer-copy">© 2025 Azertio contributors. Released under the MIT License.</p>
   </div>
 </footer>
 
