@@ -27,7 +27,7 @@ jobs:
           server-password: GITHUB_TOKEN
 
       - name: Build and deploy to GitHub Packages
-        run: ./mvnw -B deploy -Pgithub,plugins -DskipTests
+        run: ./mvnw -B deploy -Pplugins -DskipTests
         env:
           GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

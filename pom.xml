@@ -34,6 +34,17 @@
 
 	<url>https://azertio.org</url>
 
+	<distributionManagement>
+		<repository>
+			<id>github</id>
+			<url>https://maven.pkg.github.com/org-azertio/azertio</url>
+		</repository>
+		<snapshotRepository>
+			<id>github</id>
+			<url>https://maven.pkg.github.com/org-azertio/azertio</url>
+		</snapshotRepository>
+	</distributionManagement>
+
 	<licenses>
 		<license>
 			<name>MIT</name>
@@ -179,22 +190,6 @@
 				<module>plugins/pdfreport-azertio-plugin</module>
 				<module>azertio-it</module>
 			</modules>
-		</profile>
-
-		<!-- ── GitHub Packages (active by default) ───────────────── -->
-		<profile>
-			<id>github</id>
-			<activation><activeByDefault>true</activeByDefault></activation>
-			<distributionManagement>
-				<repository>
-					<id>github</id>
-					<url>https://maven.pkg.github.com/org-azertio/azertio</url>
-				</repository>
-				<snapshotRepository>
-					<id>github</id>
-					<url>https://maven.pkg.github.com/org-azertio/azertio</url>
-				</snapshotRepository>
-			</distributionManagement>
 		</profile>
 
 		<!-- ── Maven Central (Sonatype Central Portal) ───────────── -->
