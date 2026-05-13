@@ -1,8 +1,8 @@
 # Definition / Implementation — Two-Level Test Scenarios
 
-OpenBBT supports a two-level scenario model that separates *what* a test does from *how* it does it. The **definition** layer describes the test intent in high-level, business-readable language. The **implementation** layer provides the concrete, executable steps that fulfil that intent — potentially in a different natural language, with a different level of technical detail.
+Azertio supports a two-level scenario model that separates *what* a test does from *how* it does it. The **definition** layer describes the test intent in high-level, business-readable language. The **implementation** layer provides the concrete, executable steps that fulfil that intent — potentially in a different natural language, with a different level of technical detail.
 
-This mechanism is unique to OpenBBT and has no direct equivalent in other testing frameworks.
+This mechanism is unique to Azertio and has no direct equivalent in other testing frameworks.
 
 ---
 
@@ -15,7 +15,7 @@ In typical BDD projects, feature files serve two masters simultaneously:
 
 These two needs often pull in opposite directions. Business-facing language is abstract and concise (`Given a registered user`), while executable steps tend to be technical and verbose (`Given I send a POST to "/users" with body {"name":"Alice","email":"alice@example.com"}`). The result is feature files that are too technical for business review, or steps so abstract they hide what actually happens — neither extreme is ideal.
 
-OpenBBT solves this by letting you maintain both levels as separate files that are merged at plan-build time.
+Azertio solves this by letting you maintain both levels as separate files that are merged at plan-build time.
 
 ---
 
@@ -225,7 +225,7 @@ The implementation Examples table is ignored. The plan is expanded using the def
 
 ## Configuration
 
-The tags used for definition and implementation are configurable in `openbbt.yaml`:
+The tags used for definition and implementation are configurable in `azertio.yaml`:
 
 ```yaml
 configuration:
@@ -245,7 +245,7 @@ A typical project using this mechanism looks like:
 
 ```
 tests/
-├── openbbt.yaml
+├── azertio.yaml
 ├── features/
 │   ├── definition/
 │   │   ├── user-registration.feature    (@definition)

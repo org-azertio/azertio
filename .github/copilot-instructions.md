@@ -1,7 +1,7 @@
-# OpenBBT — Copilot Instructions
+# Azertio — Copilot Instructions
 
 ## Project Identity
-- **Org**: `org.myjtools.openbbt` | **Version**: `1.0.0-alpha1` | **License**: MIT
+- **Org**: `org.azertio` | **Version**: `1.0.0-alpha1` | **License**: MIT
 - **Stack**: Java 21 + Maven 3.x | JPMS modules throughout | Parent POM: `myjtools-parent:1.4.0`
 
 ## Branch Strategy
@@ -18,18 +18,18 @@ mvn -B verify                # CI mode
 ## Module Map
 | Module | Role |
 |--------|------|
-| `openbbt-core` | BDD runtime, step execution, expression matching, assertions |
-| `openbbt-persistence` | jOOQ + Flyway + HSQLDB/PostgreSQL |
-| `openbbt-cli` | PicoCLI — subcommands: browse, init, install, version, purge, plan, serve, show-config, tui, lsp |
-| `openbbt-lsp` | Eclipse LSP4J language server |
-| `openbbt-tui` | Lanterna terminal UI |
-| `openbbt-vscode` | TypeScript VS Code extension (npm, separate from Maven) |
-| `openbbt-plugin-starter` | Template POM for plugin development |
-| `openbbt-it` | Integration tests (TestContainers) |
-| `openbbt-docgen-maven-plugin` | Doc generation from code |
-| `plugins/gherkin-openbbt-plugin` | Gherkin feature file support (`-P plugins`) |
-| `plugins/rest-openbbt-plugin` | REST-assured HTTP testing steps |
-| `plugins/markdown-plan-openbbt-plugin` | Markdown-based test plan definitions |
+| `azertio-core` | BDD runtime, step execution, expression matching, assertions |
+| `azertio-persistence` | jOOQ + Flyway + HSQLDB/PostgreSQL |
+| `azertio-cli` | PicoCLI — subcommands: browse, init, install, version, purge, plan, serve, show-config, tui, lsp |
+| `azertio-lsp` | Eclipse LSP4J language server |
+| `azertio-tui` | Lanterna terminal UI |
+| `azertio-vscode` | TypeScript VS Code extension (npm, separate from Maven) |
+| `azertio-plugin-starter` | Template POM for plugin development |
+| `azertio-it` | Integration tests (TestContainers) |
+| `azertio-docgen-maven-plugin` | Doc generation from code |
+| `plugins/gherkin-azertio-plugin` | Gherkin feature file support (`-P plugins`) |
+| `plugins/rest-azertio-plugin` | REST-assured HTTP testing steps |
+| `plugins/markdown-plan-azertio-plugin` | Markdown-based test plan definitions |
 
 ## Architecture Patterns
 - **Plugins**: JExten + JPMS `ModuleLayerProvider`
@@ -73,7 +73,7 @@ log.warn("No factory found for {}", type.getSimpleName());
 
 ### Exceptions
 ```java
-throw new OpenBBTException("Node {} not found in plan {}", nodeId, planId);
+throw new AzertioException("Node {} not found in plan {}", nodeId, planId);
 ```
 - Prefer unchecked exceptions.
 - `@Serial private static final long serialVersionUID = 1L;` in serializable exceptions.
@@ -97,12 +97,12 @@ protected abstract void fillSuppliers();
 
 ### JPMS Module Template
 ```java
-module org.myjtools.openbbt.mymodule {
-    requires org.myjtools.openbbt.core;
+module org.azertio.mymodule {
+    requires org.azertio.core;
     requires org.myjtools.jexten;
     requires static lombok;
-    exports org.myjtools.openbbt.mymodule;
-    opens org.myjtools.openbbt.mymodule to org.myjtools.jexten;
+    exports org.azertio.mymodule;
+    opens org.azertio.mymodule to org.myjtools.jexten;
     uses SomeExtensionPoint;
     provides SomeExtensionPoint with MyImpl;
 }
@@ -110,7 +110,7 @@ module org.myjtools.openbbt.mymodule {
 
 ### Package Structure
 ```
-org.myjtools.openbbt.<module>
+org.azertio.<module>
 ├── (root)         — public API
 ├── .contributors  — SPI interfaces / extension points
 ├── .backend       — engine internals

@@ -10,12 +10,12 @@
 		<version>1.4.0</version>
 	</parent>
 
-	<groupId>org.myjtools.openbbt</groupId>
-	<artifactId>openbbt</artifactId>
+	<groupId>org.azertio</groupId>
+	<artifactId>azertio</artifactId>
 	<version>1.0.0-alpha1</version>
 	<packaging>pom</packaging>
 
-	<name>OpenBBT</name>
+	<name>Azertio</name>
 	<description>Open Blackbox Testing</description>
 
 	<properties>
@@ -27,7 +27,7 @@
 		<!-- Sonar reads the aggregate JaCoCo report (IT tests covering all modules)
 		     plus each module's own per-module report -->
 		<sonar.coverage.jacoco.xmlReportPaths>
-			${maven.multiModuleProjectDirectory}/openbbt-it/target/site/jacoco-aggregate/jacoco.xml,
+			${maven.multiModuleProjectDirectory}/azertio-it/target/site/jacoco-aggregate/jacoco.xml,
 			${project.basedir}/target/site/jacoco/jacoco.xml
 		</sonar.coverage.jacoco.xmlReportPaths>
 	</properties>
@@ -40,14 +40,13 @@
 	</licenses>
 
 	<modules>
-		<module>openbbt-core</module>
-		<module>openbbt-persistence</module>
-		<module>openbbt-test-support</module>
-		<module>openbbt-jsonrpc</module>
-		<module>openbbt-cli</module>
-		<module>openbbt-it</module>
-		<module>openbbt-docgen-maven-plugin</module>
-		<module>openbbt-lsp</module>
+		<module>azertio-core</module>
+		<module>azertio-persistence</module>
+		<module>azertio-test-support</module>
+		<module>azertio-jsonrpc</module>
+		<module>azertio-cli</module>
+		<module>azertio-docgen-maven-plugin</module>
+		<module>azertio-lsp</module>
 	</modules>
 
 	<dependencyManagement>
@@ -126,12 +125,13 @@
 		<profile>
 			<id>plugins</id>
 			<modules>
-				<module>openbbt-plugin-starter</module>
-				<module>plugins/gherkin-openbbt-plugin</module>
-				<module>plugins/markdown-plan-openbbt-plugin</module>
-				<module>plugins/rest-openbbt-plugin</module>
-				<module>plugins/db-openbbt-plugin</module>
-				<module>plugins/pdfreport-openbbt-plugin</module>
+				<module>azertio-plugin-starter</module>
+				<module>plugins/gherkin-azertio-plugin</module>
+				<module>plugins/markdown-plan-azertio-plugin</module>
+				<module>plugins/rest-azertio-plugin</module>
+				<module>plugins/db-azertio-plugin</module>
+				<module>plugins/pdfreport-azertio-plugin</module>
+				<module>azertio-it</module>
 			</modules>
 		</profile>
 	</profiles>

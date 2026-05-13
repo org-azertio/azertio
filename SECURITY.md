@@ -10,7 +10,7 @@
 
 Please **do not** open a public GitHub issue for security vulnerabilities.
 
-Report vulnerabilities privately by opening a [GitHub Security Advisory](https://github.com/org-myjtools/openbbt/security/advisories/new).
+Report vulnerabilities privately by opening a [GitHub Security Advisory](https://github.com/org-myjtools/azertio/security/advisories/new).
 
 Include:
 - Description of the vulnerability

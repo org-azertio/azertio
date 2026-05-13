@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.azertio</groupId>
+    <artifactId>azertio-plugin-starter</artifactId>
+    <version>1.0.0-alpha1</version>
+    <packaging>pom</packaging>
+
+    <name>Azertio Plugin Starter</name>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <java.version>21</java.version>
+        <azertio-core.version>1.0.0-alpha1</azertio-core.version>
+        <jexten.version>1.0.0-alpha5</jexten.version>
+        <!-- Doc generation: override in child pom to customise paths and titles -->
+        <azertio.docgen.stepDocFile>${project.basedir}/src/main/resources/steps.yaml</azertio.docgen.stepDocFile>
+        <azertio.docgen.configFile>${project.basedir}/src/main/resources/config.yaml</azertio.docgen.configFile>
+        <azertio.docgen.outputDirectory>${project.basedir}/docs</azertio.docgen.outputDirectory>
+        <azertio.docgen.stepTitle>Step Reference</azertio.docgen.stepTitle>
+        <azertio.docgen.configTitle>Configuration Reference</azertio.docgen.configTitle>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.azertio</groupId>
+            <artifactId>azertio-core</artifactId>
+            <version>${azertio-core.version}</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.myjtools.jexten</groupId>
+                            <artifactId>jexten-processor</artifactId>
+                            <version>${jexten.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.azertio</groupId>
+                <artifactId>azertio-docgen-maven-plugin</artifactId>
+                <version>${project.version}</version>
+                <executions>
+                    <execution>
+                        <id>generate-step-index</id>
+                        <goals><goal>generate-step-index</goal></goals>
+                        <configuration>
+                            <inputFile>${azertio.docgen.stepDocFile}</inputFile>
+                            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.myjtools.jexten</groupId>
+                <artifactId>jexten-maven-plugin</artifactId>
+                <version>${jexten.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate-manifest</goal>
+                            <goal>assemble-bundle</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <application>org.azertio</application>
+                    <hostModule>org.azertio.core</hostModule>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>generate-doc</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.azertio</groupId>
+                        <artifactId>azertio-docgen-maven-plugin</artifactId>
+                        <version>${project.version}</version>
+                        <executions>
+                            <execution>
+                                <id>generate-step-docs</id>
+                                <goals><goal>generate</goal></goals>
+                                <configuration>
+                                    <inputFile>${azertio.docgen.stepDocFile}</inputFile>
+                                    <outputDirectory>${azertio.docgen.outputDirectory}</outputDirectory>
+                                    <title>${azertio.docgen.stepTitle}</title>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>generate-config-docs</id>
+                                <goals><goal>generate-config</goal></goals>
+                                <configuration>
+                                    <inputFile>${azertio.docgen.configFile}</inputFile>
+                                    <outputDirectory>${azertio.docgen.outputDirectory}</outputDirectory>
+                                    <title>${azertio.docgen.configTitle}</title>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+</project>

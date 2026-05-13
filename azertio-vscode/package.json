@@ -1,0 +1,205 @@
+{
+  "name": "azertio",
+  "displayName": "Azertio",
+  "description": "Language support for Azertio feature files",
+  "version": "1.0.0-alpha1",
+  "publisher": "myjtools.org",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": ["Testing"],
+  "activationEvents": [
+    "workspaceContains:azertio.yaml"
+  ],
+  "icon": "./resources/azertio-icon.svg",
+  "main": "./out/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "feature",
+        "aliases": ["Gherkin", "Feature"],
+        "extensions": [".feature"],
+        "mimetypes": ["text/x-feature"],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "yaml",
+        "filenames": ["azertio.yaml"]
+      }
+    ],
+    "commands": [
+      {
+        "command": "azertio.installPlugins",
+        "title": "Azertio: Install plugins",
+        "icon": "$(cloud-download)"
+      },
+      {
+        "command": "azertio.testPlan.refresh",
+        "title": "Azertio: Refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "azertio.openSource",
+        "title": "Azertio: Open Source Location"
+      },
+      {
+        "command": "azertio.executions.run",
+        "title": "Azertio: Run",
+        "icon": "$(run-all)"
+      },
+      {
+        "command": "azertio.executions.rerun",
+        "title": "Azertio: Re-run",
+        "icon": "$(run-all)"
+      },
+      {
+        "command": "azertio.executions.deleteExecution",
+        "title": "Azertio: Delete Execution",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "azertio.executions.deletePlan",
+        "title": "Azertio: Delete Plan",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "azertio.executions.pruneEmpty",
+        "title": "Azertio: Delete Plans Without Executions",
+        "icon": "$(clear-all)"
+      },
+      {
+        "command": "azertio.contributors.refresh",
+        "title": "Azertio: Refresh Contributors",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "azertio.showLogs",
+        "title": "Azertio: Show Logs",
+        "icon": "$(output)"
+      },
+      {
+        "command": "azertio.ai.toggle",
+        "title": "Azertio: Toggle AI Completions"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "azertio",
+          "title": "Azertio",
+          "icon": "./resources/azertio-activity.svg"
+        }
+      ]
+    },
+    "views": {
+      "azertio": [
+        {
+          "id": "azertio.testPlan",
+          "name": "Test Plan",
+          "icon": "$(list-tree)"
+        },
+        {
+          "id": "azertio.executions",
+          "name": "Executions",
+          "icon": "$(run-all)"
+        },
+        {
+          "id": "azertio.contributors",
+          "name": "Contributors",
+          "icon": "$(extensions)"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "azertio.executions.pruneEmpty",
+          "when": "view == azertio.executions",
+          "group": "navigation"
+        },
+        {
+          "command": "azertio.executions.run",
+          "when": "view == azertio.testPlan",
+          "group": "navigation"
+        },
+        {
+          "command": "azertio.testPlan.refresh",
+          "when": "view == azertio.testPlan",
+          "group": "navigation"
+        },
+        {
+          "command": "azertio.contributors.refresh",
+          "when": "view == azertio.contributors",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "azertio.executions.rerun",
+          "when": "view == azertio.executions && viewItem == execution",
+          "group": "inline@1"
+        },
+        {
+          "command": "azertio.executions.deleteExecution",
+          "when": "view == azertio.executions && viewItem == execution",
+          "group": "inline@2"
+        },
+        {
+          "command": "azertio.executions.deletePlan",
+          "when": "view == azertio.executions && viewItem == plan",
+          "group": "inline"
+        }
+      ]
+    },
+    "grammars": [
+      {
+        "language": "feature",
+        "scopeName": "text.gherkin.feature",
+        "path": "./syntaxes/feature.tmLanguage.json",
+        "embeddedLanguages": {
+          "meta.embedded.block.json": "json",
+          "meta.embedded.block.xml": "xml",
+          "meta.embedded.block.html": "html",
+          "meta.embedded.block.javascript": "javascript",
+          "meta.embedded.block.typescript": "typescript",
+          "meta.embedded.block.sql": "sql",
+          "meta.embedded.block.yaml": "yaml",
+          "meta.embedded.block.python": "python"
+        }
+      }
+    ],
+    "configuration": {
+      "title": "Azertio",
+      "properties": {
+        "azertio.executablePath": {
+          "type": "string",
+          "default": "azertio",
+          "description": "Path to the azertio CLI executable. Defaults to 'azertio' (must be on PATH)."
+        },
+        "azertio.ai.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable AI-powered inline step completions in .feature files. Requires a language model provider (e.g. GitHub Copilot)."
+        },
+        "azertio.ai.model": {
+          "type": "string",
+          "default": "",
+          "description": "Language model family to use (e.g. 'gpt-4o', 'claude-sonnet-4-5'). Leave empty to use the first available model."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "vscode:prepublish": "npm run compile"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.90.0",
+    "typescript": "^5.3.0"
+  }
+}
