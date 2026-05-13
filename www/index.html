@@ -824,6 +824,43 @@
       margin-bottom: 1.2rem;
     }
 
+    /* ── Quick Start ─────────────────────────────────────────────── */
+    #quickstart { padding: 7rem 0; border-top: 1px solid var(--border); }
+
+    .qs-steps { display: flex; flex-direction: column; gap: 3rem; }
+
+    .qs-step {
+      display: grid;
+      grid-template-columns: 1fr 1.3fr;
+      gap: 3rem;
+      align-items: start;
+    }
+    @media (max-width: 800px) {
+      .qs-step { grid-template-columns: 1fr; }
+    }
+
+    .qs-step-info { display: flex; gap: 1.2rem; align-items: flex-start; }
+
+    .qs-num {
+      flex-shrink: 0;
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      background: rgba(0,255,224,0.08);
+      border: 1px solid rgba(0,255,224,0.3);
+      color: var(--cyan);
+      font-weight: 700; font-size: 0.85rem;
+      display: flex; align-items: center; justify-content: center;
+      margin-top: 0.15rem;
+    }
+
+    .qs-step-info h3 { font-size: 1.05rem; font-weight: 700; color: var(--white); margin-bottom: 0.5rem; }
+    .qs-step-info p  { font-size: 0.9rem; color: var(--muted); line-height: 1.65; }
+    .qs-step-info code {
+      font-family: var(--mono); font-size: 0.82em;
+      color: var(--cyan); background: rgba(0,255,224,0.08);
+      padding: 0.1em 0.4em; border-radius: 4px;
+    }
+
     /* Scroll fade-in */
     .reveal {
       opacity: 0;
@@ -854,6 +891,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <a href="#features">Features</a>
     <a href="#example">DSL</a>
     <a href="#plugins">Plugins</a>
+    <a href="#quickstart">Quick Start</a>
     <a href="#vscode">VS Code</a>
     <a href="#comparisons">Comparisons</a>
     <a href="https://github.com/org-azertio/azertio" class="btn-nav" target="_blank" rel="noopener">
@@ -898,12 +936,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 
   <div class="hero-cta">
-    <a href="https://github.com/org-azertio/azertio" class="btn-primary" target="_blank" rel="noopener">
+    <a href="#quickstart" class="btn-primary">
+      Get Started &darr;
+    </a>
+    <a href="https://github.com/org-azertio/azertio" class="btn-secondary" target="_blank" rel="noopener">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
       View on GitHub
-    </a>
-    <a href="#example" class="btn-secondary">
-      See the DSL &darr;
     </a>
   </div>
 
@@ -926,6 +964,123 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div><span class="t-fail">  ✗</span> <span class="t-cmd">DELETE /posts/1 returns 204</span> <span class="t-dim">29ms</span></div>
       <div class="t-dim">  ────────────────────────────────────</div>
       <div><span class="t-pass">  3 passed</span>  <span class="t-fail">1 failed</span>  <span class="t-dim">in 2.1s</span> <span class="cursor"></span></div>
+    </div>
+  </div>
+</section>
+
+<div class="glow-line"></div>
+
+<!-- ── Quick Start ──────────────────────────────────────────────── -->
+<section id="quickstart">
+  <div class="container">
+    <div class="features-head reveal">
+      <span class="section-label">Quick Start</span>
+      <h2>Up and running in minutes</h2>
+      <p class="section-intro">No framework to integrate, no agent to configure. Download, point at your app, run.</p>
+    </div>
+
+    <div class="qs-steps">
+
+      <div class="qs-step reveal">
+        <div class="qs-step-info">
+          <div class="qs-num">1</div>
+          <div>
+            <h3>Download &amp; install</h3>
+            <p>Download the distribution ZIP, unzip it anywhere and add the <code>bin/</code> directory to your PATH.</p>
+            <a href="https://github.com/org-azertio/azertio/releases/download/v1.0.0-alpha1/azertio-cli-1.0.0-alpha1-dist.zip"
+               class="btn-primary" style="display:inline-flex;margin-top:0.5rem;font-size:0.875rem;padding:0.6rem 1.4rem">
+              Download v1.0.0-alpha1
+            </a>
+          </div>
+        </div>
+        <div class="code-window">
+          <div class="code-bar">
+            <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+            <span class="code-filename">shell</span>
+          </div>
+          <pre><span class="t-prompt">$</span> unzip azertio-cli-1.0.0-alpha1-dist.zip
+<span class="t-prompt">$</span> export PATH=<span class="str">"$PATH:$(pwd)/azertio-cli-1.0.0-alpha1/bin"</span>
+<span class="t-prompt">$</span> azertio --version
+<span class="t-pass">azertio 1.0.0-alpha1</span></pre>
+        </div>
+      </div>
+
+      <div class="qs-step reveal">
+        <div class="qs-step-info">
+          <div class="qs-num">2</div>
+          <div>
+            <h3>Configure</h3>
+            <p>Create an <code>azertio.yaml</code> in your project root. Declare the plugins you need — Azertio fetches them at startup.</p>
+          </div>
+        </div>
+        <div class="code-window">
+          <div class="code-bar">
+            <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+            <span class="code-filename">azertio.yaml</span>
+          </div>
+          <pre><span class="kw">plugins</span>:
+  - <span class="str">gherkin</span>
+  - <span class="str">rest</span>
+
+<span class="kw">configuration</span>:
+  <span class="kw">rest</span>:
+    <span class="kw">baseURL</span>: <span class="str">'https://api.example.com'</span></pre>
+        </div>
+      </div>
+
+      <div class="qs-step reveal">
+        <div class="qs-step-info">
+          <div class="qs-num">3</div>
+          <div>
+            <h3>Write a test</h3>
+            <p>Create a <code>.feature</code> file. Plain language, no glue code — each step is resolved by the active plugins.</p>
+          </div>
+        </div>
+        <div class="code-window">
+          <div class="code-bar">
+            <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+            <span class="code-filename">tests/my-api.feature</span>
+          </div>
+          <pre><span class="kw">Feature:</span> <span class="str">User API</span>
+
+  <span class="kw">Scenario:</span> <span class="str">List users returns 200</span>
+    <span class="kw">When</span> I make a GET request to <span class="str">"users"</span>
+    <span class="kw">Then</span> the HTTP status code is equal to <span class="num">200</span>
+    <span class="kw">And</span> the response body contains:
+      <span class="str">"""json
+      [{"id": 1}]
+      """</span></pre>
+        </div>
+      </div>
+
+      <div class="qs-step reveal">
+        <div class="qs-step-info">
+          <div class="qs-num">4</div>
+          <div>
+            <h3>Run</h3>
+            <p>Execute from the terminal. Azertio resolves plugins, builds the test plan and runs it.</p>
+            <a href="docs/getting-started/" class="btn-secondary" style="display:inline-flex;margin-top:0.8rem;font-size:0.875rem;padding:0.6rem 1.4rem">
+              Full documentation →
+            </a>
+          </div>
+        </div>
+        <div class="code-window">
+          <div class="code-bar">
+            <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+            <span class="terminal-title">azertio — exec</span>
+          </div>
+          <div class="terminal-body" style="padding:1.2rem 1.4rem">
+            <div><span class="t-prompt">❯</span> <span class="t-cmd">azertio exec</span></div>
+            <div class="t-info">  Resolving plugins…</div>
+            <div class="t-info">  Installing: gherkin, rest</div>
+            <div class="t-dim">  ──────────────────────────────</div>
+            <div><span class="t-pass">  ✔</span> <span class="t-cmd">List users returns 200</span> <span class="t-dim">38ms</span></div>
+            <div class="t-dim">  ──────────────────────────────</div>
+            <div><span class="t-pass">  1 passed</span> <span class="t-dim">in 0.8s</span></div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </section>
