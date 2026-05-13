@@ -37,12 +37,12 @@
 		<dependency>
 			<groupId>org.myjtools.jexten</groupId>
 			<artifactId>jexten-core</artifactId>
-			<version>1.0.0-alpha4</version>
+			<version>1.0.0-alpha5</version>
 		</dependency>
 		<dependency>
 			<groupId>org.myjtools.jexten</groupId>
 			<artifactId>jexten-plugin-manager</artifactId>
-			<version>1.0.0-alpha4</version>
+			<version>1.0.0-alpha5</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
@@ -59,7 +59,7 @@
 		<dependency>
 			<groupId>org.myjtools.jexten</groupId>
 			<artifactId>jexten-maven-artifact-store</artifactId>
-			<version>1.0.0-alpha4</version>
+			<version>1.0.0-alpha5</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hamcrest</groupId>
@@ -107,7 +107,7 @@
 						<path>
 							<groupId>org.myjtools.jexten</groupId>
 							<artifactId>jexten-processor</artifactId>
-							<version>1.0.0-alpha4</version>
+							<version>1.0.0-alpha5</version>
 						</path>
 					</annotationProcessorPaths>
 				</configuration>

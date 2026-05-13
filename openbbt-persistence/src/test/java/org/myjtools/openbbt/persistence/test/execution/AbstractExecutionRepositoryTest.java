@@ -4,6 +4,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.myjtools.openbbt.core.execution.ExecutionNodeStats;
 import org.myjtools.openbbt.core.execution.ExecutionResult;
 import org.myjtools.openbbt.core.execution.TestExecution;
 import org.myjtools.openbbt.core.testplan.NodeType;
@@ -506,6 +507,90 @@ abstract class AbstractExecutionRepositoryTest {
 		assertThat(repo.getExecutionNodeResult(executionNodeID)).contains(ExecutionResult.FAILED);
 		assertThat(repo.getExecutionNodeMessage(executionNodeID)).contains("step failed");
 		assertThat(repo.existsAttachment(attachmentID)).isTrue();
+	}
+
+	// --- execution node stats ---
+
+	private ExecutionNodeStats sampleStats() {
+		ExecutionNodeStats stats = new ExecutionNodeStats();
+		stats.numExecutions(100);
+		stats.numThreads(4);
+		stats.min(10);
+		stats.max(500);
+		stats.mean(120);
+		stats.p50(100);
+		stats.p95(400);
+		stats.p99(480);
+		stats.throughput(8.5);
+		stats.errorRate(0.03);
+		return stats;
+	}
+
+	@Test
+	void getExecutionNodeStats_returnsEmptyWhenNoneStored() {
+		UUID planID = persistPlanWithRoot();
+		UUID planNodeID = planRepo.searchNodes(
+			org.myjtools.openbbt.core.persistence.TestPlanNodeCriteria.withNodeType(NodeType.TEST_PLAN)
+		).findFirst().orElseThrow();
+		TestExecution execution = repo.newExecution(planID, Instant.now(), null);
+		UUID executionNodeID = repo.newExecutionNode(execution.executionID(), planNodeID);
+
+		assertThat(repo.getExecutionNodeStats(executionNodeID)).isEmpty();
+	}
+
+	@Test
+	void storeAndGetExecutionNodeStats_roundtrip() {
+		UUID planID = persistPlanWithRoot();
+		UUID planNodeID = planRepo.searchNodes(
+			org.myjtools.openbbt.core.persistence.TestPlanNodeCriteria.withNodeType(NodeType.TEST_PLAN)
+		).findFirst().orElseThrow();
+		TestExecution execution = repo.newExecution(planID, Instant.now(), null);
+		UUID executionNodeID = repo.newExecutionNode(execution.executionID(), planNodeID);
+
+		repo.storeExecutionNodeStats(executionNodeID, sampleStats());
+
+		assertThat(repo.getExecutionNodeStats(executionNodeID))
+			.isPresent()
+			.contains(sampleStats());
+	}
+
+	@Test
+	void storeExecutionNodeStats_calledTwice_updatesExisting() {
+		UUID planID = persistPlanWithRoot();
+		UUID planNodeID = planRepo.searchNodes(
+			org.myjtools.openbbt.core.persistence.TestPlanNodeCriteria.withNodeType(NodeType.TEST_PLAN)
+		).findFirst().orElseThrow();
+		TestExecution execution = repo.newExecution(planID, Instant.now(), null);
+		UUID executionNodeID = repo.newExecutionNode(execution.executionID(), planNodeID);
+
+		repo.storeExecutionNodeStats(executionNodeID, sampleStats());
+
+		ExecutionNodeStats updated = sampleStats();
+		updated.numExecutions(200);
+		updated.max(1000);
+		repo.storeExecutionNodeStats(executionNodeID, updated);
+
+		assertThat(repo.getExecutionNodeStats(executionNodeID))
+			.isPresent()
+			.hasValueSatisfying(s -> {
+				assertThat(s.numExecutions()).isEqualTo(200);
+				assertThat(s.max()).isEqualTo(1000);
+			});
+	}
+
+	@Test
+	void deleteExecution_cascadesStats() {
+		UUID planID = persistPlanWithRoot();
+		UUID planNodeID = planRepo.searchNodes(
+			org.myjtools.openbbt.core.persistence.TestPlanNodeCriteria.withNodeType(NodeType.TEST_PLAN)
+		).findFirst().orElseThrow();
+		TestExecution execution = repo.newExecution(planID, Instant.now(), null);
+		UUID executionNodeID = repo.newExecutionNode(execution.executionID(), planNodeID);
+		repo.storeExecutionNodeStats(executionNodeID, sampleStats());
+
+		repo.deleteExecution(execution.executionID());
+
+		assertThat(repo.getExecutionNodeStats(executionNodeID)).isEmpty();
 	}
 
 	@Test

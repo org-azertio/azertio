@@ -8,11 +8,17 @@ import org.myjtools.openbbt.core.Assertion;
 import org.myjtools.openbbt.core.OpenBBTException;
 import org.myjtools.openbbt.core.ResourceFinder;
 import org.myjtools.openbbt.core.backend.ExecutionContext;
+import org.myjtools.openbbt.core.contributors.StatisticsProvider;
 import org.myjtools.openbbt.core.contributors.StepExpression;
 import org.myjtools.openbbt.core.contributors.StepProvider;
 import org.myjtools.openbbt.core.contributors.TearDown;
 import org.myjtools.openbbt.core.testplan.DataTable;
+import org.myjtools.openbbt.core.testplan.Document;
+import org.myjtools.openbbt.core.util.Either;
 import org.myjtools.openbbt.core.util.Log;
+import org.myjtools.openbbt.core.util.Pair;
+import java.util.ArrayList;
+import java.util.List;
 import org.myjtools.openbbt.plugins.db.jooq.JooqDbEngine;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -32,6 +38,8 @@ public class DbStepProvider implements StepProvider {
 
 	private DbEngine engine;
 	private String alias;
+	private Either<DataSet, Long> lastQueryResult;
+	private final List<Pair<String, String>> teardownSqls = new ArrayList<>();
 
 	@Override
 	public void init(Config config) {
@@ -42,6 +50,9 @@ public class DbStepProvider implements StepProvider {
 
 	@TearDown
 	public void tearDown() {
+		for (var entry : teardownSqls) {
+			engine.executeQuery(entry.left(), entry.right());
+		}
 		try {
 			engine.close();
 		} catch (Exception e) {
@@ -84,6 +95,41 @@ public class DbStepProvider implements StepProvider {
 		this.alias = alias;
 	}
 
+	@StatisticsProvider
+	@StepExpression(value = "db.execute.query")
+	public void executeQuery(Document sql) {
+		ExecutionContext ctx = ExecutionContext.current();
+		String interpolatedSql = interpolate(sql.content());
+		ctx.runWithinBenchmark(() -> {
+			lastQueryResult = engine.executeQuery(alias, interpolatedSql);
+			return true;
+		});
+		if (!ctx.isBenchmarkMode()) {
+			lastQueryResult.value().ifPresent(dataSet -> ctx.storeAttachment(dataSet.toCsv().getBytes(), "text/csv"));
+		}
+	}
+
+	@StepExpression(value = "db.teardown.execute", args = {"alias:text"})
+	public void registerTeardownSql(String alias, Document sql) {
+		teardownSqls.add(Pair.of(alias, interpolate(sql.content())));
+	}
+
+	@StepExpression(value = "db.store.query.result", args = {"variable:text"})
+	public void storeQueryResult(String variable) {
+		String value = lastQueryResult.value()
+			.map(ds -> ds.rows().getFirst().getFirst())
+			.orElseGet(() -> String.valueOf(lastQueryResult.fallback()));
+		ExecutionContext.current().setVariable(variable, value);
+	}
+
+	@StepExpression(value = "db.assert.query.count")
+	public void assertQueryCount(Assertion assertion) {
+		Integer count = lastQueryResult.value()
+			.map(ds -> ds.rows().size())
+			.orElseGet(() -> lastQueryResult.fallback().intValue());
+		Assertion.assertThat(count, assertion);
+	}
+
 	@StepExpression(value = "db.assert.count", args = {"table:word"})
 	public void assertCountSql(String table, Assertion assertion) {
 		Integer count = engine.executeCountQueryFromTable(alias, table);
@@ -124,6 +170,10 @@ public class DbStepProvider implements StepProvider {
 	}
 
 
+	private String interpolate(String sql) {
+		return ExecutionContext.current().interpolateString(sql);
+	}
+
 	private void tryAndLog(String table, Runnable assertion) {
 		try {
 			assertion.run();
@@ -137,7 +187,7 @@ public class DbStepProvider implements StepProvider {
 		String tableContent = engine.printTable(alias, table);
 		log.debug("{}\n{}", table, tableContent);
 		ExecutionContext.current()
-			.storeAttachment(tableContent.getBytes(StandardCharsets.UTF_8), "csv");
+			.storeAttachment(tableContent.getBytes(StandardCharsets.UTF_8), "text/csv");
 	}
 
 }

@@ -53,6 +53,9 @@ public final class InstallCommand extends AbstractCommand {
 				log.error(e,"Failed to install plugin {}", plugin);
 			}
 		}
+		if (parent.debugMode) {
+			log.info(pluginManager.moduleLayerTreeDescription());
+		}
 	}
 
 

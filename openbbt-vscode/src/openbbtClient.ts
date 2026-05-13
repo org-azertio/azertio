@@ -86,9 +86,14 @@ export interface NodeInfo {
     dataTable: string[][] | null;
 }
 
-export interface ContributorInfo {
+export interface ContributorTypeInfo {
     type: string;
     implementations: string[];
+}
+
+export interface PluginContributors {
+    plugin: string;
+    contributors: ContributorTypeInfo[];
 }
 
 type PendingRequest = {
@@ -152,8 +157,13 @@ export class OpenBBTClient {
         await this.call('refresh', {});
     }
 
-    async getContributors(): Promise<ContributorInfo[]> {
-        return this.call('contributors/list', {}) as Promise<ContributorInfo[]>;
+    async getContributors(): Promise<PluginContributors[]> {
+        return this.call('contributors/list', {}) as Promise<PluginContributors[]>;
+    }
+
+    async getStepsIndex(): Promise<string> {
+        const result = await this.call('steps/index', {});
+        return JSON.stringify(result);
     }
 
     async listPlans(): Promise<PlanInfo[]> {

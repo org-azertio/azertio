@@ -32,6 +32,7 @@ public class TestTreeSuiteAssembler implements SuiteAssembler {
 			case "execVirtualStep"              -> suiteWithVirtualStep();
 			case "execTwoTestCases"             -> suiteWithTwoTestCases();
 			case "execMixedResults"             -> suiteWithMixedResults();
+			case "execBenchmarkMode"            -> suiteWithBenchmarkMode();
 			default                             -> Optional.empty();
 		};
 	}
@@ -144,6 +145,28 @@ public class TestTreeSuiteAssembler implements SuiteAssembler {
 		repository.attachChildNodeLast(feature,    testCase3);
 		repository.attachChildNodeLast(testCase3,  aggregator3);
 		repository.attachChildNodeLast(aggregator3, step3);
+		return Optional.of(suite);
+	}
+
+	// TEST_SUITE → TEST_FEATURE → TEST_CASE → STEP_AGGREGATOR
+	//    → STEP("benchmark mode is enabled with 5 executions and 2 threads")
+	//    → STEP("a benchmarkable step")
+	//    → STEP("the benchmark mean response time (ms) is greater than or equal to 0")
+	private Optional<UUID> suiteWithBenchmarkMode() {
+		UUID suite       = node(NodeType.TEST_SUITE,      "suite");
+		UUID feature     = node(NodeType.TEST_FEATURE,    "feature");
+		UUID testCase    = node(NodeType.TEST_CASE,       "benchmark test");
+		UUID aggregator  = node(NodeType.STEP_AGGREGATOR, "steps");
+		UUID enableStep  = node(NodeType.STEP, "benchmark mode is enabled with 500 executions and 10 threads");
+		UUID benchStep   = node(NodeType.STEP, "a benchmarkable step");
+		UUID assertStep  = node(NodeType.STEP, "the benchmark mean response time (ms) is greater than or equal to 0");
+
+		repository.attachChildNodeLast(suite, feature);
+		repository.attachChildNodeLast(feature, testCase);
+		repository.attachChildNodeLast(testCase, aggregator);
+		repository.attachChildNodeLast(aggregator, enableStep);
+		repository.attachChildNodeLast(aggregator, benchStep);
+		repository.attachChildNodeLast(aggregator, assertStep);
 		return Optional.of(suite);
 	}
 

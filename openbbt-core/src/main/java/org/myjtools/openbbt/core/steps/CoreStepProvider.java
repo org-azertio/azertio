@@ -9,6 +9,7 @@ import org.myjtools.openbbt.core.DataTypes;
 import org.myjtools.openbbt.core.backend.ExecutionContext;
 import org.myjtools.openbbt.core.contributors.StepExpression;
 import org.myjtools.openbbt.core.contributors.StepProvider;
+import org.myjtools.openbbt.core.util.Log;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -20,6 +21,8 @@ extensionPointVersion = "1.0",
 scope = Scope.TRANSIENT // A new instance of this class will be created for each execution
 )
 public class CoreStepProvider implements StepProvider {
+
+	private static final Log log = Log.of();
 
 	@Inject
 	DataTypes dataTypes;
@@ -70,6 +73,74 @@ public class CoreStepProvider implements StepProvider {
 		String varValue = ExecutionContext.current().getVariable(variable);
 		String value = (String) dataTypes.byJavaType(String.class).parse(varValue);
 		Assertion.assertThat(value, assertion);
+	}
+
+	@StepExpression(value = "enable.benchmark.mode", args = {"executions:integer","threads:integer"})
+	public void enableBenchmarkMode(Integer executions, Integer threads) {
+		ExecutionContext.current().enableBenchmarkMode(executions, threads);
+	}
+
+	@StepExpression(value = "assert.benchmark.statistics.mean")
+	public void assertBenchmarkStatisticsMean(Assertion assertion) {
+		logStatistics();
+		ExecutionContext ctx = ExecutionContext.current();
+		Assertion.assertThat(ctx.lastBenchmarkStatistics().mean(), assertion);
+	}
+
+	@StepExpression(value = "assert.benchmark.statistics.min")
+	public void assertBenchmarkStatisticsMin(Assertion assertion) {
+		logStatistics();
+		ExecutionContext ctx = ExecutionContext.current();
+		Assertion.assertThat(ctx.lastBenchmarkStatistics().min(), assertion);
+	}
+
+	@StepExpression(value = "assert.benchmark.statistics.max")
+	public void assertBenchmarkStatisticsMax(Assertion assertion) {
+		logStatistics();
+		ExecutionContext ctx = ExecutionContext.current();
+		Assertion.assertThat(ctx.lastBenchmarkStatistics().max(), assertion);
+	}
+
+	@StepExpression(value = "assert.benchmark.statistics.p50")
+	public void assertBenchmarkStatisticsP50(Assertion assertion) {
+		logStatistics();
+		ExecutionContext ctx = ExecutionContext.current();
+		Assertion.assertThat(ctx.lastBenchmarkStatistics().p50(), assertion);
+	}
+
+	@StepExpression(value = "assert.benchmark.statistics.p95")
+	public void assertBenchmarkStatisticsP95(Assertion assertion) {
+		logStatistics();
+		ExecutionContext ctx = ExecutionContext.current();
+		Assertion.assertThat(ctx.lastBenchmarkStatistics().p95(), assertion);
+	}
+
+	@StepExpression(value = "assert.benchmark.statistics.p99")
+	public void assertBenchmarkStatisticsP99(Assertion assertion) {
+		logStatistics();
+		ExecutionContext ctx = ExecutionContext.current();
+		Assertion.assertThat(ctx.lastBenchmarkStatistics().p99(), assertion);
+	}
+
+	@StepExpression(value = "assert.benchmark.statistics.throughput")
+	public void assertBenchmarkStatisticsThroughput(Assertion assertion) {
+		logStatistics();
+		ExecutionContext ctx = ExecutionContext.current();
+		Assertion.assertThat(ctx.lastBenchmarkStatistics().throughput(), assertion);
+	}
+
+	@StepExpression(value = "assert.benchmark.statistics.errorRate")
+	public void assertBenchmarkStatisticsErrorRate(Assertion assertion) {
+		logStatistics();
+		ExecutionContext ctx = ExecutionContext.current();
+		Assertion.assertThat(ctx.lastBenchmarkStatistics().errorRate(), assertion);
+	}
+
+	private void logStatistics() {
+		ExecutionContext ctx = ExecutionContext.current();
+		var stats = ctx.lastBenchmarkStatistics().toString();
+		log.info("Benchmark statistics: {}", stats);
+		ctx.storeAttachment(stats.getBytes(), "text/plain");
 	}
 
 }

@@ -126,3 +126,143 @@
         {"recipient": "alice@example.com", "template": "welcome"}
         """
         Then the text variable message contains "success"
+
+
+'enable.benchmark.mode':
+  expression: 'benchmark mode is enabled with {executions:integer} executions and {threads:integer} threads'
+  example: |
+    Given benchmark mode is enabled with 100 executions and 4 threads
+  scenarios:
+    - title: Enable benchmark mode before a step
+      gherkin: |
+        Given benchmark mode is enabled with 200 executions and 8 threads
+        When I make a GET request to "health"
+        Then the benchmark mean response time is less than 100
+
+
+'assert.benchmark.statistics.mean':
+  expression: 'the benchmark mean response time (ms) {{integer-assertion}}'
+  assertion-hints:
+    - 'is less than 200'
+    - 'is less than or equal to 500'
+    - 'is equal to 100'
+  example: |
+    Then the benchmark mean response time (ms) is less than 200
+  scenarios:
+    - title: Assert mean response time under threshold
+      gherkin: |
+        Given benchmark mode is enabled with 100 executions and 4 threads
+        When I make a GET request to "health"
+        Then the benchmark mean response time (ms) is less than 200
+
+
+'assert.benchmark.statistics.min':
+  expression: 'the benchmark minimum response time (ms) {{integer-assertion}}'
+  assertion-hints:
+    - 'is less than 100'
+    - 'is greater than 0'
+    - 'is equal to 10'
+  example: |
+    Then the benchmark minimum response time (ms) is greater than 0
+  scenarios:
+    - title: Assert minimum response time is positive
+      gherkin: |
+        Given benchmark mode is enabled with 100 executions and 4 threads
+        When I make a GET request to "health"
+        Then the benchmark minimum response time (ms) is greater than 0
+
+
+'assert.benchmark.statistics.max':
+  expression: 'the benchmark maximum response time (ms) {{integer-assertion}}'
+  assertion-hints:
+    - 'is less than 1000'
+    - 'is less than or equal to 500'
+    - 'is equal to 200'
+  example: |
+    Then the benchmark maximum response time (ms) is less than 1000
+  scenarios:
+    - title: Assert maximum response time under threshold
+      gherkin: |
+        Given benchmark mode is enabled with 100 executions and 4 threads
+        When I make a GET request to "health"
+        Then the benchmark maximum response time (ms) is less than 1000
+
+
+'assert.benchmark.statistics.p50':
+  expression: 'the benchmark P50 response time (ms) {{integer-assertion}}'
+  assertion-hints:
+    - 'is less than 200'
+    - 'is less than or equal to 300'
+    - 'is equal to 150'
+  example: |
+    Then the benchmark P50 response time (ms) is less than 200
+  scenarios:
+    - title: Assert P50 response time under threshold
+      gherkin: |
+        Given benchmark mode is enabled with 100 executions and 4 threads
+        When I make a GET request to "health"
+        Then the benchmark P50 response time (ms) is less than 200
+
+
+'assert.benchmark.statistics.p95':
+  expression: 'the benchmark P95 response time (ms) {{integer-assertion}}'
+  assertion-hints:
+    - 'is less than 500'
+    - 'is less than or equal to 1000'
+    - 'is equal to 300'
+  example: |
+    Then the benchmark P95 response time (ms) is less than 500
+  scenarios:
+    - title: Assert P95 response time under threshold
+      gherkin: |
+        Given benchmark mode is enabled with 100 executions and 4 threads
+        When I make a GET request to "health"
+        Then the benchmark P95 response time (ms) is less than 500
+
+
+'assert.benchmark.statistics.p99':
+  expression: 'the benchmark P99 response time (ms) {{integer-assertion}}'
+  assertion-hints:
+    - 'is less than 1000'
+    - 'is less than or equal to 2000'
+    - 'is equal to 500'
+  example: |
+    Then the benchmark P99 response time (ms) is less than 1000
+  scenarios:
+    - title: Assert P99 response time under threshold
+      gherkin: |
+        Given benchmark mode is enabled with 100 executions and 4 threads
+        When I make a GET request to "health"
+        Then the benchmark P99 response time (ms) is less than 1000
+
+
+'assert.benchmark.statistics.throughput':
+  expression: 'the benchmark throughput (req/s) {{decimal-assertion}}'
+  assertion-hints:
+    - 'is greater than 10.0'
+    - 'is greater than or equal to 5.0'
+    - 'is equal to 20.0'
+  example: |
+    Then the benchmark throughput (req/s) is greater than 10.0
+  scenarios:
+    - title: Assert throughput exceeds minimum
+      gherkin: |
+        Given benchmark mode is enabled with 100 executions and 4 threads
+        When I make a GET request to "health"
+        Then the benchmark throughput (req/s) is greater than 10.0
+
+
+'assert.benchmark.statistics.errorRate':
+  expression: 'the benchmark error rate {{decimal-assertion}}'
+  assertion-hints:
+    - 'is equal to 0.0'
+    - 'is less than 0.01'
+    - 'is less than or equal to 0.05'
+  example: |
+    Then the benchmark error rate is equal to 0.0
+  scenarios:
+    - title: Assert no errors during benchmark
+      gherkin: |
+        Given benchmark mode is enabled with 100 executions and 4 threads
+        When I make a GET request to "health"
+        Then the benchmark error rate is equal to 0.0

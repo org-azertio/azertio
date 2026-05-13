@@ -1,11 +1,13 @@
 package org.myjtools.openbbt.core.backend;
 
 import org.myjtools.openbbt.core.OpenBBTRuntime;
+import org.myjtools.openbbt.core.execution.ExecutionNodeStats;
 import org.myjtools.openbbt.core.persistence.AttachmentRepository;
 import org.myjtools.openbbt.core.persistence.TestExecutionRepository;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BooleanSupplier;
 
 public class ExecutionContext {
 
@@ -23,6 +25,18 @@ public class ExecutionContext {
 		threadLocal.remove();
 	}
 
+	public static Runnable withCurrent(Runnable task) {
+		ExecutionContext ctx = threadLocal.get();
+		return () -> {
+			threadLocal.set(ctx);
+			try {
+				task.run();
+			} finally {
+				threadLocal.remove();
+			}
+		};
+	}
+
 
 
 
@@ -30,6 +44,10 @@ public class ExecutionContext {
 	private final OpenBBTRuntime runtime;
 	private final UUID executionID;
 	private UUID executionNodeID;
+	private Benchmark benchmark;
+	private ExecutionNodeStats lastBenchmarkStatistics;
+
+
 
 	public ExecutionContext(OpenBBTRuntime runtime, UUID executionID, UUID executionNodeID) {
 		this.runtime = runtime;
@@ -64,5 +82,53 @@ public class ExecutionContext {
 		UUID attachmentID = testExecutionRepository.newAttachment(executionNodeID);
 		attachmentRepository.storeAttachment(executionID, executionNodeID, attachmentID, bytes, contentType);
 	}
+
+	public void enableBenchmarkMode(Integer executions, Integer threads) {
+		this.benchmark = new Benchmark(executions, threads, runtime.clock());
+	}
+
+	public void disableBenchmarkMode() {
+		if (benchmark != null) {
+			lastBenchmarkStatistics = benchmark.statistics();
+		}
+		this.benchmark = null;
+	}
+
+	public Benchmark benchmark() {
+		return benchmark;
+	}
+
+
+	/**
+	 * Runs the given task within the benchmark context, measuring its execution time and error status.
+	 * If benchmark mode is not enabled, it simply executes the task without measuring.
+	 * The task should return true if it succeeded, or false if it failed. Any thrown
+	 * exceptions will be treated as failures and rethrown after recording the failure in the benchmark statistics.
+	 * @param task the task to execute, returning true if it succeeded or false if it failed
+	 * @throws Throwable if the task throws any exception, which will be rethrown
+	 */
+	public void runWithinBenchmark(BooleanSupplier task) {
+		if (benchmark == null) {
+			task.getAsBoolean();
+			return;
+		}
+		int executionNumber = benchmark.markStarted();
+		try {
+			benchmark.markFinished(executionNumber, !task.getAsBoolean());
+		} catch (Throwable t) {
+			benchmark.markFinished(executionNumber, true);
+			throw t;
+		}
+	}
+
+	public boolean isBenchmarkMode() {
+		return benchmark != null;
+	}
+
+	public ExecutionNodeStats lastBenchmarkStatistics() {
+		return lastBenchmarkStatistics;
+	}
+
+
 
 }

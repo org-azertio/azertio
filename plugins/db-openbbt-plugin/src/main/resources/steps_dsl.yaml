@@ -9,6 +9,75 @@
         * count db table users = 3
 
 
+'db.teardown.execute':
+  expression: 'db teardown {alias:text} query:'
+  example: |
+    * db teardown "main" query:
+      """sql
+      DELETE FROM users WHERE status = 'active'
+      """
+  scenarios:
+    - title: Register cleanup SQL to run after the scenario regardless of outcome
+      gherkin: |
+        * db teardown "main" query:
+          """sql
+          DELETE FROM users WHERE status = 'active'
+          """
+
+
+'db.execute.query':
+  expression: 'db query:'
+  example: |
+    * db query:
+      """sql
+      SELECT * FROM users WHERE status = 'active'
+      """
+  scenarios:
+    - title: Execute a SELECT and assert the result in subsequent steps
+      gherkin: |
+        * use db "main"
+        * db query:
+          """sql
+          SELECT id, name FROM users WHERE status = 'active'
+          """
+        * db query count > 0
+
+
+'db.store.query.result':
+  expression: 'db query result -> {variable:text}'
+  example: |
+    * db query result -> "name"
+  scenarios:
+    - title: Store the first field of a SELECT result in a variable
+      gherkin: |
+        * use db "main"
+        * db query:
+          """sql
+          SELECT name FROM users WHERE status = 'active'
+          """
+        * db query result -> "name"
+
+
+'db.assert.query.count':
+  expression: 'db query count {{integer-assertion}}'
+  assertion-hints:
+    - '= 0'
+    - '= 1'
+    - '> 0'
+    - '!= 0'
+  example: |
+    * db query count > 0
+  scenarios:
+    - title: Assert the number of rows returned by the last SQL query
+      gherkin: |
+        * use db "main"
+        * db query:
+          """sql
+          SELECT * FROM users WHERE status = 'active'
+          """
+        * db query count > 0
+
+
 'db.assert.count':
   expression: 'count db table {table:word} {{integer-assertion}}'
   assertion-hints:

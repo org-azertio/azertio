@@ -75,6 +75,380 @@ Entonces el número de filas de la tabla users es igual a 3:
 
 ---
 
+## `db.teardown.execute`
+
+**Role:** `given`
+
+Registers a SQL statement to be executed at teardown, after the scenario finishes.
+This guarantees cleanup regardless of whether the scenario passed or failed.
+Multiple statements can be registered; they are executed in registration order.
+
+### Parameters
+
+| Name | Type | Description |
+|------|------|-------------|
+| `alias` | text | The name of the datasource where the statement will be executed |
+| `sql` | document | The SQL statement to execute at teardown, provided as a docstring block |
+
+### `dsl`
+
+**Expression:** `db teardown {alias:text} query:`
+
+**Example:**
+
+```gherkin
+* db teardown "main" query:
+  """sql
+  DELETE FROM users WHERE status = 'active'
+  """
+```
+
+**Scenarios:**
+
+*Register cleanup SQL to run after the scenario regardless of outcome*
+
+```gherkin
+* db teardown "main" query:
+  """sql
+  DELETE FROM users WHERE status = 'active'
+  """
+```
+
+### `en`
+
+**Expression:** `at teardown execute in datasource {alias:text} the SQL statement:`
+
+**Example:**
+
+```gherkin
+Given at teardown execute in datasource "main" the SQL statement:
+  """sql
+  DELETE FROM users WHERE status = 'active'
+  """
+```
+
+**Scenarios:**
+
+*Register cleanup SQL to run after the scenario regardless of outcome*
+
+```gherkin
+Given at teardown execute in datasource "main" the SQL statement:
+  """sql
+  DELETE FROM users WHERE status = 'active'
+  """
+```
+
+### `es`
+
+**Expression:** `al finalizar se ejecutará en el origen de datos {alias:text} la sentencia SQL:`
+
+**Example:**
+
+```gherkin
+Dado que al finalizar se ejecutará en el origen de datos "main" la sentencia SQL:
+  """sql
+  DELETE FROM users WHERE status = 'active'
+  """
+```
+
+**Scenarios:**
+
+*Registrar una sentencia de limpieza para ejecutar al finalizar el escenario*
+
+```gherkin
+Dado que al finalizar se ejecutará en el origen de datos "main" la sentencia SQL:
+  """sql
+  DELETE FROM users WHERE status = 'active'
+  """
+```
+
+---
+
+## `db.execute.query`
+
+**Role:** `given`
+
+Executes an arbitrary SQL statement and stores the result for subsequent steps.
+For SELECT queries, the result set is stored and can be asserted with db.assert.query.* steps.
+For INSERT, UPDATE or DELETE statements, the number of affected rows is stored instead.
+
+### Parameters
+
+| Name | Type | Description |
+|------|------|-------------|
+| `sql` | document | The SQL statement to execute, provided as a docstring block |
+
+### `dsl`
+
+**Expression:** `db query:`
+
+**Example:**
+
+```gherkin
+* db query:
+  """sql
+  SELECT * FROM users WHERE status = 'active'
+  """
+```
+
+**Scenarios:**
+
+*Execute a SELECT and assert the result in subsequent steps*
+
+```gherkin
+* use db "main"
+* db query:
+  """sql
+  SELECT id, name FROM users WHERE status = 'active'
+  """
+* db query count > 0
+```
+
+### `en`
+
+**Expression:** `I execute the SQL query:`
+
+**Example:**
+
+```gherkin
+Given I execute the SQL query:
+  """sql
+  SELECT * FROM users WHERE status = 'active'
+  """
+```
+
+**Scenarios:**
+
+*Execute a SELECT and assert the result in subsequent steps*
+
+```gherkin
+Given I use datasource "main"
+And I execute the SQL query:
+  """sql
+  SELECT id, name FROM users WHERE status = 'active'
+  """
+Then the SQL result row count is greater than 0
+```
+
+### `es`
+
+**Expression:** `ejecuto la sentencia SQL:`
+
+**Example:**
+
+```gherkin
+Dado que ejecuto la sentencia SQL:
+  """sql
+  SELECT * FROM users WHERE status = 'active'
+  """
+```
+
+**Scenarios:**
+
+*Ejecutar una SELECT y verificar el resultado en pasos posteriores*
+
+```gherkin
+Dado que uso el origen de datos "main"
+Y ejecuto la sentencia SQL:
+  """sql
+  SELECT id, nombre FROM users WHERE status = 'active'
+  """
+Entonces el número de filas de la respuesta SQL es mayor que 0
+```
+
+---
+
+## `db.store.query.result`
+
+**Role:** `then`
+
+Stores the result of the last executed SQL statement in a named variable.
+For SELECT queries, stores the first field of the first row.
+For INSERT, UPDATE or DELETE statements, stores the number of affected rows.
+
+### Parameters
+
+| Name | Type | Description |
+|------|------|-------------|
+| `variable` | text | The name of the variable where the value will be stored |
+
+### `dsl`
+
+**Expression:** `db query result -> {variable:text}`
+
+**Example:**
+
+```gherkin
+* db query result -> "name"
+```
+
+**Scenarios:**
+
+*Store the first field of a SELECT result in a variable*
+
+```gherkin
+* use db "main"
+* db query:
+  """sql
+  SELECT name FROM users WHERE status = 'active'
+  """
+* db query result -> "name"
+```
+
+### `en`
+
+**Expression:** `store db query result in variable {variable:text}`
+
+**Example:**
+
+```gherkin
+Then store db query result in variable "name"
+```
+
+**Scenarios:**
+
+*Store the first field of a SELECT result in a variable*
+
+```gherkin
+Given I use datasource "main"
+And I execute the SQL query:
+  """sql
+  SELECT name FROM users WHERE status = 'active'
+  """
+Then store db query result in variable "name"
+```
+
+### `es`
+
+**Expression:** `guardo el resultado de la consulta SQL en la variable {variable:text}`
+
+**Example:**
+
+```gherkin
+Entonces guardo el resultado de la consulta SQL en la variable "nombre"
+```
+
+**Scenarios:**
+
+*Guardar el primer campo del resultado de una SELECT en una variable*
+
+```gherkin
+Dado que uso el origen de datos "main"
+Y ejecuto la sentencia SQL:
+  """sql
+  SELECT nombre FROM users WHERE status = 'active'
+  """
+Entonces guardo el resultado de la consulta SQL en la variable "nombre"
+```
+
+---
+
+## `db.assert.query.count`
+
+**Role:** `then`
+
+Asserts the count resulting from the last executed SQL statement.
+For SELECT queries, asserts the number of rows in the result set.
+For INSERT, UPDATE or DELETE statements, asserts the number of affected rows.
+
+### Parameters
+
+| Name | Type | Description |
+|------|------|-------------|
+| `integer-assertion` | assertion | A condition that the count must satisfy (e.g. '= 3', '> 0') |
+
+### `dsl`
+
+**Expression:** `db query count {{integer-assertion}}`
+
+**Assertion expressions:**
+
+- `= 0`
+- `= 1`
+- `> 0`
+- `!= 0`
+
+**Example:**
+
+```gherkin
+* db query count > 0
+```
+
+**Scenarios:**
+
+*Assert the number of rows returned by the last SQL query*
+
+```gherkin
+* use db "main"
+* db query:
+  """sql
+  SELECT * FROM users WHERE status = 'active'
+  """
+* db query count > 0
+```
+
+### `en`
+
+**Expression:** `the SQL result row count {{integer-assertion}}`
+
+**Assertion expressions:**
+
+- `is equal to 0`
+- `is equal to 1`
+- `is greater than 0`
+- `is not equal to 0`
+
+**Example:**
+
+```gherkin
+Then the SQL result row count is greater than 0
+```
+
+**Scenarios:**
+
+*Assert the number of rows returned by the last SQL query*
+
+```gherkin
+Given I use datasource "main"
+And I execute the SQL query:
+  """sql
+  SELECT * FROM users WHERE status = 'active'
+  """
+Then the SQL result row count is greater than 0
+```
+
+### `es`
+
+**Expression:** `el número de filas de la respuesta SQL {{integer-assertion}}`
+
+**Assertion expressions:**
+
+- `es igual a 0`
+- `es igual a 1`
+- `es mayor que 0`
+- `no es igual a 0`
+
+**Example:**
+
+```gherkin
+Entonces el número de filas de la respuesta SQL es mayor que 0
+```
+
+**Scenarios:**
+
+*Verificar el número de filas devueltas por la última consulta SQL*
+
+```gherkin
+Dado que uso el origen de datos "main"
+Y ejecuto la sentencia SQL:
+  """sql
+  SELECT * FROM users WHERE status = 'active'
+  """
+Entonces el número de filas de la respuesta SQL es mayor que 0
+```
+
+---
+
 ## `db.assert.count`
 
 **Role:** `then`

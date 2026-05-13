@@ -14,6 +14,7 @@ import org.myjtools.openbbt.core.persistence.AttachmentRepository;
 import org.myjtools.openbbt.core.persistence.TestExecutionRepository;
 import org.myjtools.openbbt.core.persistence.TestPlanRepository;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -79,10 +80,20 @@ class TestOpenBBTRuntime {
 			StepProvider.class
 		);
 		var contributors = runtime.getContributors();
-		assertThat(contributors).containsKey("DataTypeProvider").containsKey("MessageProvider").containsKey("StepProvider");
-		assertThat(contributors.get("DataTypeProvider")).contains("CoreDataTypes");
-		assertThat(contributors.get("MessageProvider")).contains("AssertionMessageProvider", "CoreStepMessageProvider");
-		assertThat(contributors.get("StepProvider")).contains("CoreStepProvider");
+
+		// outer key = module name, inner key = type simple name
+		var allTypes = contributors.values().stream().flatMap(m -> m.keySet().stream()).toList();
+		assertThat(allTypes).contains("DataTypeProvider", "MessageProvider", "StepProvider");
+
+		var dataTypeImpls = contributors.values().stream().flatMap(m -> m.getOrDefault("DataTypeProvider", List.of()).stream()).toList();
+		var messageImpls  = contributors.values().stream().flatMap(m -> m.getOrDefault("MessageProvider",  List.of()).stream()).toList();
+		var stepImpls     = contributors.values().stream().flatMap(m -> m.getOrDefault("StepProvider",     List.of()).stream()).toList();
+
+		assertThat(dataTypeImpls).anyMatch(s -> s.endsWith("CoreDataTypes"));
+		assertThat(messageImpls)
+			.anyMatch(s -> s.endsWith("AssertionMessageProvider"))
+			.anyMatch(s -> s.endsWith("CoreStepMessageProvider"));
+		assertThat(stepImpls).anyMatch(s -> s.endsWith("CoreStepProvider"));
 	}
 
 	@Test

@@ -131,6 +131,7 @@
 				<module>plugins/markdown-plan-openbbt-plugin</module>
 				<module>plugins/rest-openbbt-plugin</module>
 				<module>plugins/db-openbbt-plugin</module>
+				<module>plugins/pdfreport-openbbt-plugin</module>
 			</modules>
 		</profile>
 	</profiles>

@@ -117,4 +117,19 @@ Feature: Posts REST API
     Then I store the value of field 'id' from the response body into variable id
     Then I make a GET request to 'posts/${id}'
     Then the HTTP status code is 200
-    Then the response body contains:
+
+    # -------------------------------------------------------------
+  @ID-11 @GET
+  Scenario: Measure response time
+    Given benchmark mode is enabled with 200 executions and 10 threads
+    When I make a GET request to "posts/1"
+    Then the benchmark P95 response time (ms) is greater than 2
+
+  @ID-12 @GET
+  Scenario: List all posts (2)
+    When I make a GET request to "posts"
+    Then the HTTP status code is equal to 200
+    And the response body contains:
+      """json
+      [{"userId": 1, "id": 1}]
+      """

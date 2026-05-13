@@ -1,6 +1,7 @@
 package org.myjtools.openbbt.core.persistence;
 
 
+import org.myjtools.openbbt.core.execution.ExecutionNodeStats;
 import org.myjtools.openbbt.core.execution.ExecutionResult;
 import org.myjtools.openbbt.core.execution.TestExecution;
 import org.myjtools.openbbt.core.execution.TestExecutionNode;
@@ -75,4 +76,12 @@ public interface TestExecutionRepository extends Repository {
 	 * @param planId the plan whose executions should be deleted
 	 */
 	void deleteExecutionsByPlan(UUID planId);
+
+	default Optional<ExecutionNodeStats> getExecutionNodeStats(UUID executionNodeID) {
+		return Optional.empty();
+	}
+
+	default void storeExecutionNodeStats(UUID executionNodeID, ExecutionNodeStats stats) {
+		// no-op for repositories that don't support stats
+	}
 }

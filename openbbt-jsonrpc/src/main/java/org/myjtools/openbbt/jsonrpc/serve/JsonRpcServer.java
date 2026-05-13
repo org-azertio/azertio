@@ -34,7 +34,12 @@ public class JsonRpcServer {
 
     @FunctionalInterface
     public interface ContributorsProvider {
-        java.util.Map<String, java.util.List<String>> getContributors();
+        java.util.Map<String, java.util.Map<String, java.util.List<String>>> getContributors();
+    }
+
+    @FunctionalInterface
+    public interface StepIndexProvider {
+        String getIndex();
     }
 
     @FunctionalInterface
@@ -47,6 +52,16 @@ public class JsonRpcServer {
          * {@code suites} is the list of test suite names to include; empty means all suites.
          */
         TestExecution exec(BiConsumer<UUID, UUID> onExecutionCreated, String profileName, List<String> suites);
+
+        /**
+         * Re-run a previously stored plan identified by {@code planID}.
+         * Uses the stored plan node tree as-is rather than rebuilding from openbbt.yaml,
+         * so the same test structure is executed regardless of how the config has changed.
+         * Default implementation delegates to {@link #exec} with no suite filter (runs all suites).
+         */
+        default TestExecution rerun(BiConsumer<UUID, UUID> onExecutionCreated, UUID planID, String profileName) {
+            return exec(onExecutionCreated, profileName, List.of());
+        }
     }
 
     @FunctionalInterface
@@ -64,6 +79,7 @@ public class JsonRpcServer {
     private final ExecHandler execHandler;
     private final PlanHandler planHandler;
     private final ContributorsProvider contributorsProvider;
+    private final StepIndexProvider stepIndexProvider;
     private TestPlanRepository repository;
     private TestExecutionRepository executionRepository;
     private AttachmentRepository attachmentRepository;
@@ -82,12 +98,17 @@ public class JsonRpcServer {
     }
 
     public JsonRpcServer(InputStream in, OutputStream out, RepositoryFactory factory, ExecHandler execHandler, PlanHandler planHandler, ContributorsProvider contributorsProvider) {
+        this(in, out, factory, execHandler, planHandler, contributorsProvider, null);
+    }
+
+    public JsonRpcServer(InputStream in, OutputStream out, RepositoryFactory factory, ExecHandler execHandler, PlanHandler planHandler, ContributorsProvider contributorsProvider, StepIndexProvider stepIndexProvider) {
         this.in = in;
         this.out = out;
         this.factory = factory;
         this.execHandler = execHandler;
         this.planHandler = planHandler;
         this.contributorsProvider = contributorsProvider;
+        this.stepIndexProvider = stepIndexProvider;
     }
 
     public void run() {
@@ -175,6 +196,7 @@ public class JsonRpcServer {
                 case "executions/attachment"  -> handleGetAttachment(params);
                 case "executions/delete" -> { handleDeleteExecution(params); yield JsonNull.INSTANCE; }
                 case "contributors/list" -> handleContributors();
+                case "steps/index"       -> handleStepsIndex();
                 case "exec"                   -> handleExec(params);
                 case "refresh"         -> { handleRefresh(); yield JsonNull.INSTANCE; }
                 case "shutdown"        -> { running = false; yield JsonNull.INSTANCE; }
@@ -381,20 +403,18 @@ public class JsonRpcServer {
             throw new IllegalStateException("exec handler not configured");
         }
         boolean detach = params.has("detach") && params.get("detach").getAsBoolean();
+        boolean isRerun = params.has("rerun") && !params.get("rerun").isJsonNull();
         String profileName;
-        List<String> suites;
-        if (params.has("rerun") && !params.get("rerun").isJsonNull()) {
+        List<String> suites = List.of();
+        UUID rerunPlanID = null;
+        if (isRerun) {
             if (executionRepository == null)
                 throw new IllegalStateException("Execution repository not available");
             UUID rerunId = UUID.fromString(params.get("rerun").getAsString());
             TestExecution sourceEx = executionRepository.getExecution(rerunId)
                 .orElseThrow(() -> new IllegalArgumentException("Execution not found: " + rerunId));
             profileName = sourceEx.profile();
-            TestPlan sourcePlan = repository.getPlan(sourceEx.planID())
-                .orElseThrow(() -> new IllegalArgumentException("Plan not found: " + sourceEx.planID()));
-            suites = sourcePlan.suites() != null && !sourcePlan.suites().isBlank()
-                ? List.of(sourcePlan.suites().split(","))
-                : List.of();
+            rerunPlanID = sourceEx.planID();
         } else {
             profileName = params.has("profile") && !params.get("profile").isJsonNull()
                 ? params.get("profile").getAsString()
@@ -405,8 +425,14 @@ public class JsonRpcServer {
                 : List.of();
         }
 
+        final String finalProfileName = profileName;
+        final List<String> finalSuites = suites;
+        final UUID finalRerunPlanID = rerunPlanID;
+
         if (!detach) {
-            TestExecution ex = execHandler.exec(null, profileName, suites);
+            TestExecution ex = isRerun
+                ? execHandler.rerun(null, finalRerunPlanID, finalProfileName)
+                : execHandler.exec(null, finalProfileName, finalSuites);
             JsonObject result = new JsonObject();
             result.addProperty("executionId", ex.executionID().toString());
             result.addProperty("planId", ex.planID().toString());
@@ -426,11 +452,16 @@ public class JsonRpcServer {
 
         Thread thread = new Thread(() -> {
             try {
-                execHandler.exec((id, planId) -> {
+                BiConsumer<UUID, UUID> cb = (id, planId) -> {
                     idRef.set(id);
                     planIdRef.set(planId);
                     latch.countDown();
-                }, profileName, suites);
+                };
+                if (isRerun) {
+                    execHandler.rerun(cb, finalRerunPlanID, finalProfileName);
+                } else {
+                    execHandler.exec(cb, finalProfileName, finalSuites);
+                }
             } catch (Throwable t) {
                 errorRef.set(t);
                 latch.countDown();
@@ -459,15 +490,28 @@ public class JsonRpcServer {
         if (contributorsProvider == null)
             throw new IllegalStateException("Contributors provider not configured");
         JsonArray result = new JsonArray();
-        contributorsProvider.getContributors().forEach((type, implementations) -> {
-            JsonObject obj = new JsonObject();
-            obj.addProperty("type", type);
-            JsonArray impls = new JsonArray();
-            implementations.forEach(impls::add);
-            obj.add("implementations", impls);
-            result.add(obj);
+        contributorsProvider.getContributors().forEach((plugin, typeMap) -> {
+            JsonObject pluginObj = new JsonObject();
+            pluginObj.addProperty("plugin", plugin);
+            JsonArray contributors = new JsonArray();
+            typeMap.forEach((type, implementations) -> {
+                JsonObject typeObj = new JsonObject();
+                typeObj.addProperty("type", type);
+                JsonArray impls = new JsonArray();
+                implementations.forEach(impls::add);
+                typeObj.add("implementations", impls);
+                contributors.add(typeObj);
+            });
+            pluginObj.add("contributors", contributors);
+            result.add(pluginObj);
         });
         return result;
+    }
+
+    private JsonElement handleStepsIndex() {
+        if (stepIndexProvider == null)
+            throw new IllegalStateException("Step index provider not configured");
+        return JsonParser.parseString(stepIndexProvider.getIndex());
     }
 
     private void handleDeleteExecution(JsonObject params) {

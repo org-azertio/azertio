@@ -5,7 +5,7 @@
   "version": "1.0.0-alpha1",
   "publisher": "myjtools.org",
   "engines": {
-    "vscode": "^1.85.0"
+    "vscode": "^1.90.0"
   },
   "categories": ["Testing"],
   "activationEvents": [
@@ -76,6 +76,10 @@
         "command": "openbbt.showLogs",
         "title": "OpenBBT: Show Logs",
         "icon": "$(output)"
+      },
+      {
+        "command": "openbbt.ai.toggle",
+        "title": "OpenBBT: Toggle AI Completions"
       }
     ],
     "viewsContainers": {
@@ -171,6 +175,16 @@
           "type": "string",
           "default": "openbbt",
           "description": "Path to the openbbt CLI executable. Defaults to 'openbbt' (must be on PATH)."
+        },
+        "openbbt.ai.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable AI-powered inline step completions in .feature files. Requires a language model provider (e.g. GitHub Copilot)."
+        },
+        "openbbt.ai.model": {
+          "type": "string",
+          "default": "",
+          "description": "Language model family to use (e.g. 'gpt-4o', 'claude-sonnet-4-5'). Leave empty to use the first available model."
         }
       }
     }
@@ -185,7 +199,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
-    "@types/vscode": "^1.85.0",
+    "@types/vscode": "^1.90.0",
     "typescript": "^5.3.0"
   }
 }

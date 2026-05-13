@@ -125,3 +125,143 @@
         {"recipient": "alice@example.com", "template": "welcome"}
         """
         * assert $message:text contains "success"
+
+
+'enable.benchmark.mode':
+  expression: 'benchmark {executions:integer} x {threads:integer} threads'
+  example: |
+    * benchmark 100 x 4 threads
+  scenarios:
+    - title: Enable benchmark mode before a step
+      gherkin: |
+        * benchmark 200 x 8 threads
+        * do HTTP GET "health"
+        * assert benchmark:mean < 100
+
+
+'assert.benchmark.statistics.mean':
+  expression: 'assert benchmark:mean {{integer-assertion}}'
+  assertion-hints:
+    - '< 200'
+    - '<= 500'
+    - '= 100'
+  example: |
+    * assert benchmark:mean < 200
+  scenarios:
+    - title: Assert mean response time under threshold
+      gherkin: |
+        * benchmark 100 x 4 threads
+        * do HTTP GET "health"
+        * assert benchmark:mean < 200
+
+
+'assert.benchmark.statistics.min':
+  expression: 'assert benchmark:min {{integer-assertion}}'
+  assertion-hints:
+    - '< 100'
+    - '> 0'
+    - '= 10'
+  example: |
+    * assert benchmark:min > 0
+  scenarios:
+    - title: Assert minimum response time is positive
+      gherkin: |
+        * benchmark 100 x 4 threads
+        * do HTTP GET "health"
+        * assert benchmark:min > 0
+
+
+'assert.benchmark.statistics.max':
+  expression: 'assert benchmark:max {{integer-assertion}}'
+  assertion-hints:
+    - '< 1000'
+    - '<= 500'
+    - '= 200'
+  example: |
+    * assert benchmark:max < 1000
+  scenarios:
+    - title: Assert maximum response time under threshold
+      gherkin: |
+        * benchmark 100 x 4 threads
+        * do HTTP GET "health"
+        * assert benchmark:max < 1000
+
+
+'assert.benchmark.statistics.p50':
+  expression: 'assert benchmark:p50 {{integer-assertion}}'
+  assertion-hints:
+    - '< 200'
+    - '<= 300'
+    - '= 150'
+  example: |
+    * assert benchmark:p50 < 200
+  scenarios:
+    - title: Assert P50 response time under threshold
+      gherkin: |
+        * benchmark 100 x 4 threads
+        * do HTTP GET "health"
+        * assert benchmark:p50 < 200
+
+
+'assert.benchmark.statistics.p95':
+  expression: 'assert benchmark:p95 {{integer-assertion}}'
+  assertion-hints:
+    - '< 500'
+    - '<= 1000'
+    - '= 300'
+  example: |
+    * assert benchmark:p95 < 500
+  scenarios:
+    - title: Assert P95 response time under threshold
+      gherkin: |
+        * benchmark 100 x 4 threads
+        * do HTTP GET "health"
+        * assert benchmark:p95 < 500
+
+
+'assert.benchmark.statistics.p99':
+  expression: 'assert benchmark:p99 {{integer-assertion}}'
+  assertion-hints:
+    - '< 1000'
+    - '<= 2000'
+    - '= 500'
+  example: |
+    * assert benchmark:p99 < 1000
+  scenarios:
+    - title: Assert P99 response time under threshold
+      gherkin: |
+        * benchmark 100 x 4 threads
+        * do HTTP GET "health"
+        * assert benchmark:p99 < 1000
+
+
+'assert.benchmark.statistics.throughput':
+  expression: 'assert benchmark:throughput {{decimal-assertion}}'
+  assertion-hints:
+    - '> 10.0'
+    - '>= 5.0'
+    - '= 20.0'
+  example: |
+    * assert benchmark:throughput > 10.0
+  scenarios:
+    - title: Assert throughput exceeds minimum
+      gherkin: |
+        * benchmark 100 x 4 threads
+        * do HTTP GET "health"
+        * assert benchmark:throughput > 10.0
+
+
+'assert.benchmark.statistics.errorRate':
+  expression: 'assert benchmark:errorRate {{decimal-assertion}}'
+  assertion-hints:
+    - '= 0.0'
+    - '< 0.01'
+    - '<= 0.05'
+  example: |
+    * assert benchmark:errorRate = 0.0
+  scenarios:
+    - title: Assert no errors during benchmark
+      gherkin: |
+        * benchmark 100 x 4 threads
+        * do HTTP GET "health"
+        * assert benchmark:errorRate = 0.0

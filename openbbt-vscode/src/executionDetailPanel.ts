@@ -14,6 +14,7 @@ interface NodeWithResult extends NodeInfo {
     message: string | null;
     executionNodeId: string | null;
     attachmentCount: number;
+    durationMs: number | null;
     testPassedCount?: number;
     testErrorCount?: number;
     testFailedCount?: number;
@@ -26,6 +27,7 @@ interface NodeUpdate {
     message: string | null;
     executionNodeId: string | null;
     attachmentCount: number;
+    durationMs: number | null;
 }
 
 interface ExecutionHeader {
@@ -145,6 +147,7 @@ export async function openExecutionDetail(
                             message: execInfo?.message ?? null,
                             executionNodeId: execInfo?.executionNodeId ?? null,
                             attachmentCount: execInfo?.attachmentCount ?? 0,
+                            durationMs: execInfo?.durationMs ?? null,
                         };
                     })
                 );
@@ -194,6 +197,7 @@ function mergeResult(node: NodeInfo, execInfo: ExecNodeInfo | null): NodeWithRes
         message: execInfo?.message ?? null,
         executionNodeId: execInfo?.executionNodeId ?? null,
         attachmentCount: execInfo?.attachmentCount ?? 0,
+        durationMs: execInfo?.durationMs ?? null,
         testPassedCount: execInfo?.testPassedCount,
         testErrorCount: execInfo?.testErrorCount,
         testFailedCount: execInfo?.testFailedCount,
@@ -204,6 +208,7 @@ function contentTypeToExtension(contentType: string): string {
     const base = contentType.split(';')[0].trim().toLowerCase();
     const map: Record<string, string> = {
         'text/plain': '.txt',
+        'text/csv': '.csv',
         'text/html': '.html',
         'text/xml': '.xml',
         'application/xml': '.xml',
@@ -274,7 +279,8 @@ function buildHtml(webview: vscode.Webview, _extensionUri: vscode.Uri): string {
     text-align: center;
     line-height: 1;
   }
-  .node-name { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+  .node-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+  .node-name-group { flex: 1; min-width: 0; display: flex; align-items: center; overflow: hidden; }
   .node-type {
     font-size: 0.8em;
     opacity: 0.6;
@@ -378,6 +384,13 @@ function buildHtml(webview: vscode.Webview, _extensionUri: vscode.Uri): string {
     margin-bottom: 12px;
     white-space: pre-wrap;
   }
+  .node-duration {
+    font-size: 0.75em;
+    opacity: 0.5;
+    margin-left: 6px;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
 </style>
 </head>
 <body>
@@ -390,6 +403,7 @@ function buildHtml(webview: vscode.Webview, _extensionUri: vscode.Uri): string {
   const pendingExpand = new Map();   // msgId -> resolve
   const nodeStatusMap = new Map();   // nodeId -> { status, result }
   const statusIconEls = new Map();   // nodeId -> span element
+  const durationEls = new Map();     // nodeId -> span element
   let rootNodeId = null;
   let headerBadgeEl = null;
   let pollTimer = null;
@@ -422,6 +436,14 @@ function buildHtml(webview: vscode.Webview, _extensionUri: vscode.Uri): string {
 
   function registerStatusIconEl(nodeId, el) {
     statusIconEls.set(nodeId, el);
+  }
+
+  function formatDuration(ms) {
+    if (ms < 1000) return ms + ' ms';
+    const totalSec = Math.floor(ms / 1000);
+    const min = Math.floor(totalSec / 60);
+    const sec = totalSec % 60;
+    return min > 0 ? min + ' min ' + sec + ' sec' : sec + ' sec';
   }
 
   function tagColor(tag) {
@@ -560,9 +582,21 @@ function buildHtml(webview: vscode.Webview, _extensionUri: vscode.Uri): string {
     const sIcon = statusIconEl(node.status, node.result);
     registerStatusIconEl(node.nodeId, sIcon);
 
+    const durEl = document.createElement('span');
+    durEl.className = 'node-duration';
+    if (node.status === 'FINISHED' && node.durationMs !== null && node.durationMs !== undefined) {
+      durEl.textContent = formatDuration(node.durationMs);
+    }
+    durationEls.set(node.nodeId, durEl);
+
+    const nameGroup = document.createElement('span');
+    nameGroup.className = 'node-name-group';
+    nameGroup.appendChild(name);
+    nameGroup.appendChild(durEl);
+
     row.appendChild(expander);
     row.appendChild(sIcon);
-    row.appendChild(name);
+    row.appendChild(nameGroup);
     const tagsEl = createTagsEl(node.tags);
     if (tagsEl) { row.appendChild(tagsEl); }
 
@@ -776,6 +810,10 @@ function buildHtml(webview: vscode.Webview, _extensionUri: vscode.Uri): string {
         nodeStatusMap.set(upd.nodeId, { status: upd.status, result: upd.result });
         const iconEl = statusIconEls.get(upd.nodeId);
         if (iconEl) { applyStatusIcon(iconEl, upd.status, upd.result); }
+        const durEl = durationEls.get(upd.nodeId);
+        if (durEl && upd.status === 'FINISHED' && upd.durationMs !== null && upd.durationMs !== undefined) {
+          durEl.textContent = formatDuration(upd.durationMs);
+        }
       }
     } else if (msg.type === 'children') {
       const resolve = pendingExpand.get(msg.msgId);

@@ -9,6 +9,7 @@ import { ExecutionProvider } from './executionProvider';
 import { openExecutionDetail } from './executionDetailPanel';
 import { ISSUE_URI_SCHEME, TestPlanProvider } from './testPlanProvider';
 import { ContributorsProvider } from './contributorsProvider';
+import { AiCompletionProvider } from './aiCompletionProvider';
 import {
     CloseAction,
     ErrorAction,
@@ -248,7 +249,7 @@ export function activate(context: vscode.ExtensionContext): void {
     const testPlanProvider = new TestPlanProvider(logOutput);
     vscode.window.registerTreeDataProvider('openbbt.testPlan', testPlanProvider);
 
-    const contributorsProvider = new ContributorsProvider();
+    const contributorsProvider = new ContributorsProvider(logOutput);
     vscode.window.registerTreeDataProvider('openbbt.contributors', contributorsProvider);
 
     // Auto-populate the tree on startup using existing plan data (no plan re-run).
@@ -605,6 +606,24 @@ export function activate(context: vscode.ExtensionContext): void {
                 }
             }
         )
+    );
+
+    const aiStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
+    context.subscriptions.push(aiStatusBar);
+
+    context.subscriptions.push(
+        vscode.languages.registerInlineCompletionItemProvider(
+            { scheme: 'file', language: 'feature' },
+            new AiCompletionProvider(() => serveClient, aiStatusBar)
+        ),
+        vscode.commands.registerCommand('openbbt.ai.toggle', () => {
+            const cfg = vscode.workspace.getConfiguration('openbbt.ai');
+            const current = cfg.get<boolean>('enabled', false);
+            cfg.update('enabled', !current, vscode.ConfigurationTarget.Global);
+            vscode.window.showInformationMessage(
+                `OpenBBT AI completions ${!current ? 'enabled' : 'disabled'}.`
+            );
+        })
     );
 }
 

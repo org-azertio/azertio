@@ -171,6 +171,32 @@ class TestPlanExecutorTest {
 	}
 
 
+	@Test
+	void execute_benchmarkMode_testCasePassesAndStatsStored(@TempDir Path tempDir) {
+		var ctx = setup("execBenchmarkMode", tempDir);
+		TestExecution execution = new TestPlanExecutor(ctx.runtime()).execute(ctx.plan().planID());
+
+		UUID testCaseNodeID = findNodeOfType(ctx, NodeType.TEST_CASE);
+		UUID testCaseExecNodeID = ctx.execRepo().getExecutionNodeByPlanNode(execution.executionID(), testCaseNodeID).orElseThrow();
+		assertThat(ctx.execRepo().getExecutionNodeResult(testCaseExecNodeID)).contains(ExecutionResult.PASSED);
+
+		UUID benchStepNodeID = ctx.planRepo().searchNodes(TestPlanNodeCriteria.and(
+			TestPlanNodeCriteria.descendantOf(ctx.plan().planNodeRoot()),
+			TestPlanNodeCriteria.withNodeType(NodeType.STEP)
+		)).filter(id -> "a benchmarkable step".equals(
+			ctx.planRepo().getNodeData(id).map(n -> n.name()).orElse("")
+		)).findFirst().orElseThrow();
+
+		UUID benchStepExecNodeID = ctx.execRepo().getExecutionNodeByPlanNode(execution.executionID(), benchStepNodeID).orElseThrow();
+		var stats = ctx.execRepo().getExecutionNodeStats(benchStepExecNodeID);
+		assertThat(stats).isPresent();
+		assertThat(stats.get().numExecutions()).isEqualTo(500);
+		assertThat(stats.get().numThreads()).isEqualTo(10);
+		assertThat(stats.get().errorRate()).isEqualTo(0.0);
+		assertThat(stats.get().min()).isGreaterThanOrEqualTo(0);
+		assertThat(stats.get().max()).isGreaterThanOrEqualTo(stats.get().min());
+	}
+
 	// ---- helpers ----
 
 	private record ExecutionContext(

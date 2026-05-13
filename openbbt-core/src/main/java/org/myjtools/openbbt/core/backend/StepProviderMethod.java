@@ -4,15 +4,18 @@ import org.myjtools.openbbt.core.Assertion;
 import org.myjtools.openbbt.core.DataType;
 import org.myjtools.openbbt.core.DataTypes;
 import org.myjtools.openbbt.core.OpenBBTException;
+import org.myjtools.openbbt.core.contributors.StepExpression;
 import org.myjtools.openbbt.core.contributors.StepProvider;
 import org.myjtools.openbbt.core.testplan.DataTable;
 import org.myjtools.openbbt.core.testplan.Document;
-import org.myjtools.openbbt.core.contributors.StepExpression;
 import org.myjtools.openbbt.core.util.Pair;
-
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author Luis Iñesta Gelabert - luiinge@gmail.com
@@ -192,6 +195,11 @@ public class StepProviderMethod {
 			result.put(name, type);
 		}
 		return result;
+	}
+
+
+	public boolean hasAnnotation(Class<? extends Annotation> annotationClass) {
+		return method.isAnnotationPresent(annotationClass);
 	}
 
 

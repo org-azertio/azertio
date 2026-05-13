@@ -3,6 +3,8 @@ package org.myjtools.openbbt.core.execution;
 import org.myjtools.openbbt.core.OpenBBTConfig;
 import org.myjtools.openbbt.core.OpenBBTException;
 import org.myjtools.openbbt.core.OpenBBTRuntime;
+import org.myjtools.openbbt.core.backend.Benchmark;
+import org.myjtools.openbbt.core.contributors.StatisticsProvider;
 import org.myjtools.openbbt.core.events.ExecutionFinished;
 import org.myjtools.openbbt.core.events.ExecutionNodeFinished;
 import org.myjtools.openbbt.core.events.ExecutionNodeStarted;
@@ -129,6 +131,7 @@ public class TestPlanExecutor {
 			log.error(e);
 			Instant finish = runtime.clock().now();
 			testExecutionRepository.updateExecutionNodeFinish(executionNodeID, ExecutionResult.ERROR, finish);
+			storeStackTraceAttachment(executionID, executionNodeID, e);
 			runtime.eventBus().publish(
 				new ExecutionNodeFinished(finish, executionID, executionNodeID, testPlanNodeID, ExecutionResult.ERROR)
 			);
@@ -229,12 +232,17 @@ public class TestPlanExecutor {
 	private ExecutionResult recordStepExecution(
 		UUID executionID, UUID executionNodeID, BackendExecutor backendExecutor, TestPlanNode node
 	) {
-		Result stepResult = executeTestCaseStep(backendExecutor, node, executionNodeID);
+		Benchmark benchmark = backendExecutor.currentBenchmark();
+		Result stepResult = executeTestCaseStep(backendExecutor, node, executionNodeID, benchmark);
 		if (stepResult.message() != null) {
 			testExecutionRepository.updateExecutionNodeMessage(executionNodeID, stepResult.message());
 		}
 		if (stepResult.error() != null) {
 			storeStackTraceAttachment(executionID, executionNodeID, stepResult.error());
+		}
+		if (benchmark != null) {
+			testExecutionRepository.storeExecutionNodeStats(executionNodeID, benchmark.statistics());
+			backendExecutor.disableBenchmarkMode();
 		}
 		return stepResult.result();
 	}
@@ -243,8 +251,25 @@ public class TestPlanExecutor {
 	private Result executeTestCaseStep(
 		BackendExecutor backendExecutor,
 		TestPlanNode node,
-		UUID executionNodeID
+		UUID executionNodeID,
+		Benchmark benchmark
 	) {
+		if (benchmark != null) {
+			try {
+				if (!backendExecutor.hasAnnotation(node, StatisticsProvider.class)) {
+					throw new OpenBBTException(
+						"Step '{}' cannot be executed in benchmark mode because it does not provide statistics, which are required in benchmark mode.",
+						node.name()
+					);
+				}
+				backendExecutor.executeBenchmark(node, executionNodeID, benchmark);
+				return new Result(ExecutionResult.PASSED, null, null);
+			} catch (Exception e) {
+				log.error(e);
+				return new Result(ExecutionResult.ERROR, e.getMessage(), e);
+			}
+		}
+
 		try {
 			long timeoutSec = Long.parseLong(node.properties().getOrDefault(OpenBBTConfig.STEP_EXECUTION_TIMEOUT, "-1"));
 			if (timeoutSec == -1L) {

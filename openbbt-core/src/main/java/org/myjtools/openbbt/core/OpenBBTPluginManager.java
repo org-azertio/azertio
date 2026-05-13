@@ -34,6 +34,10 @@ public class OpenBBTPluginManager {
 		return pluginManager;
 	}
 
+	public String moduleLayerTreeDescription() {
+		return pluginManager.moduleLayerTree().description();
+	}
+
 	public boolean installPlugin(String pluginNameExpression) {
 		String pluginName;
 		String runtimePluginConfig;
@@ -54,6 +58,11 @@ public class OpenBBTPluginManager {
 		PluginID pluginID = new PluginID(groupId, artifactId);
 		if (pluginManager.plugins().contains(pluginID)) {
 			log.info("Plugin {} is already installed.", pluginName);
+			if (runtimePluginConfig != null) {
+				for (String runtimeConfigEntry : runtimePluginConfig.split(",")) {
+					installPluginRuntimeConfig(pluginID, runtimeConfigEntry);
+				}
+			}
 			return true;
 		}
 		log.info("Installing plugin {} from artifact store...", pluginName);

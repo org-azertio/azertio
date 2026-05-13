@@ -4,6 +4,7 @@ import org.jooq.*;
 import org.jooq.Record;
 import org.jooq.impl.DSL;
 import org.jooq.impl.DataSourceConnectionProvider;
+import org.myjtools.openbbt.core.execution.ExecutionNodeStats;
 import org.myjtools.openbbt.core.execution.ExecutionResult;
 import org.myjtools.openbbt.core.execution.TestExecution;
 import org.myjtools.openbbt.core.execution.TestExecutionNode;
@@ -25,6 +26,7 @@ public class JooqExecutionRepository implements TestExecutionRepository, AutoClo
 	private static final Table<Record> TABLE_EXECUTION = DSL.table("execution");
 	private static final Table<Record> TABLE_EXECUTION_NODE = DSL.table("execution_node");
 	private static final Table<Record> TABLE_EXECUTION_ATTACHMENT = DSL.table("execution_attachment");
+	private static final Table<Record> TABLE_EXECUTION_NODE_STATS = DSL.table("execution_node_stats");
 
 	private static final Field<UUID> FIELD_EXECUTION_ID = DSL.field("execution_id", UUID.class);
 	private static final Field<UUID> FIELD_PLAN_ID = DSL.field("plan_id", UUID.class);
@@ -42,6 +44,17 @@ public class JooqExecutionRepository implements TestExecutionRepository, AutoClo
 
 	private static final Field<UUID> FIELD_ATTACHMENT_ID = DSL.field("attachment_id", UUID.class);
 	private static final Field<String> FIELD_PROFILE = DSL.field("profile", String.class);
+
+	private static final Field<Integer> FIELD_STATS_NUM_EXECUTIONS = DSL.field("num_executions", Integer.class);
+	private static final Field<Integer> FIELD_STATS_NUM_THREADS    = DSL.field("num_threads",    Integer.class);
+	private static final Field<Integer> FIELD_STATS_MIN_MS         = DSL.field("min_ms",         Integer.class);
+	private static final Field<Integer> FIELD_STATS_MAX_MS         = DSL.field("max_ms",         Integer.class);
+	private static final Field<Integer> FIELD_STATS_MEAN_MS        = DSL.field("mean_ms",        Integer.class);
+	private static final Field<Integer> FIELD_STATS_P50_MS         = DSL.field("p50_ms",         Integer.class);
+	private static final Field<Integer> FIELD_STATS_P95_MS         = DSL.field("p95_ms",         Integer.class);
+	private static final Field<Integer> FIELD_STATS_P99_MS         = DSL.field("p99_ms",         Integer.class);
+	private static final Field<Double>  FIELD_STATS_THROUGHPUT     = DSL.field("throughput",     Double.class);
+	private static final Field<Double>  FIELD_STATS_ERROR_RATE     = DSL.field("error_rate",     Double.class);
 
 	private final DSLContext dsl;
 	private final Connection directConnection;
@@ -319,6 +332,60 @@ public class JooqExecutionRepository implements TestExecutionRepository, AutoClo
 		);
 	}
 
+
+	@Override
+	public Optional<ExecutionNodeStats> getExecutionNodeStats(UUID executionNodeID) {
+		return dsl.select(
+				FIELD_STATS_NUM_EXECUTIONS, FIELD_STATS_NUM_THREADS,
+				FIELD_STATS_MIN_MS, FIELD_STATS_MAX_MS, FIELD_STATS_MEAN_MS,
+				FIELD_STATS_P50_MS, FIELD_STATS_P95_MS, FIELD_STATS_P99_MS,
+				FIELD_STATS_THROUGHPUT, FIELD_STATS_ERROR_RATE)
+			.from(TABLE_EXECUTION_NODE_STATS)
+			.where(FIELD_EXECUTION_NODE_ID.eq(executionNodeID))
+			.fetchOptional(rec -> {
+				ExecutionNodeStats stats = new ExecutionNodeStats();
+				stats.numExecutions(rec.value1());
+				stats.numThreads(rec.value2());
+				stats.min(rec.value3());
+				stats.max(rec.value4());
+				stats.mean(rec.value5());
+				stats.p50(rec.value6());
+				stats.p95(rec.value7());
+				stats.p99(rec.value8());
+				stats.throughput(rec.value9());
+				stats.errorRate(rec.value10());
+				return stats;
+			});
+	}
+
+	@Override
+	public void storeExecutionNodeStats(UUID executionNodeID, ExecutionNodeStats stats) {
+		dsl.insertInto(TABLE_EXECUTION_NODE_STATS)
+		   .set(FIELD_EXECUTION_NODE_ID, executionNodeID)
+		   .set(FIELD_STATS_NUM_EXECUTIONS, stats.numExecutions())
+		   .set(FIELD_STATS_NUM_THREADS,    stats.numThreads())
+		   .set(FIELD_STATS_MIN_MS,         stats.min())
+		   .set(FIELD_STATS_MAX_MS,         stats.max())
+		   .set(FIELD_STATS_MEAN_MS,        stats.mean())
+		   .set(FIELD_STATS_P50_MS,         stats.p50())
+		   .set(FIELD_STATS_P95_MS,         stats.p95())
+		   .set(FIELD_STATS_P99_MS,         stats.p99())
+		   .set(FIELD_STATS_THROUGHPUT,     stats.throughput())
+		   .set(FIELD_STATS_ERROR_RATE,     stats.errorRate())
+		   .onConflict(FIELD_EXECUTION_NODE_ID)
+		   .doUpdate()
+		   .set(FIELD_STATS_NUM_EXECUTIONS, stats.numExecutions())
+		   .set(FIELD_STATS_NUM_THREADS,    stats.numThreads())
+		   .set(FIELD_STATS_MIN_MS,         stats.min())
+		   .set(FIELD_STATS_MAX_MS,         stats.max())
+		   .set(FIELD_STATS_MEAN_MS,        stats.mean())
+		   .set(FIELD_STATS_P50_MS,         stats.p50())
+		   .set(FIELD_STATS_P95_MS,         stats.p95())
+		   .set(FIELD_STATS_P99_MS,         stats.p99())
+		   .set(FIELD_STATS_THROUGHPUT,     stats.throughput())
+		   .set(FIELD_STATS_ERROR_RATE,     stats.errorRate())
+		   .execute();
+	}
 
 	@Override
 	public UUID newAttachment(UUID executionNodeID) {

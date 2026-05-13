@@ -9,6 +9,75 @@
         Then the count of rows of table users is equal to 3
 
 
+'db.teardown.execute':
+  expression: 'at teardown execute in datasource {alias:text} the SQL statement:'
+  example: |
+    Given at teardown execute in datasource "main" the SQL statement:
+      """sql
+      DELETE FROM users WHERE status = 'active'
+      """
+  scenarios:
+    - title: Register cleanup SQL to run after the scenario regardless of outcome
+      gherkin: |
+        Given at teardown execute in datasource "main" the SQL statement:
+          """sql
+          DELETE FROM users WHERE status = 'active'
+          """
+
+
+'db.execute.query':
+  expression: 'I execute the SQL query:'
+  example: |
+    Given I execute the SQL query:
+      """sql
+      SELECT * FROM users WHERE status = 'active'
+      """
+  scenarios:
+    - title: Execute a SELECT and assert the result in subsequent steps
+      gherkin: |
+        Given I use datasource "main"
+        And I execute the SQL query:
+          """sql
+          SELECT id, name FROM users WHERE status = 'active'
+          """
+        Then the SQL result row count is greater than 0
+
+
+'db.store.query.result':
+  expression: 'store db query result in variable {variable:text}'
+  example: |
+    Then store db query result in variable "name"
+  scenarios:
+    - title: Store the first field of a SELECT result in a variable
+      gherkin: |
+        Given I use datasource "main"
+        And I execute the SQL query:
+          """sql
+          SELECT name FROM users WHERE status = 'active'
+          """
+        Then store db query result in variable "name"
+
+
+'db.assert.query.count':
+  expression: 'the SQL result row count {{integer-assertion}}'
+  assertion-hints:
+    - 'is equal to 0'
+    - 'is equal to 1'
+    - 'is greater than 0'
+    - 'is not equal to 0'
+  example: |
+    Then the SQL result row count is greater than 0
+  scenarios:
+    - title: Assert the number of rows returned by the last SQL query
+      gherkin: |
+        Given I use datasource "main"
+        And I execute the SQL query:
+          """sql
+          SELECT * FROM users WHERE status = 'active'
+          """
+        Then the SQL result row count is greater than 0
+
+
 'db.assert.count':
   expression: 'the count of rows of table {table:word} {{integer-assertion}}'
   assertion-hints:

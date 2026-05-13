@@ -19,9 +19,11 @@ import org.myjtools.openbbt.core.util.Lazy;
 import org.myjtools.openbbt.core.util.Log;
 import java.nio.file.Path;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.TreeMap;
 import java.util.stream.Stream;
 
 public class OpenBBTRuntime implements InjectionProvider {
@@ -225,18 +227,41 @@ public class OpenBBTRuntime implements InjectionProvider {
 			DataTypeProvider.class,
 			ReportBuilder.class,
 			StepProvider.class,
-			SuiteAssembler.class
+			SuiteAssembler.class,
+			AIIndexProvider.class
 		);
 	}
 
-	public Map<String, List<String>> getContributors() {
-		return getContributedTypes().stream()
-			.flatMap(type -> getExtensions(type).map(ext -> Map.entry(type.getSimpleName(), ext.getClass().getSimpleName())))
-			.collect(Collectors.toMap(
-				Map.Entry::getKey,
-				entry -> List.of(entry.getValue()),
-				(a, b) -> Stream.concat(a.stream(), b.stream()).toList()
-			));
+	public String getStepIndex() {
+		var parts = getExtensions(AIIndexProvider.class)
+			.map(AIIndexProvider::stepIndexJson)
+			.filter(s -> s != null && !s.isBlank())
+			.map(String::strip)
+			.filter(s -> s.startsWith("[") && s.endsWith("]"))
+			.map(s -> s.substring(1, s.length() - 1).strip())
+			.filter(s -> !s.isEmpty())
+			.toList();
+		if (parts.isEmpty()) return "[]";
+		return "[\n" + String.join(",\n", parts) + "\n]";
+	}
+
+
+	public Map<String, Map<String,List<String>>> getContributors() {
+		Map<String, Map<String,List<String>>> result = new TreeMap<>();
+		for (Class<?> type : getContributedTypes()) {
+			try {
+				long count = getExtensions(type).peek(ext -> result
+					.computeIfAbsent(ext.getClass().getModule().getName(), k -> new TreeMap<>())
+					.computeIfAbsent(type.getSimpleName(), k -> new ArrayList<>())
+					.add(ext.getClass().getSimpleName())
+				).count();
+				log.info("Contributors of type {}: {}", type.getSimpleName(), count);
+			} catch (Exception e) {
+				log.error(e, "Failed to load contributors of type {}", type.getSimpleName());
+			}
+		}
+		result.values().forEach(types -> types.values().forEach(Collections::sort));
+		return result;
 	}
 
 

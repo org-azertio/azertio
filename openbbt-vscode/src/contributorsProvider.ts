@@ -1,5 +1,17 @@
 import * as vscode from 'vscode';
-import { ContributorInfo, OpenBBTClient } from './openbbtClient';
+import { ContributorTypeInfo, OpenBBTClient, PluginContributors } from './openbbtClient';
+
+export class PluginItem extends vscode.TreeItem {
+    constructor(
+        public readonly plugin: string,
+        public readonly contributors: ContributorTypeInfo[]
+    ) {
+        super(plugin, vscode.TreeItemCollapsibleState.Collapsed);
+        this.iconPath = new vscode.ThemeIcon('package');
+        this.description = `${contributors.length} contributor type(s)`;
+        this.contextValue = 'contributorPlugin';
+    }
+}
 
 export class ContributorTypeItem extends vscode.TreeItem {
     constructor(
@@ -7,7 +19,7 @@ export class ContributorTypeItem extends vscode.TreeItem {
         public readonly implementations: string[]
     ) {
         super(type, implementations.length > 0
-            ? vscode.TreeItemCollapsibleState.Expanded
+            ? vscode.TreeItemCollapsibleState.Collapsed
             : vscode.TreeItemCollapsibleState.None);
         this.iconPath = new vscode.ThemeIcon('extensions');
         this.description = `${implementations.length}`;
@@ -23,7 +35,7 @@ export class ContributorImplItem extends vscode.TreeItem {
     }
 }
 
-type TreeItem = ContributorTypeItem | ContributorImplItem;
+type TreeItem = PluginItem | ContributorTypeItem | ContributorImplItem;
 
 export class ContributorsProvider implements vscode.TreeDataProvider<TreeItem> {
 
@@ -31,7 +43,9 @@ export class ContributorsProvider implements vscode.TreeDataProvider<TreeItem> {
     readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
 
     private client: OpenBBTClient | undefined;
-    private contributors: ContributorInfo[] = [];
+    private plugins: PluginContributors[] = [];
+
+    constructor(private readonly log: (msg: string) => void = () => {}) {}
 
     setClient(client: OpenBBTClient): void {
         this.client = client;
@@ -39,13 +53,12 @@ export class ContributorsProvider implements vscode.TreeDataProvider<TreeItem> {
     }
 
     async refresh(): Promise<void> {
-        if (!this.client) {
-            return;
-        }
+        if (!this.client) { return; }
         try {
-            this.contributors = await this.client.getContributors();
-        } catch {
-            this.contributors = [];
+            this.plugins = await this.client.getContributors();
+        } catch (err) {
+            this.log(`[contributors] failed to load: ${err}`);
+            this.plugins = [];
         }
         this._onDidChangeTreeData.fire();
     }
@@ -56,7 +69,10 @@ export class ContributorsProvider implements vscode.TreeDataProvider<TreeItem> {
 
     getChildren(element?: TreeItem): TreeItem[] {
         if (!element) {
-            return this.contributors.map(c => new ContributorTypeItem(c.type, c.implementations));
+            return this.plugins.map(p => new PluginItem(p.plugin, p.contributors));
+        }
+        if (element instanceof PluginItem) {
+            return element.contributors.map(c => new ContributorTypeItem(c.type, c.implementations));
         }
         if (element instanceof ContributorTypeItem) {
             return element.implementations.map(impl => new ContributorImplItem(impl));

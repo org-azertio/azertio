@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg version="1.1" x="0px" y="0px" viewBox="-29.257 2.669 127.522 32.401" id="svg5" xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com">
+  <defs id="defs5">
+    <style bx:fonts="Baumans">@import url(https://fonts.googleapis.com/css2?family=Baumans%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
+    <bx:export>
+      <bx:file format="png" href="#g4" excluded="true"/>
+      <bx:file format="png" href="#object-0" path="Untitled 2.png" excluded="true"/>
+      <bx:file format="png" href="#object-1" path="Untitled 3.png" excluded="true"/>
+    </bx:export>
+  </defs>
+  <g transform="matrix(1, 0, 0, 1, -479.346191, -615.663147)" id="g4">
+    <g id="g3">      <polygon points="477,627.217 464.5,620 452,627.217 464.5,634.434   " id="polygon1" style="fill: rgb(54, 71, 64);"/>
+      <polygon points="464,635.434 452,628.506 452,642.506 464,649.434   " id="polygon2" style="fill: rgb(54, 71, 64);"/>
+      <polygon points="465,635.434 477,628.506 477,642.506 465,649.434   " id="polygon3" style="fill: rgb(54, 71, 64);"/>
+    </g>
+  </g>
+  <g id="g1" style="fill:#ffffff;fill-opacity:1;image-rendering:optimizeQuality;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" transform="matrix(0.112487, -0.045039, 0.038156, 0.095297, -14.488243, 21.151979)">
+    <path class="fil0" d="m 0,43 c 2,-4 6,-9 13,-7 6,2 10,8 13,16 C 50,25 70,6 94,0 97,0 98,0 96,2 70,20 45,47 25,82 24,83 23,83 22,82 18,72 15,62 10,52 8,47 5,43 0,43 Z" id="path1" style="fill:#ffffff;fill-opacity:1"/>
+  </g>
+  <text style="fill: rgb(127, 178, 168); font-family: Baumans; font-size: 28px; font-weight: 700; letter-spacing: -1.6px; white-space: pre;" x="0.504" y="25.459" id="object-0">open</text>
+  <text style="fill: rgb(54, 71, 64); font-family: Baumans; font-size: 28px; font-weight: 700; letter-spacing: -1.6px; white-space: pre;" id="object-1" x="56.649" y="25.597">bbt</text>
+  <text style="white-space: pre; fill: rgb(51, 51, 51); font-family: Arial, sans-serif; font-size: 28px;" x="80.939" y="-10.303"> </text>
+</svg>

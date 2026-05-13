@@ -1,6 +1,7 @@
 package org.myjtools.openbbt.plugins.db;
 
 import org.myjtools.openbbt.core.testplan.DataTable;
+import org.myjtools.openbbt.core.util.Either;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -28,5 +29,7 @@ public interface DbEngine extends AutoCloseable {
 	List<DataSet> readXls(Path file);
 
 	String printTable(String alias, String table);
+
+	Either<DataSet, Long> executeQuery(String alias, String sql);
 
 }

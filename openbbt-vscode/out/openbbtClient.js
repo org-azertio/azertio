@@ -55,6 +55,10 @@ class OpenBBTClient {
     async getContributors() {
         return this.call('contributors/list', {});
     }
+    async getStepsIndex() {
+        const result = await this.call('steps/index', {});
+        return JSON.stringify(result);
+    }
     async listPlans() {
         return this.call('browse/plans', {});
     }

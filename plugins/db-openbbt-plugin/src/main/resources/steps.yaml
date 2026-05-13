@@ -8,6 +8,57 @@
       description: The name of the datasource as defined in the configuration
 
 
+'db.teardown.execute':
+  role: given
+  description: |
+    Registers a SQL statement to be executed at teardown, after the scenario finishes.
+    This guarantees cleanup regardless of whether the scenario passed or failed.
+    Multiple statements can be registered; they are executed in registration order.
+  parameters:
+    - name: alias
+      type: text
+      description: The name of the datasource where the statement will be executed
+    - name: sql
+      type: document
+      description: The SQL statement to execute at teardown, provided as a docstring block
+
+
+'db.execute.query':
+  role: given
+  description: |
+    Executes an arbitrary SQL statement and stores the result for subsequent steps.
+    For SELECT queries, the result set is stored and can be asserted with db.assert.query.* steps.
+    For INSERT, UPDATE or DELETE statements, the number of affected rows is stored instead.
+  parameters:
+    - name: sql
+      type: document
+      description: The SQL statement to execute, provided as a docstring block
+
+
+'db.store.query.result':
+  role: then
+  description: |
+    Stores the result of the last executed SQL statement in a named variable.
+    For SELECT queries, stores the first field of the first row.
+    For INSERT, UPDATE or DELETE statements, stores the number of affected rows.
+  parameters:
+    - name: variable
+      type: text
+      description: The name of the variable where the value will be stored
+
+
+'db.assert.query.count':
+  role: then
+  description: |
+    Asserts the count resulting from the last executed SQL statement.
+    For SELECT queries, asserts the number of rows in the result set.
+    For INSERT, UPDATE or DELETE statements, asserts the number of affected rows.
+  parameters:
+    - name: integer-assertion
+      type: assertion
+      description: A condition that the count must satisfy (e.g. '= 3', '> 0')
+
+
 'db.assert.count':
   role: then
   description: |

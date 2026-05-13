@@ -8,3 +8,4 @@ target/
 *.db.log
 *.db.properties
 *.db.script
+/.claude/scheduled_tasks.lock

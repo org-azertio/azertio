@@ -24,23 +24,32 @@ public final class ListContributorsCommand extends AbstractCommand {
     @Override
     protected void execute() {
         OpenBBTRuntime runtime = new OpenBBTRuntime(getContext().configuration());
-        Map<String, List<String>> contributors = runtime.getContributors();
+        Map<String, Map<String, List<String>>> contributors = runtime.getContributors();
 
         if (json) {
             JsonArray result = new JsonArray();
-            contributors.forEach((type, implementations) -> {
+            contributors.forEach((module, byType) -> {
                 JsonObject obj = new JsonObject();
-                obj.addProperty("type", type);
-                JsonArray impls = new JsonArray();
-                implementations.forEach(impls::add);
-                obj.add("implementations", impls);
+                obj.addProperty("plugin", module);
+                JsonArray types = new JsonArray();
+                byType.forEach((type, impls) -> {
+                    JsonObject typeObj = new JsonObject();
+                    typeObj.addProperty("type", type);
+                    JsonArray implsArr = new JsonArray();
+                    impls.forEach(implsArr::add);
+                    typeObj.add("implementations", implsArr);
+                    types.add(typeObj);
+                });
+                obj.add("contributors", types);
                 result.add(obj);
             });
             System.out.println(result);
         } else {
-            contributors.forEach((type, implementations) -> {
-                System.out.println(type);
-                implementations.forEach(impl -> System.out.println("  " + impl));
+            contributors.forEach((module, byType) -> {
+                System.out.println(module);
+                byType.forEach((type, impls) ->
+                    impls.forEach(impl -> System.out.println("  [" + type + "] " + impl))
+                );
             });
         }
     }

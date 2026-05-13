@@ -45,3 +45,46 @@
       type: id
       description: The name of the variable to check.
   role: then
+
+'enable.benchmark.mode':
+  description: Enable benchmark mode for the next step, running it a given number of times across a number of parallel threads
+  parameters:
+    - name: executions
+      type: integer
+      description: Total number of executions to run.
+    - name: threads
+      type: integer
+      description: Number of parallel threads to use.
+  role: given
+
+'assert.benchmark.statistics.mean':
+  description: Assert that the mean response time (ms) of the last benchmark satisfies an integer assertion
+  role: then
+
+'assert.benchmark.statistics.min':
+  description: Assert that the minimum response time (ms) of the last benchmark satisfies an integer assertion
+  role: then
+
+'assert.benchmark.statistics.max':
+  description: Assert that the maximum response time (ms) of the last benchmark satisfies an integer assertion
+  role: then
+
+'assert.benchmark.statistics.p50':
+  description: Assert that the P50 response time (ms) of the last benchmark satisfies an integer assertion
+  role: then
+
+'assert.benchmark.statistics.p95':
+  description: Assert that the P95 response time (ms) of the last benchmark satisfies an integer assertion
+  role: then
+
+'assert.benchmark.statistics.p99':
+  description: Assert that the P99 response time (ms) of the last benchmark satisfies an integer assertion
+  role: then
+
+'assert.benchmark.statistics.throughput':
+  description: Assert that the throughput (requests/s) of the last benchmark satisfies a decimal assertion
+  role: then
+
+'assert.benchmark.statistics.errorRate':
+  description: Assert that the error rate (0.0–1.0) of the last benchmark satisfies a decimal assertion
+  role: then
