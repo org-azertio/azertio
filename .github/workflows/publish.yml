@@ -1,4 +1,4 @@
-name: Publish to GitHub Packages
+name: Publish
 
 on:
   workflow_dispatch:
@@ -7,7 +7,7 @@ on:
       - 'v*'
 
 permissions:
-  contents: read
+  contents: write
   packages: write
 
 jobs:
@@ -26,8 +26,20 @@ jobs:
           server-username: GITHUB_ACTOR
           server-password: GITHUB_TOKEN
 
-      - name: Publish to GitHub Packages
+      - name: Build and deploy to GitHub Packages
         run: ./mvnw -B deploy -Pgithub,plugins -DskipTests
         env:
           GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          ZIP="azertio-cli/target/azertio-cli-${VERSION}-dist.zip"
+          gh release create "$GITHUB_REF_NAME" \
+            --title "Azertio ${GITHUB_REF_NAME}" \
+            --generate-notes \
+            "${ZIP}#azertio-cli-${VERSION}-dist.zip"
