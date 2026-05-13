@@ -30,6 +30,26 @@ jobs:
       - name: Build and generate docs
         run: ./mvnw -B install -Pplugins,generate-doc -DskipTests
 
+      - name: Install pandoc
+        run: sudo apt-get install -y pandoc
+
+      - name: Convert docs to HTML
+        run: |
+          for f in www/docs/*.md; do
+            [ -f "$f" ] || continue
+            slug=$(basename "$f" .md)
+            title=$(grep "^# " "$f" | head -1 | sed 's/^# //')
+            mkdir -p "www/docs/$slug"
+            pandoc "$f" \
+              --from gfm \
+              --to html5 \
+              --template .github/pandoc/doc-template.html \
+              --highlight-style zenburn \
+              --metadata title="$title" \
+              --metadata slug="$slug" \
+              --output "www/docs/$slug/index.html"
+          done
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
 

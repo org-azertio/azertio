@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>$title$ — Azertio Docs</title>
+  <meta name="description" content="$title$ — Azertio documentation" />
+  <link rel="canonical" href="https://azertio.org/docs/$slug$/" />
+  <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-NDFJJ357');</script>
+  <!-- End Google Tag Manager -->
+
+  <!-- Google Analytics (GA4) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z3JDMGL1G4"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-Z3JDMGL1G4');
+  </script>
+  <!-- End Google Analytics -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Baumans&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  $if(highlighting-css)$
+  <style>
+  /* pandoc syntax highlighting */
+  $highlighting-css$
+  pre.sourceCode { margin: 1.2rem 0; border-radius: 10px; border: 1px solid #1e1e35; overflow-x: auto; padding: 1.2rem 1.4rem; background: #0b0b18 !important; }
+  code.sourceCode { font-size: 0.82rem; line-height: 1.7; }
+  </style>
+  $endif$
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #07070f;
+      --surface: #0e0e1a;
+      --border:  #1e1e35;
+      --cyan:    #00ffe0;
+      --text:    #d1d5db;
+      --muted:   #6b7280;
+      --white:   #f9fafb;
+      --font:    'Inter', sans-serif;
+      --mono:    'JetBrains Mono', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font); line-height: 1.6; min-height: 100vh; }
+    a { color: var(--cyan); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.9rem 2rem;
+      background: rgba(7,7,15,0.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo img { width: 100px; height: auto; display: block; }
+    .nav-back {
+      display: flex; align-items: center; gap: 0.4rem;
+      font-size: 0.85rem; color: var(--muted); transition: color 0.2s;
+    }
+    .nav-back:hover { color: var(--white); text-decoration: none; }
+
+    .page { max-width: 860px; margin: 0 auto; padding: 3.5rem 2rem 6rem; }
+
+    /* ── Markdown body ── */
+    .md-body h1 {
+      font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 800;
+      color: var(--white); letter-spacing: -0.02em; line-height: 1.2;
+      margin-bottom: 1.5rem; padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .md-body h2 {
+      font-size: 1.35rem; font-weight: 700; color: var(--white);
+      margin: 2.5rem 0 0.8rem; letter-spacing: -0.01em;
+    }
+    .md-body h3 {
+      font-size: 1.05rem; font-weight: 600; color: var(--white);
+      margin: 1.8rem 0 0.5rem;
+    }
+    .md-body p { margin-bottom: 1rem; line-height: 1.75; }
+    .md-body ul, .md-body ol { margin: 0.5rem 0 1rem 1.5rem; }
+    .md-body li { margin-bottom: 0.35rem; line-height: 1.7; }
+    .md-body strong { color: var(--white); font-weight: 600; }
+    .md-body hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+    .md-body blockquote {
+      border-left: 3px solid var(--cyan);
+      padding: 0.6rem 1.2rem;
+      background: rgba(0,255,224,0.04);
+      border-radius: 0 6px 6px 0;
+      margin: 1rem 0;
+    }
+    .md-body code {
+      font-family: var(--mono); font-size: 0.83em;
+      background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+      padding: 0.15em 0.4em; border-radius: 4px; color: var(--cyan);
+    }
+    .md-body pre code { background: none; border: none; padding: 0; color: inherit; }
+    .md-body table {
+      width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.9rem;
+    }
+    .md-body th {
+      background: var(--surface); color: var(--white); font-weight: 600;
+      padding: 0.65rem 1rem; text-align: left; border: 1px solid var(--border);
+    }
+    .md-body td { padding: 0.6rem 1rem; border: 1px solid var(--border); vertical-align: top; }
+    .md-body tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+    .md-body a { color: var(--cyan); }
+  </style>
+</head>
+<body>
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NDFJJ357"
+height="0" width="0" style="display:none;visibility:hidden" title="Google Tag Manager"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<nav>
+  <a href="/" class="nav-logo" aria-label="Azertio home">
+    <img src="/logo.svg" alt="Azertio" />
+  </a>
+  <a href="/" class="nav-back">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Back to home
+  </a>
+</nav>
+
+<div class="page">
+  <article class="md-body">
+    $body$
+  </article>
+</div>
+
+</body>
+</html>
