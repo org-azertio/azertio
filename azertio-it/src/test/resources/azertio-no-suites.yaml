@@ -1,0 +1,11 @@
+project:
+  organization: My Org
+  name: My Project
+
+plugins:
+  - gherkin
+  - org.azertio.plugins:gherkin-azertio-plugin
+
+configuration:
+  gherkin:
+    enabled: true

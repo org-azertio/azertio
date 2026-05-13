@@ -1,10 +1,15 @@
 .idea/
 .mvn/
 target/
-/plugins/gherkin-openbbt-plugin/.flattened-pom.xml
-/openbbt-core/.flattened-pom.xml
+/plugins/gherkin-azertio-plugin/.flattened-pom.xml
+/azertio-core/.flattened-pom.xml
 /.flattened-pom.xml
 *.db.data
 *.db.log
 *.db.properties
 *.db.script
+*.db.tmp
+.openbbt/
+.azertio/
+www/docs/
+/.claude/scheduled_tasks.lock

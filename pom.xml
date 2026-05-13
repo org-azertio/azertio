@@ -10,12 +10,12 @@
 		<version>1.4.0</version>
 	</parent>
 
-	<groupId>org.myjtools.openbbt</groupId>
-	<artifactId>openbbt</artifactId>
-	<version>1.0.0-alpha1</version>
+	<groupId>org.azertio</groupId>
+	<artifactId>azertio</artifactId>
+	<version>1.0.0-alpha1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
-	<name>OpenBBT</name>
+	<name>Azertio</name>
 	<description>Open Blackbox Testing</description>
 
 	<properties>
@@ -24,7 +24,26 @@
 		<maven.compiler.source>21</maven.compiler.source>
 		<maven.compiler.target>21</maven.compiler.target>
 		<java.version>21</java.version>
+		<!-- Sonar reads the aggregate JaCoCo report (IT tests covering all modules)
+		     plus each module's own per-module report -->
+		<sonar.coverage.jacoco.xmlReportPaths>
+			${maven.multiModuleProjectDirectory}/azertio-it/target/site/jacoco-aggregate/jacoco.xml,
+			${project.basedir}/target/site/jacoco/jacoco.xml
+		</sonar.coverage.jacoco.xmlReportPaths>
 	</properties>
+
+	<url>https://azertio.org</url>
+
+	<distributionManagement>
+		<repository>
+			<id>github</id>
+			<url>https://maven.pkg.github.com/org-azertio/azertio</url>
+		</repository>
+		<snapshotRepository>
+			<id>github</id>
+			<url>https://maven.pkg.github.com/org-azertio/azertio</url>
+		</snapshotRepository>
+	</distributionManagement>
 
 	<licenses>
 		<license>
@@ -33,16 +52,65 @@
 		</license>
 	</licenses>
 
+	<developers>
+		<developer>
+			<id>luiinge</id>
+			<name>Luis Iñesta Gelabert</name>
+			<email>luiinge@gmail.com</email>
+			<url>https://github.com/luiinge</url>
+		</developer>
+	</developers>
+
+	<scm>
+		<connection>scm:git:git://github.com/org-azertio/azertio.git</connection>
+		<developerConnection>scm:git:ssh://github.com/org-azertio/azertio.git</developerConnection>
+		<url>https://github.com/org-azertio/azertio</url>
+		<tag>HEAD</tag>
+	</scm>
+
 	<modules>
-		<module>openbbt-core</module>
-		<module>openbbt-persistence</module>
-		<module>openbbt-plugin-starter</module>
-		<module>openbbt-cli</module>
-		<module>openbbt-it</module>
-		<module>openbbt-docgen-maven-plugin</module>
-		<module>openbbt-tui</module>
-		<module>openbbt-lsp</module>
+		<module>azertio-core</module>
+		<module>azertio-persistence</module>
+		<module>azertio-test-support</module>
+		<module>azertio-jsonrpc</module>
+		<module>azertio-cli</module>
+		<module>azertio-docgen-maven-plugin</module>
+		<module>azertio-lsp</module>
 	</modules>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.assertj</groupId>
+				<artifactId>assertj-core</artifactId>
+				<version>3.27.7</version>
+			</dependency>
+			<dependency>
+				<groupId>org.bouncycastle</groupId>
+				<artifactId>bcprov-jdk18on</artifactId>
+				<version>1.84</version>
+			</dependency>
+<dependency>
+				<groupId>net.minidev</groupId>
+				<artifactId>json-smart</artifactId>
+				<version>2.5.2</version>
+			</dependency>
+			<dependency>
+				<groupId>com.google.guava</groupId>
+				<artifactId>guava</artifactId>
+				<version>33.4.8-jre</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<version>3.27.7</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
 
 	<build>
 		<plugins>
@@ -84,12 +152,94 @@
 
 	<profiles>
 		<profile>
+			<id>generate-doc</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-resources-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>copy-docs-to-www</id>
+								<phase>generate-resources</phase>
+								<goals><goal>copy-resources</goal></goals>
+								<configuration>
+									<outputDirectory>${project.basedir}/www/docs</outputDirectory>
+									<resources>
+										<resource>
+											<directory>${project.basedir}/docs</directory>
+											<filtering>false</filtering>
+										</resource>
+									</resources>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
 			<id>plugins</id>
 			<modules>
-				<module>plugins/gherkin-openbbt-plugin</module>
-				<module>plugins/markdown-plan-openbbt-plugin</module>
-				<module>plugins/rest-openbbt-plugin</module>
+				<module>azertio-plugin-starter</module>
+				<module>plugins/gherkin-azertio-plugin</module>
+				<module>plugins/markdown-plan-azertio-plugin</module>
+				<module>plugins/rest-azertio-plugin</module>
+				<module>plugins/db-azertio-plugin</module>
+				<module>plugins/pdfreport-azertio-plugin</module>
+				<module>azertio-it</module>
 			</modules>
+		</profile>
+
+		<!-- ── Maven Central (Sonatype Central Portal) ───────────── -->
+		<profile>
+			<id>maven-central</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<version>3.6.3</version>
+						<executions>
+							<execution>
+								<id>attach-javadocs</id>
+								<goals><goal>jar</goal></goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>3.2.4</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals><goal>sign</goal></goals>
+								<configuration>
+									<!-- allows passing key passphrase via -Dgpg.passphrase in CI -->
+									<gpgArguments>
+										<arg>--pinentry-mode</arg>
+										<arg>loopback</arg>
+									</gpgArguments>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.sonatype.central</groupId>
+						<artifactId>central-publishing-maven-plugin</artifactId>
+						<version>0.6.0</version>
+						<extensions>true</extensions>
+						<configuration>
+							<publishingServerId>central</publishingServerId>
+							<!-- autoPublish=false: review the bundle in the portal before releasing -->
+							<autoPublish>false</autoPublish>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
 		</profile>
 	</profiles>
 

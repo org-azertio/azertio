@@ -1,0 +1,178 @@
+'rest.request.GET':
+  description: |
+    Makes a GET request to the specified URL.
+  parameters:
+    - name: endpoint
+      type: text
+      description: The URL to which the GET request is made
+  language:
+    en:
+      expression: 'I make a GET request to {endpoint:text}'
+      example: |
+        Given I make a GET request to "users"
+    es:
+      expression: 'Hago una petición GET a {endpoint:text}'
+
+
+'rest.request.POST':
+  description: |
+    Makes a POST request to the specified URL with the given body.
+  parameters:
+    - name: endpoint
+      type: text
+      description: The URL to which the POST request is made
+  additional-data: The body of the POST request, provided as a multi-line text input
+  language:
+    en:
+      expression: 'I make a POST request to {endpoint:text} with body:'
+      example: |
+        Given I make a POST request to "users" with body:
+        ```json
+        {
+          "name": "John",
+          "age": 30
+        }
+        ```
+    es:
+      expression: 'Hago una petición POST a {endpoint:text} con el cuerpo:'
+
+'rest.request.POST.file':
+  description: |
+    Makes a POST request to the specified URL with the given body read from a file.
+  parameters:
+    - name: endpoint
+      type: text
+      description: The URL to which the POST request is made
+    - name: file
+      type: text
+      description: The path to the file containing the body of the POST request
+  language:
+    en:
+      expression: 'I make a POST request to {endpoint:text} with body from file {file:text}'
+      example: |
+        Given I make a POST request to "users" with body from file "user_data.json"
+    es:
+      expression: 'Hago una petición POST a {endpoint:text} con el cuerpo del archivo {file:text}'
+
+
+'rest.request.PUT':
+  description: |
+    Makes a PUT request to the specified URL with the given body.
+  parameters:
+    - name: endpoint
+      type: text
+      description: The URL to which the PUT request is made
+  additional-data: The body of the PUT request, provided as a multi-line text input
+  language:
+    en:
+      expression: 'I make a PUT request to {endpoint:text} with body:'
+    es:
+      expression: 'Hago una petición PUT a {endpoint:text} con el cuerpo:'
+
+'rest.request.PUT.file':
+  description: |
+    Makes a PUT request to the specified URL with the given body read from a file.
+  parameters:
+    - name: endpoint
+      type: text
+      description: The URL to which the PUT request is made
+    - name: file
+      type: text
+      description: The path to the file containing the body of the PUT request
+  language:
+    en:
+      expression: 'I make a PUT request to {endpoint:text} with body from file {file:text}'
+    es:
+      expression: 'Hago una petición PUT a {endpoint:text} con el cuerpo del archivo {file:text}'
+
+
+'rest.request.PATCH':
+  description: |
+    Makes a PATCH request to the specified URL with the given body.
+  parameters:
+    - name: endpoint
+      type: text
+      description: The URL to which the PATCH request is made
+  additional-data: The body of the PATCH request, provided as a multi-line text input
+  language:
+    en:
+      expression: 'I make a PATCH request to {endpoint:text} with body:'
+    es:
+      expression: 'Hago una petición PATCH a {endpoint:text} con el cuerpo:'
+
+'rest.request.PATCH.file':
+  description: |
+    Makes a PATCH request to the specified URL with the given body read from a file.
+  parameters:
+    - name: endpoint
+      type: text
+      description: The URL to which the PATCH request is made
+    - name: file
+      type: text
+      description: The path to the file containing the body of the PATCH request
+  language:
+    en:
+      expression: 'I make a PATCH request to {endpoint:text} with body from file {file:text}'
+    es:
+      expression: 'Hago una petición PATCH a {endpoint:text} con el cuerpo del archivo {file:text}'
+
+
+'rest.request.DELETE':
+  description: |
+    Makes a DELETE request to the specified URL.
+  parameters:
+    - name: endpoint
+      type: text
+      description: The URL to which the DELETE request is made
+  language:
+    en:
+      expression: 'I make a DELETE request to {endpoint:text}'
+    es:
+      expression: 'Hago una petición DELETE a {endpoint:text}'
+
+
+'rest.response.statusCode':
+  description: |
+    Asserts that the status code of the last REST response matches the expected value.
+  parameters:
+    - name: statusCode
+      type: integer
+      description: The expected HTTP status code of the response
+  language:
+    en:
+      expression: 'the HTTP status code {integer-assertion}'
+    es:
+      expression: 'el código de estado HTTP {integer-assertion}'
+
+'rest.response.body':
+  description: |
+    Asserts that the body of the last REST response matches the expected value.
+  additional-data: The expected body of the response, provided as a multi-line text input
+  language:
+    en:
+      expression: 'the response body is:'
+    es:
+      expression: 'el cuerpo de la respuesta es:'
+
+'rest.response.body.file':
+  description: |
+    Asserts that the body of the last REST response matches the expected value read from a file.
+  parameters:
+    - name: file
+      type: text
+      description: The path to the file containing the expected body of the response
+  language:
+    en:
+      expression: 'the response body is the content of file {file:text}'
+    es:
+      expression: 'el cuerpo de la respuesta es el contenido del archivo {file:text}'
+
+'rest.response.body.contains':
+  description: |
+    Asserts that the body of the last REST response contains the expected value.
+  additional-data: The expected content that should be present in the response body, provided as a multi-line text input
+  language:
+    en:
+      expression: 'the response body contains:'
+    es:
+      expression: 'el cuerpo de la respuesta contiene:'

@@ -1,0 +1,275 @@
+'rest.request.GET':
+  expression: 'do HTTP GET {endpoint:text}'
+  example: |
+    * do HTTP GET "users"
+  scenarios:
+    - title: Retrieve a collection of resources
+      gherkin: |
+        * do HTTP GET "users"
+        * assert HTTP status code = 200
+        * assert HTTP response body:
+          """json
+          [{"id": 1, "name": "Alice"}]
+          """
+    - title: Retrieve a single resource by ID
+      gherkin: |
+        * do HTTP GET "users/1"
+        * assert HTTP status code = 200
+    - title: Request a non-existent resource
+      gherkin: |
+        * do HTTP GET "users/9999"
+        * assert HTTP status code = 404
+
+
+'rest.request.POST.empty':
+  expression: 'do HTTP POST {endpoint:text}'
+  example: |
+    * do HTTP POST "sessions/logout"
+  scenarios:
+    - title: Trigger an action with no payload
+      gherkin: |
+        * do HTTP POST "sessions/logout"
+        * assert HTTP status code = 204
+
+
+'rest.request.POST.body':
+  expression: 'do HTTP POST {endpoint:text}:'
+  example: |
+    * do HTTP POST "users":
+    """json
+    {"name": "John", "age": 30}
+    """
+  scenarios:
+    - title: Create a new resource successfully
+      gherkin: |
+        * do HTTP POST "users":
+        """json
+        {"name": "John", "age": 30}
+        """
+        * HTTP status code = 201
+    - title: Reject a request with invalid data
+      gherkin: |
+        * do HTTP POST "users" body:
+        """json
+        {"name": ""}
+        """
+        * assert HTTP status code = 400
+
+
+'rest.request.POST.file':
+  expression: 'do HTTP POST {endpoint:text} using {file:text}'
+  example: |
+    * do HTTP POST "users" using "user_data.json"
+  scenarios:
+    - title: Create a resource using a body from file
+      gherkin: |
+        * do HTTP POST "users" using "fixtures/new_user.json"
+        * assert HTTP status code = 201
+
+
+'rest.request.PUT.body':
+  expression: 'do HTTP PUT {endpoint:text}:'
+  example: |
+    * do HTTP PUT "users/123":
+    """json
+    {"name": "John", "age": 31}
+    """
+  scenarios:
+    - title: Replace a resource completely
+      gherkin: |
+        * do HTTP PUT "users/1":
+        """json
+        {"name": "John Updated", "age": 31}
+        """
+        * assert HTTP status code = 200
+    - title: Replace a non-existent resource
+      gherkin: |
+        * do HTTP PUT "users/9999":
+        """json
+        {"name": "Ghost"}
+        """
+        * assert HTTP status code = 404
+
+
+'rest.request.PUT.file':
+  expression: 'do HTTP PUT {endpoint:text} using {file:text}'
+  example: |
+    * do HTTP PUT "users/123" using "updated_user_data.json"
+  scenarios:
+    - title: Replace a resource using a body from file
+      gherkin: |
+        * do HTTP PUT "users/1" using "fixtures/updated_user.json"
+        * assert HTTP status code = 200
+
+
+'rest.request.PATCH.body':
+  expression: 'do HTTP PATCH {endpoint:text}:'
+  example: |
+    * do HTTP PATCH "users/123":
+    """json
+    {"age": 32}
+    """
+  scenarios:
+    - title: Partially update a resource
+      gherkin: |
+        * do HTTP PATCH "users/1":
+        """json
+        {"age": 32}
+        """
+        * assert HTTP status code = 200
+
+
+'rest.request.PATCH.file':
+  expression: 'do HTTP PATCH {endpoint:text} using {file:text}'
+  example: |
+    * do HTTP PATCH "users/123" using "partial_user_update.json"
+  scenarios:
+    - title: Partially update a resource using a body from file
+      gherkin: |
+        * do HTTP PATCH "users/1" using "fixtures/partial_update.json"
+        * assert HTTP status code = 200
+
+
+'rest.request.DELETE':
+  expression: 'do HTTP DELETE {endpoint:text}'
+  example: |
+    * do HTTP DELETE "users/123"
+  scenarios:
+    - title: Delete an existing resource
+      gherkin: |
+        * do HTTP DELETE "users/1"
+        * assert HTTP status code = 204
+    - title: Delete a non-existent resource
+      gherkin: |
+        * do HTTP DELETE "users/9999"
+        * assert HTTP status code = 404
+
+
+'rest.response.statusCode':
+  expression: 'assert HTTP status code {{integer-assertion}}'
+  assertion-hints:
+    - '= 200'
+    - '= 201'
+    - '= 204'
+    - '= 400'
+    - '= 401'
+    - '= 403'
+    - '= 404'
+    - '!= 500'
+    - '> 199'
+    - '< 300'
+  example: |
+    * assert HTTP status code = 200
+  scenarios:
+    - title: Verify a successful GET response
+      gherkin: |
+        * do HTTP GET "users"
+        * assert HTTP status code = 200
+    - title: Verify a resource was created
+      gherkin: |
+        * do HTTP POST "users":
+        """json
+        {"name": "Alice"}
+        """
+        * assert HTTP status code = 201
+    - title: Verify a successful deletion
+      gherkin: |
+        * do HTTP DELETE "users/1"
+        * assert HTTP status code = 204
+    - title: Verify an error response
+      gherkin: |
+        * do HTTP GET "users/9999"
+        * assert HTTP status code = 404
+
+
+'rest.response.body':
+  expression: 'assert HTTP response body:'
+  example: |
+    * assert HTTP response body:
+    """json
+    {"id": 123, "name": "John", "age": 30}
+    """
+  scenarios:
+    - title: Verify exact response body after a GET
+      gherkin: |
+        * do HTTP GET "users/1"
+        * assert HTTP status code = 200
+        * assert HTTP response body:
+        """json
+        {"id": 1, "name": "Alice", "age": 25}
+        """
+    - title: Verify exact response body after a POST
+      gherkin: |
+        * do HTTP POST "users":
+        """json
+        {"name": "Bob", "age": 22}
+        """
+        * assert HTTP status code = 201
+        * assert HTTP response body:
+        """json
+        {"id": 2, "name": "Bob", "age": 22}
+        """
+
+
+'rest.response.body.file':
+  expression: 'assert HTTP response body using {file:text}'
+  example: |
+    * assert HTTP response body using "expected_response.json"
+  scenarios:
+    - title: Verify response body matches a reference file
+      gherkin: |
+        * do HTTP GET "users/1"
+        * assert HTTP status code = 200
+        * assert HTTP response body using "fixtures/expected_user.json"
+
+
+'rest.response.body.contains':
+  expression: 'assert HTTP response body \(loose\):'
+  example: |
+    * assert HTTP response body (loose):
+    """json
+    {"id": 123, "name": "John"}
+    """
+  scenarios:
+    - title: Verify a field is present in the response after a GET
+      gherkin: |
+        * do HTTP GET "users/1"
+        * assert HTTP status code = 200
+        * assert HTTP response body (loose):
+        """json
+        {"name": "Alice"}
+        """
+    - title: Verify a new resource appears in a collection
+      gherkin: |
+        * do HTTP POST "users" body:
+        """json
+        {"name": "Carol"}
+        """
+        * assert HTTP status code = 201
+        * assert HTTP response body (loose):
+        """json
+        {"name": "Carol"}
+        """
+
+
+'rest.response.extracts.field':
+  expression: 'var {variable:id} = {field:text} from HTTP response'
+  example: |
+    * var userId = 'id' from HTTP response
+  scenarios:
+    - title: Store a field and use it in a subsequent request
+      gherkin: |
+        * do HTTP POST "users":
+        """json
+        {"name": "Carol"}
+        """
+        * var newUserId = 'id' from HTTP response
+        * do HTTP GET "users/${newUserId}"
+        * assert HTTP status code = 200
+    - title: Store an existing resource ID for reuse
+      gherkin: |
+        * do HTTP GET "users/1"
+        * assert HTTP status code = 200
+        * var existingUserId = 'id' from HTTP response
+        * do HTTP GET "users/${existingUserId}"
+        * assert HTTP status code = 200

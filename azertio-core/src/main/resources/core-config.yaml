@@ -1,0 +1,145 @@
+core.resourcePath:
+  description: |
+    Path to the resource directory. It is used to load resources such as templates, scripts, etc.
+  type: text
+  defaultValue: '.'
+
+core.resourceFilter:
+  description: |
+    Filter to apply when loading resources. It can be used to exclude certain files or directories.
+    It supports glob patterns applied to full paths (e.g., `**/*.feature` to include only feature files).
+  type: text
+  defaultValue: '**/*'
+
+core.environmentPath:
+    description: |
+        Path to the environment directory.
+    type: text
+    defaultValue: '.azertio'
+
+core.idTagPattern:
+  description: |
+    Regex for tags used as identifier. If it contains a regex group, 
+    only the group value would be used as identifier.
+  type: text
+  defaultValue: ID-(\w+)
+
+core.definitionTag:
+  description: |
+    Tag used to annotate a node aggregator as a definition node
+  type: text
+  constraints:
+    pattern: "[\\w\\-\\_]+"
+  defaultValue: definition
+
+core.implementationTag:
+  description: |
+    Tag used to annotate a node as an implementation node
+  type: text
+  constraints:
+    pattern: "[\\w\\-\\_]+"
+  defaultValue: implementation
+
+core.parallelExecutionTag:
+  description: |
+    Tag used to mark a test case as eligible for parallel execution.
+    Test cases with this tag will run concurrently; others will be serialized.
+  type: text
+  constraints:
+    pattern: "[\\w\\-\\_]+"
+  defaultValue: parallel
+
+core.persistence.mode:
+    description: |
+        Persistence mode for the application. It can be transient, file-based, or remote (database).
+    type: text
+    constraints:
+        enum: [transient, file, remote]
+    defaultValue: file
+
+core.persistence.file:
+  description: |
+    File path used when `core.persistence.mode` is set to `file`.
+    This is the filesystem location of the persistence storage (for example an H2 file or JSON file).
+  type: text
+  defaultValue: 'db/azertio.db'
+
+core.persistence.db.url:
+  description: |
+    JDBC URL used when persistence is backed by a relational database (mode `remote`).
+    Example: jdbc:h2:~/azertio or jdbc:postgresql://db-host:5432/azertio
+  type: text
+
+core.persistence.db.username:
+  description: Username for the database connection used by persistence when `core.persistence.mode` is `remote`.
+  type: text
+
+core.persistence.db.password:
+  description: |
+    Password for the database connection used by persistence when `core.persistence.mode` is `remote`.
+    Keep this secret in environment or external vault for production deployments.
+  type: text
+
+core.artifacts.local.repository:
+  description: |
+    Local filesystem path used as a local artifacts repository (for caching or local installs).
+  type: text
+  defaultValue: '.m2/repository'
+
+core.artifacts.repository.url:
+  description: |
+    Remote artifacts repository URL where artifacts are fetched/published.
+  type: text
+  defaultValue: 'https://repo.maven.apache.org/maven2'
+
+core.artifacts.repository.username:
+  description: |
+    Username for authenticating with the remote artifacts repository if required.
+  type: text
+
+core.artifacts.repository.password:
+  description: |
+    Password for authenticating with the remote artifacts repository if required.
+    Prefer injecting this value via environment variables in production.
+  type: text
+
+core.artifacts.repository.proxy.url:
+  description: |
+    Proxy URL to use when contacting the remote artifacts repository (if needed).
+  type: text
+
+core.artifacts.repository.proxy.username:
+  description: |
+    Username for proxy authentication when contacting the artifacts repository.
+  type: text
+
+core.artifacts.repository.proxy.password:
+  description: |
+    Password for proxy authentication when contacting the artifacts repository.
+  type: text
+
+core.attachments.server.url:
+  description: |
+    URL of the remote attachment server (Minio/S3-compatible).
+    Required when `core.persistence.mode` is set to `remote`.
+    Example: http://minio-host:9000
+  type: text
+
+core.attachments.server.username:
+  description: |
+    Access key (username) for the remote attachment server.
+    Required when `core.persistence.mode` is set to `remote`.
+  type: text
+
+core.attachments.server.password:
+  description: |
+    Secret key (password) for the remote attachment server.
+    Required when `core.persistence.mode` is set to `remote`.
+    Prefer injecting this value via environment variables in production.
+  type: text
+
+core.stepExecutionTimeout:
+    description: |
+        Default timeout in seconds for executing a step. If a step execution exceeds this time, it will be aborted.
+    type: integer
+    defaultValue: 60

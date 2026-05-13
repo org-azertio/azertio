@@ -1,0 +1,6 @@
+java.lang.RuntimeException: Unexpected HTTP 500 Internal Server Error
+    at org.myjtools.openbbt.plugins.rest.RestStepProvider.assertStatus(RestStepProvider.java:142)
+    at org.myjtools.openbbt.plugins.rest.RestStepProvider.lambda$3(RestStepProvider.java:98)
+    at org.myjtools.openbbt.core.execution.StepExecutor.execute(StepExecutor.java:55)
+Caused by: java.io.IOException: Connection refused (server may be down)
+    at sun.net.www.http.HttpClient.openServer(HttpClient.java:505)

@@ -1,0 +1,239 @@
+'rest.request.GET':
+  expression: 'hago una petición GET a {endpoint:text}'
+  example: |
+    Cuando hago una petición GET a "users"
+  scenarios:
+    - title: Obtener una colección de recursos
+      gherkin: |
+        Cuando hago una petición GET a "users"
+        Entonces el código de estado HTTP es igual a 200
+        Y el cuerpo de la respuesta contiene:
+        """json
+        [{"id": 1, "name": "Alice"}]
+        """
+    - title: Obtener un recurso por ID
+      gherkin: |
+        Cuando hago una petición GET a "users/1"
+        Entonces el código de estado HTTP es igual a 200
+
+
+'rest.request.POST.empty':
+  expression: 'hago una petición POST a {endpoint:text}'
+  example: |
+    Cuando hago una petición POST a "users"
+  scenarios:
+    - title: Disparar una acción sin cuerpo
+      gherkin: |
+        Cuando hago una petición POST a "sessions/logout"
+        Entonces el código de estado HTTP es igual a 204
+
+
+'rest.request.POST.body':
+  expression: 'hago una petición POST a {endpoint:text} con el cuerpo:'
+  example: |
+    Cuando hago una petición POST a "users" con el cuerpo:
+    """json
+    {
+      "name": "John",
+      "age": 30
+    }
+    """
+  scenarios:
+    - title: Crear un recurso correctamente
+      gherkin: |
+        Cuando hago una petición POST a "users" con el cuerpo:
+        """json
+        {"name": "John", "age": 30}
+        """
+        Entonces el código de estado HTTP es igual a 201
+    - title: Rechazar una petición con datos inválidos
+      gherkin: |
+        Cuando hago una petición POST a "users" con el cuerpo:
+        """json
+        {"name": ""}
+        """
+        Entonces el código de estado HTTP es igual a 400
+
+
+'rest.request.POST.file':
+  expression: 'hago una petición POST a {endpoint:text} con el cuerpo del archivo {file:text}'
+  example: |
+    Cuando hago una petición POST a "users" con el cuerpo del archivo "user_data.json"
+  scenarios:
+    - title: Crear un recurso usando un cuerpo desde archivo
+      gherkin: |
+        Cuando hago una petición POST a "users" con el cuerpo del archivo "fixtures/new_user.json"
+        Entonces el código de estado HTTP es igual a 201
+
+
+'rest.request.PUT.body':
+  expression: 'hago una petición PUT a {endpoint:text} con el cuerpo:'
+  example: |
+    Cuando hago una petición PUT a "users/123" con el cuerpo:
+    """json
+    {
+      "name": "John",
+      "age": 31
+    }
+    """
+  scenarios:
+    - title: Reemplazar un recurso completamente
+      gherkin: |
+        Cuando hago una petición PUT a "users/1" con el cuerpo:
+        """json
+        {"name": "John Actualizado", "age": 31}
+        """
+        Entonces el código de estado HTTP es igual a 200
+
+
+'rest.request.PUT.file':
+  expression: 'hago una petición PUT a {endpoint:text} con el cuerpo del archivo {file:text}'
+  example: |
+    Cuando hago una petición PUT a "users/123" con el cuerpo del archivo "updated_user_data.json"
+  scenarios:
+    - title: Reemplazar un recurso usando un cuerpo desde archivo
+      gherkin: |
+        Cuando hago una petición PUT a "users/1" con el cuerpo del archivo "fixtures/updated_user.json"
+        Entonces el código de estado HTTP es igual a 200
+
+
+'rest.request.PATCH.body':
+  expression: 'hago una petición PATCH a {endpoint:text} con el cuerpo:'
+  example: |
+    Cuando hago una petición PATCH a "users/123" con el cuerpo:
+    """json
+    {
+      "age": 32
+    }
+    """
+  scenarios:
+    - title: Actualizar parcialmente un recurso
+      gherkin: |
+        Cuando hago una petición PATCH a "users/1" con el cuerpo:
+        """json
+        {"age": 32}
+        """
+        Entonces el código de estado HTTP es igual a 200
+
+
+'rest.request.PATCH.file':
+  expression: 'hago una petición PATCH a {endpoint:text} con el cuerpo del archivo {file:text}'
+  example: |
+    Cuando hago una petición PATCH a "users/123" con el cuerpo del archivo "partial_user_update.yaml"
+  scenarios:
+    - title: Actualizar parcialmente un recurso desde archivo
+      gherkin: |
+        Cuando hago una petición PATCH a "users/1" con el cuerpo del archivo "fixtures/partial_update.json"
+        Entonces el código de estado HTTP es igual a 200
+
+
+'rest.request.DELETE':
+  expression: 'hago una petición DELETE a {endpoint:text}'
+  example: |
+    Cuando hago una petición DELETE a "users/123"
+  scenarios:
+    - title: Eliminar un recurso existente
+      gherkin: |
+        Cuando hago una petición DELETE a "users/1"
+        Entonces el código de estado HTTP es igual a 204
+    - title: Eliminar un recurso inexistente
+      gherkin: |
+        Cuando hago una petición DELETE a "users/9999"
+        Entonces el código de estado HTTP es igual a 404
+
+
+'rest.response.statusCode':
+  expression: 'el código de estado HTTP {{integer-assertion}}'
+  assertion-hints:
+    - 'es igual a 200'
+    - 'es igual a 201'
+    - 'es igual a 204'
+    - 'es igual a 404'
+    - 'es mayor que 199'
+    - 'es menor que 300'
+    - 'está entre 200 y 299'
+  example: |
+    Entonces el código de estado HTTP es igual a 200
+  scenarios:
+    - title: Verificar una respuesta exitosa
+      gherkin: |
+        Cuando hago una petición GET a "users"
+        Entonces el código de estado HTTP es igual a 200
+
+
+'rest.response.body':
+  expression: 'el cuerpo de la respuesta es:'
+  example: |
+    Entonces el cuerpo de la respuesta es:
+    """json
+    {
+      "id": 123,
+      "name": "John",
+      "age": 30
+    }
+    """
+  scenarios:
+    - title: Verificar el cuerpo exacto tras un GET
+      gherkin: |
+        Cuando hago una petición GET a "users/1"
+        Entonces el código de estado HTTP es igual a 200
+        Y el cuerpo de la respuesta es:
+        """json
+        {"id": 1, "name": "Alice", "age": 25}
+        """
+
+
+'rest.response.body.file':
+  expression: 'el cuerpo de la respuesta es el contenido del archivo {file:text}'
+  example: |
+    Entonces el cuerpo de la respuesta es el contenido del archivo "expected_response.json"
+  scenarios:
+    - title: Verificar que el cuerpo coincide con un archivo de referencia
+      gherkin: |
+        Cuando hago una petición GET a "users/1"
+        Entonces el código de estado HTTP es igual a 200
+        Y el cuerpo de la respuesta es el contenido del archivo "fixtures/expected_user.json"
+
+
+'rest.response.body.contains':
+  expression: 'el cuerpo de la respuesta contiene:'
+  example: |
+    Entonces el cuerpo de la respuesta contiene:
+    """json
+    {
+      "id": 123,
+      "name": "John"
+    }
+    """
+  scenarios:
+    - title: Verificar que un campo está presente en la respuesta
+      gherkin: |
+        Cuando hago una petición GET a "users/1"
+        Entonces el código de estado HTTP es igual a 200
+        Y el cuerpo de la respuesta contiene:
+        """json
+        {"name": "Alice"}
+        """
+
+
+'rest.response.extracts.field':
+  expression: 'almaceno el valor del campo {field:text} del cuerpo de la respuesta en la variable {variable:id}'
+  example: |
+    Entonces almaceno el valor del campo "id" del cuerpo de la respuesta en la variable userId
+  scenarios:
+    - title: Almacenar un campo y usarlo en la siguiente petición
+      gherkin: |
+        Cuando hago una petición POST a "users" con el cuerpo:
+        """json
+        {"name": "Carol"}
+        """
+        Entonces almaceno el valor del campo "id" del cuerpo de la respuesta en la variable newUserId
+        Y hago una petición GET a "users/${newUserId}"
+        Entonces el código de estado HTTP es igual a 200
+    - title: Usar una variable almacenada en una petición posterior
+      gherkin: |
+        Cuando hago una petición GET a "users/1"
+        Entonces el código de estado HTTP es igual a 200
+        Y almaceno el valor del campo "id" del cuerpo de la respuesta en la variable existingUserId
+        Y hago una petición GET a "users/${existingUserId}"
+        Entonces el código de estado HTTP es igual a 200

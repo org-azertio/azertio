@@ -1,0 +1,146 @@
+'db.define.alias':
+  role: given
+  description: |
+    Selects a configured datasource alias for subsequent database operations.
+  parameters:
+    - name: alias
+      type: text
+      description: The name of the datasource as defined in the configuration
+
+
+'db.teardown.execute':
+  role: given
+  description: |
+    Registers a SQL statement to be executed at teardown, after the scenario finishes.
+    This guarantees cleanup regardless of whether the scenario passed or failed.
+    Multiple statements can be registered; they are executed in registration order.
+  parameters:
+    - name: alias
+      type: text
+      description: The name of the datasource where the statement will be executed
+    - name: sql
+      type: document
+      description: The SQL statement to execute at teardown, provided as a docstring block
+
+
+'db.execute.query':
+  role: given
+  description: |
+    Executes an arbitrary SQL statement and stores the result for subsequent steps.
+    For SELECT queries, the result set is stored and can be asserted with db.assert.query.* steps.
+    For INSERT, UPDATE or DELETE statements, the number of affected rows is stored instead.
+  parameters:
+    - name: sql
+      type: document
+      description: The SQL statement to execute, provided as a docstring block
+
+
+'db.store.query.result':
+  role: then
+  description: |
+    Stores the result of the last executed SQL statement in a named variable.
+    For SELECT queries, stores the first field of the first row.
+    For INSERT, UPDATE or DELETE statements, stores the number of affected rows.
+  parameters:
+    - name: variable
+      type: text
+      description: The name of the variable where the value will be stored
+
+
+'db.assert.query.count':
+  role: then
+  description: |
+    Asserts the count resulting from the last executed SQL statement.
+    For SELECT queries, asserts the number of rows in the result set.
+    For INSERT, UPDATE or DELETE statements, asserts the number of affected rows.
+  parameters:
+    - name: integer-assertion
+      type: assertion
+      description: A condition that the count must satisfy (e.g. '= 3', '> 0')
+
+
+'db.assert.count':
+  role: then
+  description: |
+    Asserts that the number of rows in the specified table satisfies the given condition.
+  parameters:
+    - name: table
+      type: word
+      description: The name of the database table
+    - name: integer-assertion
+      type: assertion
+      description: A condition that the row count must satisfy (e.g. '= 3', '> 0')
+
+
+'db.assert.table.contains':
+  role: then
+  description: |
+    Asserts that the contents of a database table contains the expected data provided in a tabular format.
+  parameters:
+    - name: table
+      type: word
+      description: The name of the database table
+    - name: expected-data
+      type: table
+      description: |
+        A table of expected rows, where each row is a map of column names to expected values.
+        First row is treated as header defining column names. Values can be literals or special placeholders
+        (e.g. <null>).
+
+
+'db.assert.table.is':
+  role: then
+  description: |
+    Asserts that the contents of a database table match exactly the expected data provided in a tabular format.
+    Both the number of rows and each individual row must match.
+  parameters:
+    - name: table
+      type: word
+      description: The name of the database table
+    - name: expected-data
+      type: table
+      description: |
+        A table of expected rows, where each row is a map of column names to expected values.
+        First row is treated as header defining column names. Values can be literals or special placeholders
+        (e.g. <null>).
+
+
+'db.assert.table.contains.csv':
+  role: then
+  description: |
+    Asserts that the contents of a database table contains all rows from a CSV file.
+    The first row of the CSV is treated as the header defining column names.
+  parameters:
+    - name: table
+      type: word
+      description: The name of the database table
+    - name: file
+      type: file
+      description: Path to the CSV file with the expected rows
+
+
+'db.assert.table.is.csv':
+  role: then
+  description: |
+    Asserts that the contents of a database table match exactly the rows from a CSV file.
+    Both the number of rows and each individual row must match.
+    The first row of the CSV is treated as the header defining column names.
+  parameters:
+    - name: table
+      type: word
+      description: The name of the database table
+    - name: file
+      type: file
+      description: Path to the CSV file with the expected rows
+
+
+'db.assert.contains.xls':
+  role: then
+  description: |
+    Asserts that the database contains the rows from an Excel file.
+    Each sheet in the Excel file is treated as a table, using the sheet name as the table name.
+    The first row of each sheet is treated as the header defining column names.
+  parameters:
+    - name: file
+      type: file
+      description: Path to the Excel file with the expected data (one sheet per table)

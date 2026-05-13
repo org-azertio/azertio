@@ -23,11 +23,20 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Build and Test with Coverage
+      - name: Install core modules
+        run: mvn -B install -DskipTests
+
+      - name: Install plugins
+        run: mvn -B install -DskipTests -Pplugins
+
+      - name: Test with Coverage
         run: mvn -B verify
+
+      - name: Verify plugins
+        run: ./mvnw -B verify -Pplugins
 
       - name: SonarCloud Scan
         if: github.actor != 'dependabot[bot]'
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn -B sonar:sonar -Dsonar.projectKey=org-myjtools_openbbt -Dsonar.organization=org-myjtools -Dsonar.host.url=https://sonarcloud.io
+        run: mvn -B sonar:sonar -Dsonar.projectKey=org-myjtools_azertio -Dsonar.organization=org-myjtools -Dsonar.host.url=https://sonarcloud.io

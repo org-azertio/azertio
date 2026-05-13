@@ -1,0 +1,4 @@
+project:
+  organization: My Org
+  name: No Env CLI Project
+  test-suites: []

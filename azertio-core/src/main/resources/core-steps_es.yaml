@@ -1,0 +1,268 @@
+'assert.variable.integer':
+  expression: 'la variable entera {variable:id} {{integer-assertion}}'
+  assertion-hints:
+    - 'es igual a 0'
+    - 'no es igual a 0'
+    - 'es mayor que 0'
+    - 'es menor que 100'
+  example: |
+    Entonces la variable entera count es igual a 5
+  scenarios:
+    - title: Verificar un valor entero exacto
+      gherkin: |
+        Cuando hago una petición GET a "orders/42"
+        Entonces la variable entera retries es igual a 3
+
+
+
+'assert.variable.decimal':
+  expression: 'la variable decimal {variable:id} {{decimal-assertion}}'
+  assertion-hints:
+    - 'es igual a 0.0'
+    - 'no es igual a 0.0'
+    - 'es mayor que 0.0'
+    - 'es menor que 1.0'
+  example: |
+    Entonces la variable decimal price es igual a 19.99
+  scenarios:
+    - title: Verificar un valor decimal exacto
+      gherkin: |
+        Cuando hago una petición GET a "products/1"
+        Entonces la variable decimal price es igual a 19.99
+    - title: Verificar que un decimal es positivo
+      gherkin: |
+        Cuando hago una petición POST a "cart/apply-coupon" con el cuerpo:
+        """json
+        {"code": "SAVE10"}
+        """
+        Entonces la variable decimal discount es mayor que 0.0
+
+
+'assert.variable.date':
+  expression: 'la variable fecha {variable:id} {{date-assertion}}'
+  assertion-hints:
+    - 'es igual a 2025-01-01'
+    - 'es anterior a 2025-12-31'
+    - 'es posterior a 2020-01-01'
+  example: |
+    Entonces la variable fecha expiryDate es posterior a 2025-01-01
+  scenarios:
+    - title: Verificar que una fecha es futura
+      gherkin: |
+        Cuando hago una petición GET a "subscriptions/me"
+        Entonces la variable fecha expiryDate es posterior a 2025-01-01
+    - title: Verificar una fecha exacta
+      gherkin: |
+        Cuando hago una petición POST a "users" con el cuerpo:
+        """json
+        {"name": "Alicia", "birthdate": "1990-06-15"}
+        """
+        Entonces la variable fecha createdAt es igual a 2024-06-15
+
+
+'assert.variable.time':
+  expression: 'la variable hora {variable:id} {{time-assertion}}'
+  assertion-hints:
+    - 'es igual a 12:00:00'
+    - 'es anterior a 18:00:00'
+    - 'es posterior a 08:00:00'
+  example: |
+    Entonces la variable hora openTime es anterior a 18:00:00
+  scenarios:
+    - title: Verificar que una hora es anterior a un límite
+      gherkin: |
+        Cuando hago una petición GET a "stores/1/schedule"
+        Entonces la variable hora openTime es anterior a 18:00:00
+    - title: Verificar una hora exacta
+      gherkin: |
+        Cuando hago una petición POST a "appointments" con el cuerpo:
+        """json
+        {"slot": "09:30:00"}
+        """
+        Entonces la variable hora scheduledAt es igual a 09:30:00
+
+
+'assert.variable.datetime':
+  expression: 'la variable fechahora {variable:id} {{datetime-assertion}}'
+  assertion-hints:
+    - 'es igual a 2025-01-01T00:00:00'
+    - 'es anterior a 2025-12-31T23:59:59'
+    - 'es posterior a 2020-01-01T00:00:00'
+  example: |
+    Entonces la variable fechahora createdAt es anterior a 2025-12-31T23:59:59
+  scenarios:
+    - title: Verificar que una fechahora es anterior a un instante
+      gherkin: |
+        Cuando hago una petición POST a "events" con el cuerpo:
+        """json
+        {"name": "Conferencia", "start": "2025-06-01T09:00:00"}
+        """
+        Entonces la variable fechahora createdAt es anterior a 2025-12-31T23:59:59
+    - title: Verificar una fechahora exacta
+      gherkin: |
+        Cuando hago una petición GET a "audit/latest"
+        Entonces la variable fechahora timestamp es igual a 2024-06-15T10:30:00
+
+
+'assert.variable.text':
+  expression: 'la variable texto {variable:id} {{text-assertion}}'
+  assertion-hints:
+    - 'es igual a "esperado"'
+    - 'no es igual a "inesperado"'
+    - 'contiene "parcial"'
+    - 'empieza por "prefijo"'
+    - 'termina en "sufijo"'
+  example: |
+    Entonces la variable texto status es igual a "activo"
+  scenarios:
+    - title: Verificar un valor de texto exacto
+      gherkin: |
+        Cuando hago una petición GET a "users/1"
+        Entonces la variable texto status es igual a "activo"
+    - title: Verificar que un texto contiene una subcadena
+      gherkin: |
+        Cuando hago una petición POST a "notifications/send" con el cuerpo:
+        """json
+        {"recipient": "alicia@ejemplo.com", "template": "bienvenida"}
+        """
+        Entonces la variable texto message contiene "éxito"
+
+
+'enable.benchmark.mode':
+  expression: 'el modo benchmark está habilitado con {executions:integer} ejecuciones y {threads:integer} hilos'
+  example: |
+    Dado el modo benchmark está habilitado con 100 ejecuciones y 4 hilos
+  scenarios:
+    - title: Habilitar el modo benchmark antes de un paso
+      gherkin: |
+        Dado el modo benchmark está habilitado con 200 ejecuciones y 8 hilos
+        Cuando hago una petición GET a "health"
+        Entonces el tiempo medio de respuesta del benchmark es menor que 100
+
+
+'assert.benchmark.statistics.mean':
+  expression: 'el tiempo medio de respuesta del benchmark (ms) {{integer-assertion}}'
+  assertion-hints:
+    - 'es menor que 200'
+    - 'es menor o igual que 500'
+    - 'es igual a 100'
+  example: |
+    Entonces el tiempo medio de respuesta del benchmark (ms) es menor que 200
+  scenarios:
+    - title: Verificar que el tiempo medio está por debajo del umbral
+      gherkin: |
+        Dado el modo benchmark está habilitado con 100 ejecuciones y 4 hilos
+        Cuando hago una petición GET a "health"
+        Entonces el tiempo medio de respuesta del benchmark (ms) es menor que 200
+
+
+'assert.benchmark.statistics.min':
+  expression: 'el tiempo mínimo de respuesta del benchmark (ms) {{integer-assertion}}'
+  assertion-hints:
+    - 'es menor que 100'
+    - 'es mayor que 0'
+    - 'es igual a 10'
+  example: |
+    Entonces el tiempo mínimo de respuesta del benchmark (ms) es mayor que 0
+  scenarios:
+    - title: Verificar que el tiempo mínimo es positivo
+      gherkin: |
+        Dado el modo benchmark está habilitado con 100 ejecuciones y 4 hilos
+        Cuando hago una petición GET a "health"
+        Entonces el tiempo mínimo de respuesta del benchmark (ms) es mayor que 0
+
+
+'assert.benchmark.statistics.max':
+  expression: 'el tiempo máximo de respuesta del benchmark (ms) {{integer-assertion}}'
+  assertion-hints:
+    - 'es menor que 1000'
+    - 'es menor o igual que 500'
+    - 'es igual a 200'
+  example: |
+    Entonces el tiempo máximo de respuesta del benchmark (ms) es menor que 1000
+  scenarios:
+    - title: Verificar que el tiempo máximo está por debajo del umbral
+      gherkin: |
+        Dado el modo benchmark está habilitado con 100 ejecuciones y 4 hilos
+        Cuando hago una petición GET a "health"
+        Entonces el tiempo máximo de respuesta del benchmark (ms) es menor que 1000
+
+
+'assert.benchmark.statistics.p50':
+  expression: 'el tiempo P50 de respuesta del benchmark (ms) {{integer-assertion}}'
+  assertion-hints:
+    - 'es menor que 200'
+    - 'es menor o igual que 300'
+    - 'es igual a 150'
+  example: |
+    Entonces el tiempo P50 de respuesta del benchmark (ms) es menor que 200
+  scenarios:
+    - title: Verificar que el P50 está por debajo del umbral
+      gherkin: |
+        Dado el modo benchmark está habilitado con 100 ejecuciones y 4 hilos
+        Cuando hago una petición GET a "health"
+        Entonces el tiempo P50 de respuesta del benchmark (ms) es menor que 200
+
+
+'assert.benchmark.statistics.p95':
+  expression: 'el tiempo P95 de respuesta del benchmark (ms) {{integer-assertion}}'
+  assertion-hints:
+    - 'es menor que 500'
+    - 'es menor o igual que 1000'
+    - 'es igual a 300'
+  example: |
+    Entonces el tiempo P95 de respuesta del benchmark (ms) es menor que 500
+  scenarios:
+    - title: Verificar que el P95 está por debajo del umbral
+      gherkin: |
+        Dado el modo benchmark está habilitado con 100 ejecuciones y 4 hilos
+        Cuando hago una petición GET a "health"
+        Entonces el tiempo P95 de respuesta del benchmark (ms) es menor que 500
+
+
+'assert.benchmark.statistics.p99':
+  expression: 'el tiempo P99 de respuesta del benchmark (ms) {{integer-assertion}}'
+  assertion-hints:
+    - 'es menor que 1000'
+    - 'es menor o igual que 2000'
+    - 'es igual a 500'
+  example: |
+    Entonces el tiempo P99 de respuesta del benchmark (ms) es menor que 1000
+  scenarios:
+    - title: Verificar que el P99 está por debajo del umbral
+      gherkin: |
+        Dado el modo benchmark está habilitado con 100 ejecuciones y 4 hilos
+        Cuando hago una petición GET a "health"
+        Entonces el tiempo P99 de respuesta del benchmark (ms) es menor que 1000
+
+
+'assert.benchmark.statistics.throughput':
+  expression: 'el throughput del benchmark (req/s) {{decimal-assertion}}'
+  assertion-hints:
+    - 'es mayor que 10.0'
+    - 'es mayor o igual que 5.0'
+    - 'es igual a 20.0'
+  example: |
+    Entonces el throughput del benchmark (req/s) es mayor que 10.0
+  scenarios:
+    - title: Verificar que el throughput supera el mínimo
+      gherkin: |
+        Dado el modo benchmark está habilitado con 100 ejecuciones y 4 hilos
+        Cuando hago una petición GET a "health"
+        Entonces el throughput del benchmark (req/s) es mayor que 10.0
+
+
+'assert.benchmark.statistics.errorRate':
+  expression: 'la tasa de error del benchmark {{decimal-assertion}}'
+  assertion-hints:
+    - 'es igual a 0.0'
+    - 'es menor que 0.01'
+    - 'es menor o igual que 0.05'
+  example: |
+    Entonces la tasa de error del benchmark es igual a 0.0
+  scenarios:
+    - title: Verificar que no hay errores durante el benchmark
+      gherkin: |
+        Dado el modo benchmark está habilitado con 100 ejecuciones y 4 hilos
+        Cuando hago una petición GET a "health"
+        Entonces la tasa de error del benchmark es igual a 0.0

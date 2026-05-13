@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.azertio</groupId>
+        <artifactId>azertio-plugin-starter</artifactId>
+        <relativePath>../../azertio-plugin-starter/pom.xml</relativePath>
+        <version>1.0.0-alpha1</version>
+    </parent>
+
+    <groupId>org.azertio.plugins</groupId>
+    <artifactId>pdfreport-azertio-plugin</artifactId>
+    <version>1.0.0-alpha1</version>
+
+    <name>PDF Report Azertio Plugin</name>
+    <description>A plugin that generates PDF execution reports for Azertio test runs</description>
+
+    <properties>
+        <!-- No step doc: this plugin provides no steps -->
+        <azertio.docgen.skip>true</azertio.docgen.skip>
+        <azertio.docgen.configFile>${project.basedir}/src/main/resources/config.yaml</azertio.docgen.configFile>
+        <azertio.docgen.configTitle>PDF Report Plugin — Configuration Reference</azertio.docgen.configTitle>
+    </properties>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/licenses/MIT</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <url>https://myjtools.org/azertio/plugins/pdfreport</url>
+
+    <dependencies>
+        <!-- PDF generation (Apache License 2.0) -->
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <version>3.0.3</version>
+        </dependency>
+
+        <!-- Test dependencies -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.9.3</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.9.3</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>3.27.7</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.azertio</groupId>
+            <artifactId>azertio-persistence</artifactId>
+            <version>1.0.0-alpha1-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.5.25</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+</project>

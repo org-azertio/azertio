@@ -1,0 +1,41 @@
+project:
+    name: REST API Example
+    organization: My Organization
+    description: |
+      This is a test project against against the JSONPlaceholder public API
+      (https://jsonplaceholder.typicode.com). Some tests will fail on purpose
+      to demostrate the behaviour on failures.
+    test-suites:
+      - name: Getters
+        description: REST API Getters
+        tag-expression: GET
+      - name: Others
+        description: REST API Other Operations
+        tag-expression: not GET and not DB
+      - name: Database
+        description: DB queries against the public Rfam MySQL database
+        tag-expression: DB
+
+plugins:
+    - gherkin
+    - rest
+    - "db with com.mysql:mysql-connector-j"
+
+configuration:
+    core:
+        resourceFilter: '**/*.feature'
+    rest:
+        baseURL: 'https://jsonplaceholder.typicode.com'
+        timeout: 10000
+    db:
+        datasources:
+            rfam:
+                url: 'jdbc:mysql://mysql-rfam-public.ebi.ac.uk:4497/Rfam'
+                username: rfamro
+                password: ''
+                driver: com.mysql.cj.jdbc.Driver
+                dialect: MYSQL
+
+profiles:
+    dev: {}
+    prod: {}

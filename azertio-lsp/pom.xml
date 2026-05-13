@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.azertio</groupId>
+        <artifactId>azertio</artifactId>
+        <version>1.0.0-alpha1-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>azertio-lsp</artifactId>
+    <name>Azertio LSP Server</name>
+    <description>Language Server Protocol server for Azertio feature files</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.azertio</groupId>
+            <artifactId>azertio-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.myjtools</groupId>
+            <artifactId>gherkin-parser</artifactId>
+            <version>1.0.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.lsp4j</groupId>
+            <artifactId>org.eclipse.lsp4j</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.myjtools</groupId>
+            <artifactId>imconfig</artifactId>
+            <version>1.7.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>2.5</version>
+        </dependency>
+    </dependencies>
+
+</project>

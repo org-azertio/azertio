@@ -1,0 +1,267 @@
+'assert.variable.integer':
+  expression: 'assert ${variable:id}:integer {{integer-assertion}}'
+  assertion-hints:
+    - '= 0'
+    - 'not = 0'
+    - '> 0'
+    - '< 100'
+  example: |
+    * assert $count:integer = 5
+  scenarios:
+    - title: Assert an exact integer value
+      gherkin: |
+        * do HTTP GET "orders/42"
+        * assert $retries:integer = 3
+
+
+'assert.variable.decimal':
+  expression: 'assert ${variable:id}:decimal {{decimal-assertion}}'
+  assertion-hints:
+    - '= 0.0'
+    - 'not = 0.0'
+    - '> 0.0'
+    - '< 1.0'
+  example: |
+    * assert $price:decimal = 19.99
+  scenarios:
+    - title: Assert an exact decimal value
+      gherkin: |
+        * do HTTP GET "products/1"
+        * assert $price:decimal = 19.99
+    - title: Assert a decimal is positive
+      gherkin: |
+        * do HTTP POST "cart/apply-coupon":
+        """json
+        {"code": "SAVE10"}
+        """
+        * assert $discount:decimal > 0.0
+
+
+'assert.variable.date':
+  expression: 'assert ${variable:id}:date {{date-assertion}}'
+  assertion-hints:
+    - '= 2025-01-01'
+    - '< 2025-12-31'
+    - '> 2020-01-01'
+  example: |
+    * assert $expiryDate:date > 2025-01-01
+  scenarios:
+    - title: Assert a date is in the future
+      gherkin: |
+        * do HTTP GET "subscriptions/me"
+        * assert $expiryDate:date > 2025-01-01
+    - title: Assert an exact date
+      gherkin: |
+        * do HTTP POST "users":
+        """json
+        {"name": "Alice", "birthdate": "1990-06-15"}
+        """
+        * assert $createdAt:date = 2024-06-15
+
+
+'assert.variable.time':
+  expression: 'assert ${variable:id}:time {{time-assertion}}'
+  assertion-hints:
+    - '= 12:00:00'
+    - '< 18:00:00'
+    - '> 08:00:00'
+  example: |
+    * assert $openTime:time < 18:00:00
+  scenarios:
+    - title: Assert a time is before a given time
+      gherkin: |
+        * do HTTP GET "stores/1/schedule"
+        * assert $openTime:time < 18:00:00
+    - title: Assert an exact time
+      gherkin: |
+        * do HTTP POST "appointments":
+        """json
+        {"slot": "09:30:00"}
+        """
+        * assert $scheduledAt:time = 09:30:00
+
+
+'assert.variable.datetime':
+  expression: 'assert ${variable:id}:datetime {{datetime-assertion}}'
+  assertion-hints:
+    - '= 2025-01-01T00:00:00'
+    - '< 2025-12-31T23:59:59'
+    - '> 2020-01-01T00:00:00'
+  example: |
+    * assert $createdAt:datetime < 2025-12-31T23:59:59
+  scenarios:
+    - title: Assert a datetime is before a given instant
+      gherkin: |
+        * do HTTP POST "events":
+        """json
+        {"name": "Conference", "start": "2025-06-01T09:00:00"}
+        """
+        * assert $createdAt:datetime < 2025-12-31T23:59:59
+    - title: Assert an exact datetime
+      gherkin: |
+        * do HTTP GET "audit/latest"
+        * assert $timestamp:datetime = 2024-06-15T10:30:00
+
+
+'assert.variable.text':
+  expression: 'assert ${variable:id}:text {{text-assertion}}'
+  assertion-hints:
+    - '= "expected"'
+    - 'not = "unexpected"'
+    - 'contains "partial"'
+    - 'starts "prefix"'
+    - 'ends "suffix"'
+  example: |
+    * assert $status:text = "active"
+  scenarios:
+    - title: Assert an exact string value
+      gherkin: |
+        * do HTTP GET "users/1"
+        * assert $status:text = "active"
+    - title: Assert a string contains a substring
+      gherkin: |
+        * do HTTP POST "notifications/send":
+        """json
+        {"recipient": "alice@example.com", "template": "welcome"}
+        """
+        * assert $message:text contains "success"
+
+
+'enable.benchmark.mode':
+  expression: 'benchmark {executions:integer} x {threads:integer} threads'
+  example: |
+    * benchmark 100 x 4 threads
+  scenarios:
+    - title: Enable benchmark mode before a step
+      gherkin: |
+        * benchmark 200 x 8 threads
+        * do HTTP GET "health"
+        * assert benchmark:mean < 100
+
+
+'assert.benchmark.statistics.mean':
+  expression: 'assert benchmark:mean {{integer-assertion}}'
+  assertion-hints:
+    - '< 200'
+    - '<= 500'
+    - '= 100'
+  example: |
+    * assert benchmark:mean < 200
+  scenarios:
+    - title: Assert mean response time under threshold
+      gherkin: |
+        * benchmark 100 x 4 threads
+        * do HTTP GET "health"
+        * assert benchmark:mean < 200
+
+
+'assert.benchmark.statistics.min':
+  expression: 'assert benchmark:min {{integer-assertion}}'
+  assertion-hints:
+    - '< 100'
+    - '> 0'
+    - '= 10'
+  example: |
+    * assert benchmark:min > 0
+  scenarios:
+    - title: Assert minimum response time is positive
+      gherkin: |
+        * benchmark 100 x 4 threads
+        * do HTTP GET "health"
+        * assert benchmark:min > 0
+
+
+'assert.benchmark.statistics.max':
+  expression: 'assert benchmark:max {{integer-assertion}}'
+  assertion-hints:
+    - '< 1000'
+    - '<= 500'
+    - '= 200'
+  example: |
+    * assert benchmark:max < 1000
+  scenarios:
+    - title: Assert maximum response time under threshold
+      gherkin: |
+        * benchmark 100 x 4 threads
+        * do HTTP GET "health"
+        * assert benchmark:max < 1000
+
+
+'assert.benchmark.statistics.p50':
+  expression: 'assert benchmark:p50 {{integer-assertion}}'
+  assertion-hints:
+    - '< 200'
+    - '<= 300'
+    - '= 150'
+  example: |
+    * assert benchmark:p50 < 200
+  scenarios:
+    - title: Assert P50 response time under threshold
+      gherkin: |
+        * benchmark 100 x 4 threads
+        * do HTTP GET "health"
+        * assert benchmark:p50 < 200
+
+
+'assert.benchmark.statistics.p95':
+  expression: 'assert benchmark:p95 {{integer-assertion}}'
+  assertion-hints:
+    - '< 500'
+    - '<= 1000'
+    - '= 300'
+  example: |
+    * assert benchmark:p95 < 500
+  scenarios:
+    - title: Assert P95 response time under threshold
+      gherkin: |
+        * benchmark 100 x 4 threads
+        * do HTTP GET "health"
+        * assert benchmark:p95 < 500
+
+
+'assert.benchmark.statistics.p99':
+  expression: 'assert benchmark:p99 {{integer-assertion}}'
+  assertion-hints:
+    - '< 1000'
+    - '<= 2000'
+    - '= 500'
+  example: |
+    * assert benchmark:p99 < 1000
+  scenarios:
+    - title: Assert P99 response time under threshold
+      gherkin: |
+        * benchmark 100 x 4 threads
+        * do HTTP GET "health"
+        * assert benchmark:p99 < 1000
+
+
+'assert.benchmark.statistics.throughput':
+  expression: 'assert benchmark:throughput {{decimal-assertion}}'
+  assertion-hints:
+    - '> 10.0'
+    - '>= 5.0'
+    - '= 20.0'
+  example: |
+    * assert benchmark:throughput > 10.0
+  scenarios:
+    - title: Assert throughput exceeds minimum
+      gherkin: |
+        * benchmark 100 x 4 threads
+        * do HTTP GET "health"
+        * assert benchmark:throughput > 10.0
+
+
+'assert.benchmark.statistics.errorRate':
+  expression: 'assert benchmark:errorRate {{decimal-assertion}}'
+  assertion-hints:
+    - '= 0.0'
+    - '< 0.01'
+    - '<= 0.05'
+  example: |
+    * assert benchmark:errorRate = 0.0
+  scenarios:
+    - title: Assert no errors during benchmark
+      gherkin: |
+        * benchmark 100 x 4 threads
+        * do HTTP GET "health"
+        * assert benchmark:errorRate = 0.0

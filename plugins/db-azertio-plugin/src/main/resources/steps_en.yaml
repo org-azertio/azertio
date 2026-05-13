@@ -1,0 +1,173 @@
+'db.define.alias':
+  expression: 'I use datasource {alias:text}'
+  example: |
+    Given I use datasource "main"
+  scenarios:
+    - title: Select a datasource before performing operations
+      gherkin: |
+        Given I use datasource "main"
+        Then the count of rows of table users is equal to 3
+
+
+'db.teardown.execute':
+  expression: 'at teardown execute in datasource {alias:text} the SQL statement:'
+  example: |
+    Given at teardown execute in datasource "main" the SQL statement:
+      """sql
+      DELETE FROM users WHERE status = 'active'
+      """
+  scenarios:
+    - title: Register cleanup SQL to run after the scenario regardless of outcome
+      gherkin: |
+        Given at teardown execute in datasource "main" the SQL statement:
+          """sql
+          DELETE FROM users WHERE status = 'active'
+          """
+
+
+'db.execute.query':
+  expression: 'I execute the SQL query:'
+  example: |
+    Given I execute the SQL query:
+      """sql
+      SELECT * FROM users WHERE status = 'active'
+      """
+  scenarios:
+    - title: Execute a SELECT and assert the result in subsequent steps
+      gherkin: |
+        Given I use datasource "main"
+        And I execute the SQL query:
+          """sql
+          SELECT id, name FROM users WHERE status = 'active'
+          """
+        Then the SQL result row count is greater than 0
+
+
+'db.store.query.result':
+  expression: 'store db query result in variable {variable:text}'
+  example: |
+    Then store db query result in variable "name"
+  scenarios:
+    - title: Store the first field of a SELECT result in a variable
+      gherkin: |
+        Given I use datasource "main"
+        And I execute the SQL query:
+          """sql
+          SELECT name FROM users WHERE status = 'active'
+          """
+        Then store db query result in variable "name"
+
+
+'db.assert.query.count':
+  expression: 'the SQL result row count {{integer-assertion}}'
+  assertion-hints:
+    - 'is equal to 0'
+    - 'is equal to 1'
+    - 'is greater than 0'
+    - 'is not equal to 0'
+  example: |
+    Then the SQL result row count is greater than 0
+  scenarios:
+    - title: Assert the number of rows returned by the last SQL query
+      gherkin: |
+        Given I use datasource "main"
+        And I execute the SQL query:
+          """sql
+          SELECT * FROM users WHERE status = 'active'
+          """
+        Then the SQL result row count is greater than 0
+
+
+'db.assert.count':
+  expression: 'the count of rows of table {table:word} {{integer-assertion}}'
+  assertion-hints:
+    - 'is equal to 0'
+    - 'is equal to 1'
+    - 'is greater than 0'
+    - 'is not equal to 0'
+  example: |
+    Then the count of rows of table users is equal to 3
+  scenarios:
+    - title: Assert table is empty after a deletion
+      gherkin: |
+        Given I use datasource "main"
+        Then the count of rows of table users is equal to 0
+    - title: Assert at least one row exists
+      gherkin: |
+        Given I use datasource "main"
+        Then the count of rows of table users is greater than 0
+
+
+'db.assert.table.contains':
+  expression: 'the table {table:word} contains the rows:'
+  example: |
+    Then the table users contains the rows:
+      | id | name  |
+      | 1  | Alice |
+  scenarios:
+    - title: Assert exact table contents
+      gherkin: |
+        Given I use datasource "main"
+        Then the table users contains the rows:
+          | id | name  |
+          | 1  | Alice |
+    - title: Assert contents with null values
+      gherkin: |
+        Given I use datasource "main"
+        Then the table users contains the rows:
+          | id | name   |
+          | 2  | <null> |
+
+
+'db.assert.table.is':
+  expression: 'the table {table:word} is exactly:'
+  example: |
+    Then the table users is exactly:
+      | id | name  |
+      | 1  | Alice |
+  scenarios:
+    - title: Assert table has exactly these rows
+      gherkin: |
+        Given I use datasource "main"
+        Then the table users is exactly:
+          | id | name  |
+          | 1  | Alice |
+    - title: Assert table is exactly one row with a null value
+      gherkin: |
+        Given I use datasource "main"
+        Then the table users is exactly:
+          | id | name   |
+          | 2  | <null> |
+
+
+'db.assert.table.contains.csv':
+  expression: 'the table {table:word} contains the CSV file {file:file}'
+  example: |
+    Then the table users contains the CSV file "expected/users.csv"
+  scenarios:
+    - title: Assert table contains rows from a CSV file
+      gherkin: |
+        Given I use datasource "main"
+        Then the table users contains the CSV file "expected/users.csv"
+
+
+'db.assert.table.is.csv':
+  expression: 'the table {table:word} is exactly the CSV file {file:file}'
+  example: |
+    Then the table users is exactly the CSV file "expected/users.csv"
+  scenarios:
+    - title: Assert table matches exactly the rows in a CSV file
+      gherkin: |
+        Given I use datasource "main"
+        Then the table users is exactly the CSV file "expected/users.csv"
+
+
+'db.assert.contains.xls':
+  expression: 'the database contains the rows from Excel file {file:file}'
+  example: |
+    Then the database contains the rows from Excel file "expected/data.xlsx"
+  scenarios:
+    - title: Assert multiple tables contain the rows from an Excel file
+      gherkin: |
+        Given I use datasource "main"
+        Then the database contains the rows from Excel file "expected/data.xlsx"

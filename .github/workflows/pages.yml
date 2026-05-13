@@ -1,0 +1,70 @@
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build and generate docs
+        run: ./mvnw -B install -Pplugins,generate-doc -DskipTests
+
+      - name: Install pandoc
+        run: sudo apt-get install -y pandoc
+
+      - name: Convert docs to HTML
+        run: |
+          for f in www/docs/*.md; do
+            [ -f "$f" ] || continue
+            slug=$(basename "$f" .md)
+            title=$(grep "^# " "$f" | head -1 | sed 's/^# //')
+            mkdir -p "www/docs/$slug"
+            pandoc "$f" \
+              --from gfm \
+              --to html5 \
+              --template .github/pandoc/doc-template.html \
+              --highlight-style zenburn \
+              --metadata title="$title" \
+              --metadata slug="$slug" \
+              --output "www/docs/$slug/index.html"
+          done
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: www/
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
+        id: deployment

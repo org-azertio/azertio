@@ -1,20 +1,21 @@
-name: Publish to GitHub Packages
+name: Publish
 
 on:
+  workflow_dispatch:
   push:
+    branches: [ develop ]
     tags:
       - 'v*'
+
+permissions:
+  contents: write
+  packages: write
 
 jobs:
   publish:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Set up JDK 21
         uses: actions/setup-java@v4
@@ -22,8 +23,25 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
+          server-id: github
+          server-username: GITHUB_ACTOR
+          server-password: GITHUB_TOKEN
 
-      - name: Publish to GitHub Packages
-        run: mvn -B deploy -DskipTests -DaltDeploymentRepository=github::https://maven.pkg.github.com/${{ github.repository }}
+      - name: Deploy to GitHub Packages
+        run: ./mvnw -B deploy -Pplugins -DskipTests
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Only create a GitHub Release for stable tags (non-SNAPSHOT)
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/') && !contains(github.ref_name, 'SNAPSHOT')
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          ZIP="azertio-cli/target/azertio-cli-${VERSION}-dist.zip"
+          gh release create "$GITHUB_REF_NAME" \
+            --title "Azertio ${GITHUB_REF_NAME}" \
+            --generate-notes \
+            "${ZIP}#azertio-cli-${VERSION}-dist.zip"

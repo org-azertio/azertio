@@ -1,0 +1,1551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Azertio — Open Source Black-Box API &amp; Database Testing Framework</title>
+
+  <!-- SEO -->
+  <meta name="description" content="Azertio is an open source black-box testing framework. Write expressive Gherkin tests against REST APIs, databases, and any backend — without boilerplate or glue code. Plugin-based, CI-ready." />
+  <meta name="keywords" content="black-box testing, API testing, REST testing, database testing, BDD, Gherkin, DSL, test automation, open source, plugin-based, CI testing, backend testing" />
+  <meta name="author" content="azertio" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://azertio.org/" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://azertio.org/" />
+  <meta property="og:title" content="Azertio — Open Source Black-Box API & Database Testing Framework" />
+  <meta property="og:description" content="Extensible, plugin-based testing platform. Write expressive tests in plain DSL — test REST APIs, databases, and more — with zero boilerplate." />
+  <meta property="og:image" content="https://azertio.org/images/screenshot1.png" />
+  <meta property="og:image:width" content="1280" />
+  <meta property="og:image:height" content="720" />
+  <meta property="og:image:alt" content="Azertio VS Code extension showing test execution results" />
+  <meta property="og:site_name" content="Azertio" />
+  <meta property="og:locale" content="en_US" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Azertio — Open Source Black-Box API & Database Testing Framework" />
+  <meta name="twitter:description" content="Extensible, plugin-based testing platform. Write expressive tests in plain DSL — test REST APIs, databases, and more — with zero boilerplate." />
+  <meta name="twitter:image" content="https://azertio.org/images/screenshot1.png" />
+
+  <!-- Structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Azertio",
+    "description": "Extensible, plugin-based black-box testing platform. Write expressive tests in plain DSL — test REST APIs, databases, and more — with zero boilerplate.",
+    "url": "https://azertio.org/",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Linux, Windows, macOS",
+    "license": "https://opensource.org/licenses/MIT",
+    "codeRepository": "https://github.com/org-azertio/azertio",
+    "author": {
+      "@type": "Organization",
+      "name": "azertio",
+      "url": "https://azertio.org"
+    }
+  }
+  </script>
+
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-NDFJJ357');</script>
+  <!-- End Google Tag Manager -->
+
+  <!-- Google Analytics (GA4) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z3JDMGL1G4"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-Z3JDMGL1G4');
+  </script>
+  <!-- End Google Analytics -->
+
+  <link rel="icon" type="image/svg+xml" href="logo.svg" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Baumans&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" as="style" />
+  <link href="https://fonts.googleapis.com/css2?family=Baumans&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Reset & base ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    #particles-bg {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    section, footer { position: relative; z-index: 1; }
+
+    :root {
+      --bg:       #07070f;
+      --surface:  #0e0e1a;
+      --border:   #1e1e35;
+      --cyan:     #00ffe0;
+      --purple:   #7c3aed;
+      --pink:     #f72585;
+      --text:     #d1d5db;
+      --muted:    #6b7280;
+      --white:    #f9fafb;
+      --font:     'Inter', sans-serif;
+      --mono:     'JetBrains Mono', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* ── Noise overlay ────────────────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.025;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Nav ──────────────────────────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2.5rem;
+      background: rgba(7,7,15,0.8);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .nav-logo svg, .nav-logo img { width: 120px; height: auto; }
+
+    .hero-logo svg, .hero-logo img { width: 320px; height: auto; margin-bottom: 2rem; filter: drop-shadow(0 0 32px rgba(0,255,224,0.3)); }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--white); }
+
+    .btn-nav {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.45rem 1.1rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      color: var(--white) !important;
+      background: var(--surface);
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .btn-nav:hover {
+      border-color: var(--cyan);
+      box-shadow: 0 0 12px rgba(0,255,224,0.2);
+    }
+
+    /* ── Sections layout ──────────────────────────────────────── */
+    section { position: relative; z-index: 1; }
+
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    /* ── Hero ─────────────────────────────────────────────────── */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 8rem 2rem 6rem;
+      overflow: hidden;
+    }
+
+    /* Radial glow behind hero */
+    #hero::after {
+      content: '';
+      position: absolute;
+      top: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 900px;
+      height: 500px;
+      background: radial-gradient(ellipse at center,
+        rgba(124,58,237,0.18) 0%,
+        rgba(0,255,224,0.08) 45%,
+        transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.3rem 0.9rem;
+      border-radius: 999px;
+      border: 1px solid rgba(0,255,224,0.3);
+      background: rgba(0,255,224,0.06);
+      color: var(--cyan);
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 1.8rem;
+    }
+
+    .hero-badge span { font-size: 0.7rem; opacity: 0.7; }
+
+    h1 {
+      font-size: clamp(2.8rem, 6vw, 5rem);
+      font-weight: 900;
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+      color: var(--white);
+      max-width: 820px;
+      margin-bottom: 1.5rem;
+    }
+
+    h1 .accent-cyan  { color: var(--cyan); }
+    h1 .accent-purple { color: #a78bfa; }
+
+    .hero-sub {
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      color: var(--muted);
+      max-width: 560px;
+      margin-bottom: 1.2rem;
+      line-height: 1.7;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 4rem;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.85rem 2rem;
+      border-radius: 8px;
+      background: var(--cyan);
+      color: #07070f;
+      font-weight: 700;
+      font-size: 0.95rem;
+      transition: box-shadow 0.25s, transform 0.2s;
+    }
+    .btn-primary:hover {
+      box-shadow: 0 0 28px rgba(0,255,224,0.5);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.85rem 2rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--white);
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: border-color 0.25s, box-shadow 0.25s;
+    }
+    .btn-secondary:hover {
+      border-color: var(--purple);
+      box-shadow: 0 0 20px rgba(124,58,237,0.3);
+    }
+
+    /* Terminal mockup */
+    .terminal {
+      width: 100%;
+      max-width: 680px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #0c0c18;
+      box-shadow: 0 0 60px rgba(0,255,224,0.07), 0 24px 80px rgba(0,0,0,0.6);
+      overflow: hidden;
+      text-align: left;
+    }
+
+    .terminal-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.7rem 1rem;
+      background: #111122;
+      border-bottom: 1px solid var(--border);
+    }
+    .dot { width: 12px; height: 12px; border-radius: 50%; }
+    .dot-r { background: #ff5f57; }
+    .dot-y { background: #febc2e; }
+    .dot-g { background: #28c840; }
+
+    .terminal-title {
+      margin-left: auto;
+      margin-right: auto;
+      font-size: 0.75rem;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+
+    .terminal-body {
+      padding: 1.2rem 1.4rem;
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      line-height: 1.8;
+    }
+
+    .t-prompt { color: var(--cyan); }
+    .t-cmd    { color: var(--white); }
+    .t-pass   { color: #4ade80; }
+    .t-fail   { color: #f87171; }
+    .t-info   { color: #94a3b8; }
+    .t-dim    { color: #475569; }
+
+    /* ── Section headings ─────────────────────────────────────── */
+    .section-label {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      margin-bottom: 0.8rem;
+    }
+
+    h2 {
+      font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--white);
+      line-height: 1.15;
+      margin-bottom: 1rem;
+    }
+
+    .section-intro {
+      font-size: 1.05rem;
+      color: var(--muted);
+      max-width: 540px;
+      line-height: 1.7;
+    }
+
+    /* ── Features ─────────────────────────────────────────────── */
+    #features {
+      padding: 7rem 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .features-head {
+      margin-bottom: 3.5rem;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .feature-card {
+      padding: 1.8rem;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      transition: border-color 0.25s, box-shadow 0.25s, transform 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top left, rgba(0,255,224,0.05) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .feature-card:hover::before { opacity: 1; }
+    .feature-card:hover {
+      border-color: rgba(0,255,224,0.3);
+      box-shadow: 0 0 24px rgba(0,255,224,0.08);
+      transform: translateY(-2px);
+    }
+
+    .feature-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: rgba(0,255,224,0.1);
+      border: 1px solid rgba(0,255,224,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      margin-bottom: 1.1rem;
+    }
+
+    .feature-card h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 0.5rem;
+    }
+
+    .feature-card p {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    /* ── DSL Example ──────────────────────────────────────────── */
+    #example {
+      padding: 7rem 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .example-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+
+    @media (max-width: 800px) {
+      .example-layout { grid-template-columns: 1fr; }
+    }
+
+    .code-window {
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #0b0b18;
+      overflow: hidden;
+      box-shadow: 0 0 50px rgba(124,58,237,0.08), 0 20px 60px rgba(0,0,0,0.5);
+    }
+
+    .code-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.65rem 1rem;
+      background: #111122;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .code-filename {
+      margin-left: 0.6rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+
+    pre {
+      padding: 1.4rem 1.6rem;
+      overflow-x: auto;
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      line-height: 1.8;
+      tab-size: 2;
+    }
+
+    /* Syntax tokens */
+    .kw   { color: #c084fc; }   /* keywords: Feature, Scenario, Background */
+    .tag  { color: #f472b6; }   /* @tags */
+    .str  { color: #86efac; }   /* strings */
+    .step { color: var(--white); }
+    .cmt  { color: #475569; font-style: italic; }
+    .sql  { color: #fbbf24; }   /* SQL */
+    .num  { color: var(--cyan); }
+    .op   { color: #f87171; }   /* operators: > = */
+
+    .example-points {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 1.4rem;
+    }
+
+    .example-points li {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .point-icon {
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: rgba(124,58,237,0.15);
+      border: 1px solid rgba(124,58,237,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      margin-top: 0.1rem;
+    }
+
+    .point-text h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 0.25rem;
+    }
+    .point-text p {
+      font-size: 0.87rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ── Plugins ──────────────────────────────────────────────── */
+    #plugins {
+      padding: 7rem 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .plugins-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 3rem;
+    }
+
+    .plugin-note {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .plugin-note code {
+      font-family: var(--mono);
+      color: var(--cyan);
+      background: rgba(0,255,224,0.08);
+      padding: 0.15em 0.45em;
+      border-radius: 4px;
+      font-size: 0.8rem;
+    }
+
+    .plugins-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .plugin-card {
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      padding: 1.6rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+      transition: border-color 0.25s, box-shadow 0.25s, transform 0.2s;
+    }
+
+    .plugin-card:hover {
+      border-color: rgba(124,58,237,0.4);
+      box-shadow: 0 0 24px rgba(124,58,237,0.1);
+      transform: translateY(-2px);
+    }
+
+    .plugin-header {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .plugin-badge {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.2rem 0.6rem;
+      border-radius: 5px;
+      letter-spacing: 0.04em;
+    }
+
+    .badge-gherkin { background: rgba(74,222,128,0.12); color: #4ade80; border: 1px solid rgba(74,222,128,0.25); }
+    .badge-rest    { background: rgba(251,191,36,0.12);  color: #fbbf24; border: 1px solid rgba(251,191,36,0.25); }
+    .badge-db      { background: rgba(96,165,250,0.12);  color: #60a5fa; border: 1px solid rgba(96,165,250,0.25); }
+    .badge-custom  { background: rgba(167,139,250,0.12); color: #a78bfa; border: 1px solid rgba(167,139,250,0.25); }
+
+    .plugin-name {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--white);
+    }
+
+    .plugin-desc {
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .plugin-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.2rem;
+    }
+
+    .tag-chip {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      background: rgba(255,255,255,0.05);
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+
+    /* Config snippet inside plugin card */
+    .plugin-snippet {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      line-height: 1.7;
+      padding: 0.75rem 1rem;
+      background: rgba(0,0,0,0.35);
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      color: #94a3b8;
+      overflow-x: auto;
+    }
+
+    .plugin-snippet .sk  { color: #c084fc; }
+    .plugin-snippet .sv  { color: #86efac; }
+    .plugin-snippet .sc  { color: var(--cyan); }
+
+    /* ── Footer ───────────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 3rem 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+    }
+
+    .footer-logo { display: flex; align-items: center; gap: 0.6rem; }
+    .footer-logo svg, .footer-logo img { width: 100px; height: auto; }
+    .footer-tagline { font-size: 0.8rem; color: var(--muted); margin-top: 0.3rem; }
+
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+      font-size: 0.85rem;
+    }
+    .footer-links a { color: var(--muted); transition: color 0.2s; }
+    .footer-links a:hover { color: var(--cyan); }
+
+    .footer-copy {
+      font-size: 0.78rem;
+      color: #374151;
+      width: 100%;
+      text-align: center;
+      margin-top: 1.5rem;
+    }
+
+    /* ── Misc ─────────────────────────────────────────────────── */
+    .glow-line {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+      opacity: 0.4;
+      margin: 0;
+    }
+
+    /* ── Hero proof strip ────────────────────────────────────────── */
+    .hero-proof {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem 0.6rem;
+      margin-bottom: 2.8rem;
+    }
+    .proof-chip {
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0.02em;
+    }
+    .proof-sep {
+      color: var(--border);
+      font-size: 0.75rem;
+    }
+
+    /* Animated typing cursor */
+    .cursor {
+      display: inline-block;
+      width: 2px;
+      height: 1em;
+      background: var(--cyan);
+      vertical-align: text-bottom;
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* ── VS Code section ──────────────────────────────────────── */
+    #vscode {
+      padding: 7rem 2rem;
+    }
+
+    .vscode-layout {
+      display: flex;
+      flex-direction: column;
+      gap: 3rem;
+    }
+
+    .vscode-screenshot {
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow:
+        0 0 0 1px rgba(0,255,224,0.08),
+        0 24px 60px rgba(0,0,0,0.6),
+        0 0 80px rgba(0,255,224,0.06);
+      position: relative;
+    }
+
+    .vscode-screenshot img {
+      width: 100%;
+      display: block;
+    }
+
+    .vscode-screenshot::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 12px;
+      box-shadow: inset 0 0 0 1px rgba(0,255,224,0.12);
+      pointer-events: none;
+    }
+
+    .vscode-points {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.8rem 3rem;
+    }
+
+    @media (max-width: 700px) {
+      .vscode-points { grid-template-columns: 1fr; }
+    }
+
+    .vscode-point {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+
+    .vscode-point-icon {
+      flex-shrink: 0;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: rgba(0,255,224,0.07);
+      border: 1px solid rgba(0,255,224,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+
+    .vscode-point-text h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--white);
+      margin-bottom: 0.3rem;
+    }
+
+    .vscode-point-text p {
+      font-size: 0.875rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .vscode-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(0,255,224,0.06);
+      border: 1px solid rgba(0,255,224,0.2);
+      border-radius: 999px;
+      padding: 0.3rem 0.9rem;
+      font-size: 0.75rem;
+      color: var(--cyan);
+      font-family: var(--mono);
+      margin-bottom: 1.2rem;
+    }
+
+    /* ── Quick Start ─────────────────────────────────────────────── */
+    #quickstart { padding: 7rem 0; border-top: 1px solid var(--border); }
+
+    .qs-steps { display: flex; flex-direction: column; gap: 3rem; }
+
+    .qs-step {
+      display: grid;
+      grid-template-columns: 1fr 1.3fr;
+      gap: 3rem;
+      align-items: start;
+    }
+    @media (max-width: 800px) {
+      .qs-step { grid-template-columns: 1fr; }
+    }
+
+    .qs-step-info { display: flex; gap: 1.2rem; align-items: flex-start; }
+
+    .qs-num {
+      flex-shrink: 0;
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      background: rgba(0,255,224,0.08);
+      border: 1px solid rgba(0,255,224,0.3);
+      color: var(--cyan);
+      font-weight: 700; font-size: 0.85rem;
+      display: flex; align-items: center; justify-content: center;
+      margin-top: 0.15rem;
+    }
+
+    .qs-step-info h3 { font-size: 1.05rem; font-weight: 700; color: var(--white); margin-bottom: 0.5rem; }
+    .qs-step-info p  { font-size: 0.9rem; color: var(--muted); line-height: 1.65; }
+    .qs-step-info code {
+      font-family: var(--mono); font-size: 0.82em;
+      color: var(--cyan); background: rgba(0,255,224,0.08);
+      padding: 0.1em 0.4em; border-radius: 4px;
+    }
+
+    /* Scroll fade-in */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: none;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NDFJJ357"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<canvas id="particles-bg"></canvas>
+
+<!-- ── Nav ──────────────────────────────────────────────────────── -->
+<nav>
+  <a href="#" class="nav-logo" aria-label="Azertio home">
+    <img src="logo.svg" alt="Azertio" />
+  </a>
+  <nav class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#example">DSL</a>
+    <a href="#plugins">Plugins</a>
+    <a href="#quickstart">Quick Start</a>
+    <a href="#vscode">VS Code</a>
+    <a href="#comparisons">Comparisons</a>
+    <a href="https://github.com/org-azertio/azertio" class="btn-nav" target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+      GitHub
+    </a>
+  </nav>
+</nav>
+
+<!-- ── Hero ─────────────────────────────────────────────────────── -->
+<section id="hero">
+  <div class="hero-logo">
+    <img src="logo.svg" alt="Azertio" />
+  </div>
+
+  <div class="hero-badge">
+    <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="#00ffe0"/></svg>
+    Open Source &nbsp;<span>· MIT License · alpha</span>
+  </div>
+
+  <h1>
+    Black-Box Testing<br>
+    <span class="accent-cyan">without</span> the boilerplate
+  </h1>
+
+  <p class="hero-sub">
+    Write expressive Gherkin tests against REST APIs, databases, and any
+    backend — no glue code, no framework lock-in, no matter what your
+    application is built with.
+  </p>
+
+  <div class="hero-proof">
+    <span class="proof-chip">REST APIs</span>
+    <span class="proof-sep">·</span>
+    <span class="proof-chip">SQL Databases</span>
+    <span class="proof-sep">·</span>
+    <span class="proof-chip">Gherkin DSL</span>
+    <span class="proof-sep">·</span>
+    <span class="proof-chip">5 official plugins</span>
+    <span class="proof-sep">·</span>
+    <span class="proof-chip">VS Code extension</span>
+  </div>
+
+  <div class="hero-cta">
+    <a href="#quickstart" class="btn-primary">
+      Get Started &darr;
+    </a>
+    <a href="https://github.com/org-azertio/azertio" class="btn-secondary" target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+      View on GitHub
+    </a>
+  </div>
+
+  <!-- Terminal -->
+  <div class="terminal reveal">
+    <div class="terminal-bar">
+      <div class="dot dot-r"></div>
+      <div class="dot dot-y"></div>
+      <div class="dot dot-g"></div>
+      <span class="terminal-title">azertio — exec</span>
+    </div>
+    <div class="terminal-body">
+      <div><span class="t-prompt">❯</span> <span class="t-cmd">azertio exec --suite "REST API"</span></div>
+      <div class="t-info">  Building test plan…</div>
+      <div class="t-info">  Installing plugins: gherkin, rest</div>
+      <div class="t-dim">  ────────────────────────────────────</div>
+      <div><span class="t-pass">  ✔</span> <span class="t-cmd">GET /posts returns 200</span> <span class="t-dim">42ms</span></div>
+      <div><span class="t-pass">  ✔</span> <span class="t-cmd">GET /users has 10 results</span> <span class="t-dim">38ms</span></div>
+      <div><span class="t-pass">  ✔</span> <span class="t-cmd">POST /posts creates a resource</span> <span class="t-dim">61ms</span></div>
+      <div><span class="t-fail">  ✗</span> <span class="t-cmd">DELETE /posts/1 returns 204</span> <span class="t-dim">29ms</span></div>
+      <div class="t-dim">  ────────────────────────────────────</div>
+      <div><span class="t-pass">  3 passed</span>  <span class="t-fail">1 failed</span>  <span class="t-dim">in 2.1s</span> <span class="cursor"></span></div>
+    </div>
+  </div>
+</section>
+
+<div class="glow-line"></div>
+
+<!-- ── Quick Start ──────────────────────────────────────────────── -->
+<section id="quickstart">
+  <div class="container">
+    <div class="features-head reveal">
+      <span class="section-label">Quick Start</span>
+      <h2>Up and running in minutes</h2>
+      <p class="section-intro">No framework to integrate, no agent to configure. Download, point at your app, run.</p>
+    </div>
+
+    <div class="qs-steps">
+
+      <div class="qs-step reveal">
+        <div class="qs-step-info">
+          <div class="qs-num">1</div>
+          <div>
+            <h3>Download &amp; install</h3>
+            <p>Download the distribution ZIP, unzip it anywhere and add the <code>bin/</code> directory to your PATH.</p>
+            <a href="https://github.com/org-azertio/azertio/releases/download/v1.0.0-alpha1/azertio-cli-1.0.0-alpha1-dist.zip"
+               class="btn-primary" style="display:inline-flex;margin-top:0.5rem;font-size:0.875rem;padding:0.6rem 1.4rem">
+              Download v1.0.0-alpha1
+            </a>
+          </div>
+        </div>
+        <div class="code-window">
+          <div class="code-bar">
+            <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+            <span class="code-filename">shell</span>
+          </div>
+          <pre><span class="t-prompt">$</span> unzip azertio-cli-1.0.0-alpha1-dist.zip
+<span class="t-prompt">$</span> export PATH=<span class="str">"$PATH:$(pwd)/azertio-cli-1.0.0-alpha1/bin"</span>
+<span class="t-prompt">$</span> azertio version
+<span class="t-pass">azertio 1.0.0-alpha1</span></pre>
+        </div>
+      </div>
+
+      <div class="qs-step reveal">
+        <div class="qs-step-info">
+          <div class="qs-num">2</div>
+          <div>
+            <h3>Configure</h3>
+            <p>Create an <code>azertio.yaml</code> in your project root. Declare the plugins you need — Azertio fetches them at startup.</p>
+          </div>
+        </div>
+        <div class="code-window">
+          <div class="code-bar">
+            <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+            <span class="code-filename">azertio.yaml</span>
+          </div>
+          <pre><span class="kw">plugins</span>:
+  - <span class="str">gherkin</span>
+  - <span class="str">rest</span>
+
+<span class="kw">configuration</span>:
+  <span class="kw">rest</span>:
+    <span class="kw">baseURL</span>: <span class="str">'https://api.example.com'</span></pre>
+        </div>
+      </div>
+
+      <div class="qs-step reveal">
+        <div class="qs-step-info">
+          <div class="qs-num">3</div>
+          <div>
+            <h3>Write a test</h3>
+            <p>Create a <code>.feature</code> file. Plain language, no glue code — each step is resolved by the active plugins.</p>
+          </div>
+        </div>
+        <div class="code-window">
+          <div class="code-bar">
+            <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+            <span class="code-filename">tests/my-api.feature</span>
+          </div>
+          <pre><span class="kw">Feature:</span> <span class="str">User API</span>
+
+  <span class="kw">Scenario:</span> <span class="str">List users returns 200</span>
+    <span class="kw">When</span> I make a GET request to <span class="str">"users"</span>
+    <span class="kw">Then</span> the HTTP status code is equal to <span class="num">200</span>
+    <span class="kw">And</span> the response body contains:
+      <span class="str">"""json
+      [{"id": 1}]
+      """</span></pre>
+        </div>
+      </div>
+
+      <div class="qs-step reveal">
+        <div class="qs-step-info">
+          <div class="qs-num">4</div>
+          <div>
+            <h3>Run</h3>
+            <p>Execute from the terminal. Azertio resolves plugins, builds the test plan and runs it.</p>
+            <a href="docs/getting-started/" class="btn-secondary" style="display:inline-flex;margin-top:0.8rem;font-size:0.875rem;padding:0.6rem 1.4rem">
+              Full documentation →
+            </a>
+          </div>
+        </div>
+        <div class="code-window">
+          <div class="code-bar">
+            <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+            <span class="terminal-title">azertio — exec</span>
+          </div>
+          <div class="terminal-body" style="padding:1.2rem 1.4rem">
+            <div><span class="t-prompt">❯</span> <span class="t-cmd">azertio exec</span></div>
+            <div class="t-info">  Resolving plugins…</div>
+            <div class="t-info">  Installing: gherkin, rest</div>
+            <div class="t-dim">  ──────────────────────────────</div>
+            <div><span class="t-pass">  ✔</span> <span class="t-cmd">List users returns 200</span> <span class="t-dim">38ms</span></div>
+            <div class="t-dim">  ──────────────────────────────</div>
+            <div><span class="t-pass">  1 passed</span> <span class="t-dim">in 0.8s</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="glow-line"></div>
+
+<!-- ── Features ─────────────────────────────────────────────────── -->
+<section id="features">
+  <div class="container">
+    <div class="features-head reveal">
+      <span class="section-label">Why Azertio</span>
+      <h2>Everything you need to test, nothing you don't</h2>
+      <p class="section-intro">
+        A lightweight runtime with a powerful extension model. Bring your own
+        plugins, connect any backend, run anywhere.
+      </p>
+    </div>
+
+    <div class="features-grid">
+
+      <div class="feature-card reveal">
+        <div class="feature-icon">🧩</div>
+        <h3>Plugin architecture</h3>
+        <p>Every capability — REST, database, Gherkin parsing — is a first-class plugin resolved from Maven at runtime. No classpath wrestling.</p>
+      </div>
+
+      <div class="feature-card reveal">
+        <div class="feature-icon">📝</div>
+        <h3>Human-readable DSL</h3>
+        <p>Tests are plain feature files written in a domain-specific language. Non-technical stakeholders can read and review them directly.</p>
+      </div>
+
+      <div class="feature-card reveal">
+        <div class="feature-icon">🔌</div>
+        <h3>Any JDBC database</h3>
+        <p>Connect to MySQL, PostgreSQL, SQLite, H2, DuckDB or any JDBC driver — just add it as a runtime dependency in <code style="font-family:var(--mono);color:var(--cyan);font-size:0.85em">azertio.yaml</code>.</p>
+      </div>
+
+      <div class="feature-card reveal">
+        <div class="feature-icon">🌐</div>
+        <h3>REST API testing</h3>
+        <p>First-class steps for HTTP requests, response assertion, JSON path extraction, and header validation. No glue code required.</p>
+      </div>
+
+      <div class="feature-card reveal">
+        <div class="feature-icon">⏱</div>
+        <h3>Benchmarks built-in</h3>
+        <p>Any step can be turned into a load benchmark with configurable concurrency and iteration count. Statistics are attached to the execution report.</p>
+      </div>
+
+      <div class="feature-card reveal">
+        <div class="feature-icon">🖥</div>
+        <h3>VS Code integration</h3>
+        <p>Browse plans, inspect execution trees, view attachments and re-run past executions — all from the editor, via a JSON-RPC language server.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── DSL Example ───────────────────────────────────────────────── -->
+<section id="example">
+  <div class="container">
+    <div class="example-layout">
+
+      <div class="code-window reveal">
+        <div class="code-bar">
+          <div class="dot dot-r"></div>
+          <div class="dot dot-y"></div>
+          <div class="dot dot-g"></div>
+          <span class="code-filename">sample.feature</span>
+        </div>
+        <pre><span class="cmt"># language: en</span>
+<span class="kw">Feature:</span> <span class="str">JSONPlaceholder Posts API</span>
+
+  <span class="tag">@ID-1 @GET</span>
+  <span class="kw">Scenario:</span> <span class="str">List all posts</span>
+    <span class="kw">When</span> I make a GET request to <span class="str">"posts"</span>
+    <span class="kw">Then</span> the HTTP status code is equal to <span class="num">200</span>
+    <span class="kw">And</span> the response body contains:
+      <span class="str">"""json
+      [{"userId": 1, "id": 1}]
+      """</span>
+
+  <span class="tag">@ID-10 @POST @GET</span>
+  <span class="kw">Scenario:</span> <span class="str">Create a post and get it after</span>
+    <span class="kw">When</span> I make a POST request to <span class="str">"posts"</span> with body:
+      <span class="str">"""json
+      {
+        "title": "My new post",
+        "body": "Content of my new post.",
+        "userId": 1
+      }
+      """</span>
+    <span class="kw">Then</span> the HTTP status code is equal to <span class="num">201</span>
+    <span class="kw">And</span> I store the value of field <span class="str">'id'</span> from the response body into variable id
+    <span class="kw">When</span> I make a GET request to <span class="str">'posts/${id}'</span>
+    <span class="kw">Then</span> the HTTP status code is <span class="num">200</span>
+
+  <span class="tag">@ID-11 @GET</span>
+  <span class="kw">Scenario:</span> <span class="str">Measure response time</span>
+    <span class="kw">Given</span> benchmark mode is enabled with <span class="num">200</span> executions and <span class="num">10</span> threads
+    <span class="kw">When</span> I make a GET request to <span class="str">"posts/1"</span>
+    <span class="kw">Then</span> the benchmark P95 response time (ms) is greater than <span class="num">2</span></pre>
+      </div>
+
+      <div class="reveal">
+        <span class="section-label">The DSL</span>
+        <h2>Tests as close to English as it gets</h2>
+        <p style="color:var(--muted);margin-bottom:2rem;line-height:1.7">
+          Write scenarios in plain language. Azertio matches each line to a
+          step implementation at runtime — zero boilerplate, zero glue code.
+        </p>
+        <ul class="example-points">
+          <li>
+            <div class="point-icon">🏷</div>
+            <div class="point-text">
+              <h4>Tag-based filtering</h4>
+              <p>Run any subset of tests with boolean tag expressions: <code style="font-family:var(--mono);color:var(--cyan);font-size:0.82em">GET and not slow</code></p>
+            </div>
+          </li>
+          <li>
+            <div class="point-icon">🔄</div>
+            <div class="point-text">
+              <h4>Shared Background steps</h4>
+              <p>Set up context once per feature with <code style="font-family:var(--mono);color:var(--cyan);font-size:0.82em">Background</code> — no test setup duplication.</p>
+            </div>
+          </li>
+          <li>
+            <div class="point-icon">💾</div>
+            <div class="point-text">
+              <h4>Variables between steps</h4>
+              <p>Store values from one step and inject them into the next using <code style="font-family:var(--mono);color:var(--cyan);font-size:0.82em">${'{'}name{'}'}</code> interpolation.</p>
+            </div>
+          </li>
+          <li>
+            <div class="point-icon">🌍</div>
+            <div class="point-text">
+              <h4>Multilingual</h4>
+              <p>Steps can be written in English, Spanish, or a compact DSL alias — all from the same plugin.</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── Plugins ───────────────────────────────────────────────────── -->
+<section id="plugins">
+  <div class="container">
+    <div class="plugins-head reveal">
+      <div>
+        <span class="section-label">Plugins</span>
+        <h2>Install only what you need</h2>
+      </div>
+      <p class="plugin-note">Declare in <code>azertio.yaml</code> → resolved from Maven at runtime</p>
+    </div>
+
+    <div class="plugins-grid">
+
+      <div class="plugin-card reveal">
+        <div class="plugin-header">
+          <span class="plugin-badge badge-gherkin">gherkin</span>
+          <span class="plugin-name">Gherkin Parser</span>
+        </div>
+        <p class="plugin-desc">
+          Loads <code style="font-family:var(--mono);color:#4ade80;font-size:0.82em">.feature</code> files and assembles a structured test plan. Supports Gherkin syntax and the compact DSL dialect.
+        </p>
+        <div class="plugin-tags">
+          <span class="tag-chip">Feature files</span>
+          <span class="tag-chip">Scenarios</span>
+          <span class="tag-chip">Background</span>
+          <span class="tag-chip">Tags</span>
+        </div>
+        <div class="plugin-snippet">
+<span class="sk">plugins</span>:
+  - <span class="sv">gherkin</span></div>
+      </div>
+
+      <div class="plugin-card reveal">
+        <div class="plugin-header">
+          <span class="plugin-badge badge-rest">rest</span>
+          <span class="plugin-name">REST API</span>
+        </div>
+        <p class="plugin-desc">
+          Steps for HTTP requests (GET, POST, PUT, DELETE), response assertions, JSON path extraction and header checks. Zero boilerplate.
+        </p>
+        <div class="plugin-tags">
+          <span class="tag-chip">HTTP verbs</span>
+          <span class="tag-chip">JSON path</span>
+          <span class="tag-chip">Status codes</span>
+          <span class="tag-chip">Headers</span>
+        </div>
+        <div class="plugin-snippet">
+<span class="sk">plugins</span>:
+  - <span class="sv">rest</span>
+<span class="sk">configuration</span>:
+  <span class="sc">rest</span>:
+    <span class="sc">baseURL</span>: <span class="sv">'https://api.example.com'</span></div>
+      </div>
+
+      <div class="plugin-card reveal">
+        <div class="plugin-header">
+          <span class="plugin-badge badge-db">db</span>
+          <span class="plugin-name">Database</span>
+        </div>
+        <p class="plugin-desc">
+          Execute SQL queries, assert row counts and table contents against any
+          JDBC datasource. Bring your own driver as a runtime dependency.
+        </p>
+        <div class="plugin-tags">
+          <span class="tag-chip">SQL queries</span>
+          <span class="tag-chip">Count assertions</span>
+          <span class="tag-chip">Any JDBC</span>
+          <span class="tag-chip">Multiple DSes</span>
+        </div>
+        <div class="plugin-snippet">
+<span class="sk">plugins</span>:
+  - <span class="sv">"db with com.mysql:mysql-connector-j"</span></div>
+      </div>
+
+      <div class="plugin-card reveal">
+        <div class="plugin-header">
+          <span class="plugin-badge badge-custom">custom</span>
+          <span class="plugin-name">Build your own</span>
+        </div>
+        <p class="plugin-desc">
+          Implement <code style="font-family:var(--mono);color:#a78bfa;font-size:0.82em">StepProvider</code> and publish to Maven. Azertio resolves and loads it at startup — no forks, no rebuilds.
+        </p>
+        <div class="plugin-tags">
+          <span class="tag-chip">Java SPI</span>
+          <span class="tag-chip">Maven artifact</span>
+          <span class="tag-chip">Hot-install</span>
+        </div>
+        <div class="plugin-snippet">
+<span class="sk">plugins</span>:
+  - <span class="sv">"com.example:my-plugin:1.0"</span></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── VS Code ───────────────────────────────────────────────────── -->
+<section id="vscode">
+  <div class="container">
+    <div class="vscode-layout">
+
+      <div class="vscode-screenshot reveal">
+        <a href="images/screenshot1.png" target="_blank" rel="noopener">
+          <picture>
+            <source srcset="images/screenshot1.webp" type="image/webp" />
+            <img src="images/screenshot1.png" alt="Azertio VS Code extension showing execution results" style="cursor:zoom-in" loading="lazy" />
+          </picture>
+        </a>
+      </div>
+
+      <div class="reveal" style="text-align:center">
+        <div class="vscode-badge" style="justify-content:center">
+          <svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="5" fill="#00ffe0"/></svg>
+          VS Code Extension
+        </div>
+        <span class="section-label">IDE Integration</span>
+        <h2>Run and inspect tests without leaving the editor</h2>
+        <p style="color:var(--muted);margin-top:1rem;line-height:1.7;max-width:640px;margin-inline:auto">
+          The Azertio extension connects to a local JSON-RPC server and gives
+          you a full testing workflow inside VS Code — no terminal juggling required.
+        </p>
+        <div style="display:flex;gap:0.8rem;flex-wrap:wrap;justify-content:center;margin-top:1.8rem">
+          <a href="vscode:extension/azertio.azertio" class="btn-primary" style="font-size:0.88rem;padding:0.7rem 1.5rem">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M23.15 2.587L18.21.21a1.494 1.494 0 0 0-1.705.29l-9.46 8.63-4.12-3.128a.999.999 0 0 0-1.276.057L.327 7.261A1 1 0 0 0 .326 8.74L3.899 12 .326 15.26a1 1 0 0 0 .001 1.479L1.65 17.94a.999.999 0 0 0 1.276.057l4.12-3.128 9.46 8.63a1.492 1.492 0 0 0 1.704.29l4.942-2.377A1.5 1.5 0 0 0 24 19.851V4.149a1.5 1.5 0 0 0-.85-1.562zM18 14.333L11.37 12 18 9.667v4.666z"/></svg>
+            Install in VS Code
+          </a>
+          <a href="https://marketplace.visualstudio.com/items?itemName=azertio.azertio" target="_blank" rel="noopener" class="btn-secondary" style="font-size:0.88rem;padding:0.7rem 1.5rem">
+            View on Marketplace
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="vscode-points reveal">
+        <div class="vscode-point">
+          <div class="vscode-point-icon">📋</div>
+          <div class="vscode-point-text">
+            <h4>Execution history</h4>
+            <p>Browse every past run with its date, duration and overall result. Each execution is stored locally and always available to review.</p>
+          </div>
+        </div>
+
+        <div class="vscode-point">
+          <div class="vscode-point-icon">🌲</div>
+          <div class="vscode-point-text">
+            <h4>Full result tree</h4>
+            <p>Drill down from test plan → suite → scenario → step. Each node shows its individual pass/fail status and execution time.</p>
+          </div>
+        </div>
+
+        <div class="vscode-point">
+          <div class="vscode-point-icon">📎</div>
+          <div class="vscode-point-text">
+            <h4>Attachments inline</h4>
+            <p>Steps that produce data — CSV query results, JSON responses — are saved as attachments and opened directly from the result tree.</p>
+          </div>
+        </div>
+
+        <div class="vscode-point">
+          <div class="vscode-point-icon">🔁</div>
+          <div class="vscode-point-text">
+            <h4>One-click re-run</h4>
+            <p>Re-execute any past run against its original test plan and profile with a single button — no need to reconfigure anything.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── Comparisons ──────────────────────────────────────────────── -->
+<section id="comparisons">
+  <div class="container">
+    <div class="features-head reveal">
+      <span class="section-label">Comparisons</span>
+      <h2>How does Azertio stack up?</h2>
+      <p class="section-intro">
+        Honest, detailed comparisons against the most popular Java API testing tools.
+      </p>
+    </div>
+
+    <div class="features-grid">
+
+      <a href="docs/comparison-karate/" class="feature-card reveal" style="text-decoration:none;cursor:pointer">
+        <div class="feature-icon">🥋</div>
+        <h3>Azertio vs Karate</h3>
+        <p>Both use <code style="font-family:var(--mono);color:var(--cyan);font-size:0.85em">.feature</code> files and support REST + DB testing, but differ in architecture, philosophy, and extensibility.</p>
+        <span style="font-size:0.8rem;color:var(--cyan);margin-top:0.5rem;display:inline-block">Read comparison →</span>
+      </a>
+
+      <a href="docs/comparison-cucumber-restassured/" class="feature-card reveal" style="text-decoration:none;cursor:pointer">
+        <div class="feature-icon">🥒</div>
+        <h3>Azertio vs Cucumber + RestAssured</h3>
+        <p>The most common Java BDD stack. Powerful but ceremonious — see where each approach shines and where the boilerplate adds up.</p>
+        <span style="font-size:0.8rem;color:var(--cyan);margin-top:0.5rem;display:inline-block">Read comparison →</span>
+      </a>
+
+      <a href="docs/comparison-postman-newman/" class="feature-card reveal" style="text-decoration:none;cursor:pointer">
+        <div class="feature-icon">📮</div>
+        <h3>Azertio vs Postman / Newman</h3>
+        <p>The most widely used API tool. Great for exploration, but version-controlled automated testing is a different game.</p>
+        <span style="font-size:0.8rem;color:var(--cyan);margin-top:0.5rem;display:inline-block">Read comparison →</span>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── Footer ───────────────────────────────────────────────────── -->
+<div class="glow-line"></div>
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-logo">
+        <img src="logo.svg" alt="Azertio" />
+        <div>
+          <div class="footer-tagline">Open Black-Box Testing · MIT License</div>
+        </div>
+      </div>
+
+      <nav class="footer-links">
+        <a href="https://github.com/org-azertio/azertio" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://github.com/org-azertio/azertio/issues" target="_blank" rel="noopener">Issues</a>
+        <a href="https://github.com/org-azertio/azertio/blob/main/LICENSE" target="_blank" rel="noopener">License</a>
+      </nav>
+    </div>
+    <p class="footer-copy">© 2025 Azertio contributors. Released under the MIT License.</p>
+  </div>
+</footer>
+
+<script>
+  // Scroll reveal
+  const observer = new IntersectionObserver(
+    entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
+    { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+  );
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Particles
+  (function () {
+    const canvas = document.getElementById('particles-bg');
+    const ctx = canvas.getContext('2d');
+    const COLORS = ['#00ffe0', '#7c3aed', '#f72585'];
+    const COUNT  = 72;
+    const LINK   = 140;   // max distance to draw a line
+    const SPEED  = 0.35;
+
+    let W, H, particles;
+
+    function resize() {
+      W = canvas.width  = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+    }
+
+    function rand(min, max) { return Math.random() * (max - min) + min; }
+
+    function make() {
+      return {
+        x:  rand(0, W),
+        y:  rand(0, H),
+        vx: rand(-SPEED, SPEED),
+        vy: rand(-SPEED, SPEED),
+        r:  rand(1.2, 2.4),
+        color: COLORS[Math.floor(Math.random() * COLORS.length)]
+      };
+    }
+
+    function init() {
+      resize();
+      particles = Array.from({ length: COUNT }, make);
+    }
+
+    function tick() {
+      ctx.clearRect(0, 0, W, H);
+
+      for (const p of particles) {
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.x < 0) p.x = W;
+        if (p.x > W) p.x = 0;
+        if (p.y < 0) p.y = H;
+        if (p.y > H) p.y = 0;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = 0.7;
+        ctx.fill();
+      }
+
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const a = particles[i], b = particles[j];
+          const dx = a.x - b.x, dy = a.y - b.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < LINK) {
+            ctx.beginPath();
+            ctx.moveTo(a.x, a.y);
+            ctx.lineTo(b.x, b.y);
+            ctx.strokeStyle = a.color;
+            ctx.globalAlpha = (1 - dist / LINK) * 0.18;
+            ctx.lineWidth = 0.8;
+            ctx.stroke();
+          }
+        }
+      }
+
+      ctx.globalAlpha = 1;
+      requestAnimationFrame(tick);
+    }
+
+    window.addEventListener('resize', () => { resize(); });
+    init();
+    tick();
+  })();
+</script>
+</body>
+</html>

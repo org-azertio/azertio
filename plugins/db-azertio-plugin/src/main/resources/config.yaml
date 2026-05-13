@@ -1,0 +1,56 @@
+db.maxAssertRows:
+  description: |
+    Maximum number of rows from the expected data table that will be evaluated
+    when asserting table contents. Defaults to 100.
+  type: integer
+  defaultValue: '100'
+
+db.nullValue:
+  description: |
+    The string value that will be interpreted as SQL NULL when loading data from tables,
+    CSV files or Excel files. Cells matching this value will be inserted as NULL.
+  type: text
+  defaultValue: ''
+
+db.datasources:
+  description: |
+    Map of named datasource configurations. Each key is the datasource alias used in
+    test steps to identify the target database connection.
+  type: map
+  entries:
+    url:
+      description: The JDBC connection URL for the datasource.
+      type: text
+      required: true
+    username:
+      description: The username used to authenticate against the database.
+      type: text
+      required: true
+    password:
+      description: The password used to authenticate against the database.
+      type: text
+      required: true
+    driver:
+      description: The fully qualified class name of the JDBC driver.
+      type: text
+      required: true
+    dialect:
+      description: |
+        The SQL dialect for the datasource (e.g. POSTGRES, MYSQL, H2, ORACLE,
+        SQLSERVER). Must match a value of org.jooq.SQLDialect.
+      type: text
+      required: true
+    schema:
+      description: The default schema to use for the datasource. Optional.
+      type: text
+    catalog:
+      description: The default catalog to use for the datasource. Optional.
+      type: text
+    quoteIdentifiers:
+      description: |
+        Whether SQL identifiers (table names, column names) should be quoted in
+        generated queries. Set to false for databases that normalize unquoted
+        identifiers to uppercase (e.g. HSQLDB) or that do not require quoting
+        (e.g. SQLite). Defaults to true.
+      type: boolean
+      defaultValue: 'true'

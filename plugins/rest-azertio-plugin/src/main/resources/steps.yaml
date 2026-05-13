@@ -1,0 +1,149 @@
+'rest.request.GET':
+  role: when
+  description: |
+    Makes a GET request to the specified URL.
+  parameters:
+    - name: endpoint
+      type: text
+      description: The URL to which the GET request is made
+
+
+'rest.request.POST.empty':
+  role: when
+  description: |
+    Makes a POST request to the specified URL with an empty body.
+  parameters:
+    - name: endpoint
+      type: text
+      description: The URL to which the POST request is made
+
+
+'rest.request.POST.body':
+  role: when
+  description: |
+    Makes a POST request to the specified URL with the given body.
+  parameters:
+    - name: endpoint
+      type: text
+      description: The URL to which the POST request is made
+  additional-data: |
+    The body of the POST request, provided as a multi-line text input.
+
+
+'rest.request.POST.file':
+  role: when
+  description: |
+    Makes a POST request to the specified URL with the given body read from a file.
+  parameters:
+    - name: endpoint
+      type: text
+      description: The URL to which the POST request is made
+    - name: file
+      type: text
+      description: The path to the file containing the body of the POST request
+
+
+'rest.request.PUT.body':
+  role: when
+  description: |
+    Makes a PUT request to the specified URL with the given body.
+  parameters:
+    - name: endpoint
+      type: text
+      description: The URL to which the PUT request is made
+  additional-data: |
+    The body of the PUT request, provided as a multi-line text input.
+
+
+'rest.request.PUT.file':
+  role: when
+  description: |
+    Makes a PUT request to the specified URL with the given body read from a file.
+  parameters:
+    - name: endpoint
+      type: text
+      description: The URL to which the PUT request is made
+    - name: file
+      type: text
+      description: The path to the file containing the body of the PUT request
+
+
+'rest.request.PATCH.body':
+  role: when
+  description: |
+    Makes a PATCH request to the specified URL with the given body.
+  parameters:
+    - name: endpoint
+      type: text
+      description: The URL to which the PATCH request is made
+  additional-data: |
+    The body of the PATCH request, provided as a multi-line text input.
+
+
+'rest.request.PATCH.file':
+  role: when
+  description: |
+    Makes a PATCH request to the specified URL with the given body read from a file.
+  parameters:
+    - name: endpoint
+      type: text
+      description: The URL to which the PATCH request is made
+    - name: file
+      type: text
+      description: The path to the file containing the body of the PATCH request
+
+
+'rest.request.DELETE':
+  role: when
+  description: |
+    Makes a DELETE request to the specified URL.
+  parameters:
+    - name: endpoint
+      type: text
+      description: The URL to which the DELETE request is made
+
+
+'rest.response.statusCode':
+  role: then
+  description: |
+    Asserts that the status code of the last REST response matches the expected value.
+
+
+'rest.response.body':
+  role: then
+  description: |
+    Asserts that the body of the last REST response matches exactly the expected value.
+  additional-data: |
+    The expected body of the response, provided as a multi-line text input.
+
+
+'rest.response.body.file':
+  role: then
+  description: |
+    Asserts that the body of the last REST response matches exactly the expected value read from a file.
+  parameters:
+    - name: file
+      type: text
+      description: The path to the file containing the expected body of the response
+
+
+'rest.response.body.contains':
+  role: then
+  description: |
+    Asserts that the body of the last REST response contains the expected value.
+  additional-data: |
+    The expected content that should be present in the response body, provided as a multi-line text input.
+
+
+'rest.response.extracts.field':
+  role: then
+  description: |
+    Stores the value of a field from the response body into a variable for later use in the test scenario.
+  parameters:
+    - name: field
+      type: text
+      description: The path of the field in the response body whose value should be stored
+    - name: variable
+      type: id
+      description: The name of the variable where the value will be stored
+

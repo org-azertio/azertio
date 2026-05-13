@@ -1,0 +1,174 @@
+'db.define.alias':
+  expression: 'uso el origen de datos {alias:text}'
+  example: |
+    Dado que uso el origen de datos "main"
+  scenarios:
+    - title: Seleccionar un origen de datos antes de operar
+      gherkin: |
+        Dado que uso el origen de datos "main"
+        Entonces el número de filas de la tabla users es igual a 3:
+  
+
+
+'db.teardown.execute':
+  expression: 'al finalizar se ejecutará en el origen de datos {alias:text} la sentencia SQL:'
+  example: |
+    Dado que al finalizar se ejecutará en el origen de datos "main" la sentencia SQL:
+      """sql
+      DELETE FROM users WHERE status = 'active'
+      """
+  scenarios:
+    - title: Registrar una sentencia de limpieza para ejecutar al finalizar el escenario
+      gherkin: |
+        Dado que al finalizar se ejecutará en el origen de datos "main" la sentencia SQL:
+          """sql
+          DELETE FROM users WHERE status = 'active'
+          """
+
+
+'db.execute.query':
+  expression: 'ejecuto la sentencia SQL:'
+  example: |
+    Dado que ejecuto la sentencia SQL:
+      """sql
+      SELECT * FROM users WHERE status = 'active'
+      """
+  scenarios:
+    - title: Ejecutar una SELECT y verificar el resultado en pasos posteriores
+      gherkin: |
+        Dado que uso el origen de datos "main"
+        Y ejecuto la sentencia SQL:
+          """sql
+          SELECT id, nombre FROM users WHERE status = 'active'
+          """
+        Entonces el número de filas de la respuesta SQL es mayor que 0
+
+
+'db.store.query.result':
+  expression: 'guardo el resultado de la consulta SQL en la variable {variable:text}'
+  example: |
+    Entonces guardo el resultado de la consulta SQL en la variable "nombre"
+  scenarios:
+    - title: Guardar el primer campo del resultado de una SELECT en una variable
+      gherkin: |
+        Dado que uso el origen de datos "main"
+        Y ejecuto la sentencia SQL:
+          """sql
+          SELECT nombre FROM users WHERE status = 'active'
+          """
+        Entonces guardo el resultado de la consulta SQL en la variable "nombre"
+
+
+'db.assert.query.count':
+  expression: 'el número de filas de la respuesta SQL {{integer-assertion}}'
+  assertion-hints:
+    - 'es igual a 0'
+    - 'es igual a 1'
+    - 'es mayor que 0'
+    - 'no es igual a 0'
+  example: |
+    Entonces el número de filas de la respuesta SQL es mayor que 0
+  scenarios:
+    - title: Verificar el número de filas devueltas por la última consulta SQL
+      gherkin: |
+        Dado que uso el origen de datos "main"
+        Y ejecuto la sentencia SQL:
+          """sql
+          SELECT * FROM users WHERE status = 'active'
+          """
+        Entonces el número de filas de la respuesta SQL es mayor que 0
+
+
+'db.assert.count':
+  expression: 'el número de filas de la tabla {table:word} {{integer-assertion}}'
+  assertion-hints:
+    - 'es igual a 0'
+    - 'es igual a 1'
+    - 'es mayor que 0'
+    - 'no es igual a 0'
+  example: |
+    Entonces el número de filas de la tabla users es igual a 3
+  scenarios:
+    - title: Verificar que la tabla está vacía tras un borrado
+      gherkin: |
+        Dado que uso el origen de datos "main"
+        Entonces el número de filas de la tabla users es igual a 0
+    - title: Verificar que existe al menos una fila
+      gherkin: |
+        Dado que uso el origen de datos "main"
+        Entonces el número de filas de la tabla users es mayor que 0
+
+
+'db.assert.table.contains':
+  expression: 'la tabla {table:word} contiene las filas:'
+  example: |
+    Entonces la tabla users contiene las filas:
+      | id | nombre |
+      | 1  | Alice  |
+  scenarios:
+    - title: Verificar el contenido exacto de la tabla
+      gherkin: |
+        Dado que uso el origen de datos "main"
+        Entonces la tabla users contiene las filas:
+          | id | nombre |
+          | 1  | Alice  |
+    - title: Verificar contenido con valores nulos
+      gherkin: |
+        Dado que uso el origen de datos "main"
+        Entonces la tabla users contiene las filas:
+          | id | nombre |
+          | 2  | <null> |
+
+
+'db.assert.table.is':
+  expression: 'la tabla {table:word} es exactamente:'
+  example: |
+    Entonces la tabla users es exactamente:
+      | id | nombre |
+      | 1  | Alice  |
+  scenarios:
+    - title: Verificar que la tabla contiene exactamente estas filas
+      gherkin: |
+        Dado que uso el origen de datos "main"
+        Entonces la tabla users es exactamente:
+          | id | nombre |
+          | 1  | Alice  |
+    - title: Verificar que la tabla tiene exactamente una fila con valor nulo
+      gherkin: |
+        Dado que uso el origen de datos "main"
+        Entonces la tabla users es exactamente:
+          | id | nombre |
+          | 2  | <null> |
+
+
+'db.assert.table.contains.csv':
+  expression: 'la tabla {table:word} contiene el fichero CSV {file:file}'
+  example: |
+    Entonces la tabla users contiene el fichero CSV "expected/users.csv"
+  scenarios:
+    - title: Verificar que la tabla contiene las filas de un fichero CSV
+      gherkin: |
+        Dado que uso el origen de datos "main"
+        Entonces la tabla users contiene el fichero CSV "expected/users.csv"
+
+
+'db.assert.table.is.csv':
+  expression: 'la tabla {table:word} es exactamente el fichero CSV {file:file}'
+  example: |
+    Entonces la tabla users es exactamente el fichero CSV "expected/users.csv"
+  scenarios:
+    - title: Verificar que la tabla coincide exactamente con un fichero CSV
+      gherkin: |
+        Dado que uso el origen de datos "main"
+        Entonces la tabla users es exactamente el fichero CSV "expected/users.csv"
+
+
+'db.assert.contains.xls':
+  expression: 'la base de datos contiene las filas del fichero Excel {file:file}'
+  example: |
+    Entonces la base de datos contiene las filas del fichero Excel "expected/data.xlsx"
+  scenarios:
+    - title: Verificar que varias tablas contienen las filas de un fichero Excel
+      gherkin: |
+        Dado que uso el origen de datos "main"
+        Entonces la base de datos contiene las filas del fichero Excel "expected/data.xlsx"

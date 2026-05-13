@@ -1,0 +1,173 @@
+'db.define.alias':
+  expression: 'use db {alias:text}'
+  example: |
+    * use db "main"
+  scenarios:
+    - title: Select a datasource before performing operations
+      gherkin: |
+        * use db "main"
+        * count db table users = 3
+
+
+'db.teardown.execute':
+  expression: 'db teardown {alias:text} query:'
+  example: |
+    * db teardown "main" query:
+      """sql
+      DELETE FROM users WHERE status = 'active'
+      """
+  scenarios:
+    - title: Register cleanup SQL to run after the scenario regardless of outcome
+      gherkin: |
+        * db teardown "main" query:
+          """sql
+          DELETE FROM users WHERE status = 'active'
+          """
+
+
+'db.execute.query':
+  expression: 'db query:'
+  example: |
+    * db query:
+      """sql
+      SELECT * FROM users WHERE status = 'active'
+      """
+  scenarios:
+    - title: Execute a SELECT and assert the result in subsequent steps
+      gherkin: |
+        * use db "main"
+        * db query:
+          """sql
+          SELECT id, name FROM users WHERE status = 'active'
+          """
+        * db query count > 0
+
+
+'db.store.query.result':
+  expression: 'db query result -> {variable:text}'
+  example: |
+    * db query result -> "name"
+  scenarios:
+    - title: Store the first field of a SELECT result in a variable
+      gherkin: |
+        * use db "main"
+        * db query:
+          """sql
+          SELECT name FROM users WHERE status = 'active'
+          """
+        * db query result -> "name"
+
+
+'db.assert.query.count':
+  expression: 'db query count {{integer-assertion}}'
+  assertion-hints:
+    - '= 0'
+    - '= 1'
+    - '> 0'
+    - '!= 0'
+  example: |
+    * db query count > 0
+  scenarios:
+    - title: Assert the number of rows returned by the last SQL query
+      gherkin: |
+        * use db "main"
+        * db query:
+          """sql
+          SELECT * FROM users WHERE status = 'active'
+          """
+        * db query count > 0
+
+
+'db.assert.count':
+  expression: 'count db table {table:word} {{integer-assertion}}'
+  assertion-hints:
+    - '= 0'
+    - '= 1'
+    - '> 0'
+    - '!= 0'
+  example: |
+    * count db table users = 3
+  scenarios:
+    - title: Assert table is empty after a deletion
+      gherkin: |
+        * use db "main"
+        * count db table users = 0
+    - title: Assert at least one row exists
+      gherkin: |
+        * use db "main"
+        * count db table users > 0
+
+
+'db.assert.table.contains':
+  expression: 'db table {table:word} has:'
+  example: |
+    * db table users has:
+      | id | name  |
+      | 1  | Alice |
+  scenarios:
+    - title: Assert exact table contents
+      gherkin: |
+        * use db "main"
+        * db table users has:
+          | id | name  |
+          | 1  | Alice |
+    - title: Assert contents with null values
+      gherkin: |
+        * use db "main"
+        * db table users has:
+          | id | name   |
+          | 2  | <null> |
+
+
+'db.assert.table.is':
+  expression: 'db table {table:word} is:'
+  example: |
+    * db table users is:
+      | id | name  |
+      | 1  | Alice |
+  scenarios:
+    - title: Assert table has exactly these rows
+      gherkin: |
+        * use db "main"
+        * db table users is:
+          | id | name  |
+          | 1  | Alice |
+    - title: Assert table is exactly one row with a null value
+      gherkin: |
+        * use db "main"
+        * db table users is:
+          | id | name   |
+          | 2  | <null> |
+
+
+'db.assert.table.contains.csv':
+  expression: 'db table {table:word} has CSV {file:file}'
+  example: |
+    * db table users has CSV "expected/users.csv"
+  scenarios:
+    - title: Assert table contains rows from a CSV file
+      gherkin: |
+        * use db "main"
+        * db table users has CSV "expected/users.csv"
+
+
+'db.assert.table.is.csv':
+  expression: 'db table {table:word} is CSV {file:file}'
+  example: |
+    * db table users is CSV "expected/users.csv"
+  scenarios:
+    - title: Assert table matches exactly the rows in a CSV file
+      gherkin: |
+        * use db "main"
+        * db table users is CSV "expected/users.csv"
+
+
+'db.assert.contains.xls':
+  expression: 'db has XLS {file:file}'
+  example: |
+    * db has XLS "expected/data.xlsx"
+  scenarios:
+    - title: Assert multiple tables contain the rows from an Excel file
+      gherkin: |
+        * use db "main"
+        * db has XLS "expected/data.xlsx"

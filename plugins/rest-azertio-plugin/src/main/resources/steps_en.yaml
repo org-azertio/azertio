@@ -1,0 +1,303 @@
+'rest.request.GET':
+  expression: 'I make a GET request to {endpoint:text}'
+  example: |
+    When I make a GET request to "users"
+  scenarios:
+    - title: Retrieve a collection of resources
+      gherkin: |
+        When I make a GET request to "users"
+        Then the HTTP status code is equal to 200
+        And the response body contains:
+        """json
+        [{"id": 1, "name": "Alice"}]
+        """
+    - title: Retrieve a single resource by ID
+      gherkin: |
+        When I make a GET request to "users/1"
+        Then the HTTP status code is equal to 200
+    - title: Request a non-existent resource
+      gherkin: |
+        When I make a GET request to "users/9999"
+        Then the HTTP status code is equal to 404
+
+
+'rest.request.POST.empty':
+  expression: 'I make a POST request to {endpoint:text}'
+  example: |
+    When I make a POST request to "users"
+  scenarios:
+    - title: Trigger an action with no payload
+      gherkin: |
+        When I make a POST request to "sessions/logout"
+        Then the HTTP status code is equal to 204
+
+
+'rest.request.POST.body':
+  expression: 'I make a POST request to {endpoint:text} with body:'
+  example: |
+    When I make a POST request to "users" with body:
+    """json
+    {
+      "name": "John",
+      "age": 30
+    }
+    """
+  scenarios:
+    - title: Create a new resource successfully
+      gherkin: |
+        When I make a POST request to "users" with body:
+        """json
+        {"name": "John", "age": 30}
+        """
+        Then the HTTP status code is equal to 201
+        And the response body contains:
+        """json
+        {"name": "John"}
+        """
+    - title: Reject a request with invalid data
+      gherkin: |
+        When I make a POST request to "users" with body:
+        """json
+        {"name": ""}
+        """
+        Then the HTTP status code is equal to 400
+
+
+'rest.request.POST.file':
+  expression: 'I make a POST request to {endpoint:text} with body from file {file:text}'
+  example: |
+    When I make a POST request to "users" with body from file "user_data.json"
+  scenarios:
+    - title: Create a resource using a body from file
+      gherkin: |
+        When I make a POST request to "users" with body from file "fixtures/new_user.json"
+        Then the HTTP status code is equal to 201
+
+
+'rest.request.PUT.body':
+  expression: 'I make a PUT request to {endpoint:text} with body:'
+  example: |
+    When I make a PUT request to "users/123" with body:
+    """json
+    {
+      "name": "John",
+      "age": 31
+    }
+    """
+  scenarios:
+    - title: Replace a resource completely
+      gherkin: |
+        When I make a PUT request to "users/1" with body:
+        """json
+        {"name": "John Updated", "age": 31}
+        """
+        Then the HTTP status code is equal to 200
+        And the response body contains:
+        """json
+        {"name": "John Updated"}
+        """
+    - title: Replace a non-existent resource
+      gherkin: |
+        When I make a PUT request to "users/9999" with body:
+        """json
+        {"name": "Ghost"}
+        """
+        Then the HTTP status code is equal to 404
+
+
+'rest.request.PUT.file':
+  expression: 'I make a PUT request to {endpoint:text} with body from file {file:text}'
+  example: |
+    When I make a PUT request to "users/123" with body from file "updated_user_data.json"
+  scenarios:
+    - title: Replace a resource using a body from file
+      gherkin: |
+        When I make a PUT request to "users/1" with body from file "fixtures/updated_user.json"
+        Then the HTTP status code is equal to 200
+
+
+'rest.request.PATCH.body':
+  expression: 'I make a PATCH request to {endpoint:text} with body:'
+  example: |
+    When I make a PATCH request to "users/123" with body:
+    """json
+    {
+      "age": 32
+    }
+    """
+  scenarios:
+    - title: Partially update a resource
+      gherkin: |
+        When I make a PATCH request to "users/1" with body:
+        """json
+        {"age": 32}
+        """
+        Then the HTTP status code is equal to 200
+        And the response body contains:
+        """json
+        {"id": 1, "age": 32}
+        """
+
+
+'rest.request.PATCH.file':
+  expression: 'I make a PATCH request to {endpoint:text} with body from file {file:text}'
+  example: |
+    When I make a PATCH request to "users/123" with body from file "partial_user_update.json"
+  scenarios:
+    - title: Partially update a resource using a body from file
+      gherkin: |
+        When I make a PATCH request to "users/1" with body from file "fixtures/partial_update.json"
+        Then the HTTP status code is equal to 200
+
+
+'rest.request.DELETE':
+  expression: 'I make a DELETE request to {endpoint:text}'
+  example: |
+    When I make a DELETE request to "users/123"
+  scenarios:
+    - title: Delete an existing resource
+      gherkin: |
+        When I make a DELETE request to "users/1"
+        Then the HTTP status code is equal to 204
+    - title: Delete a non-existent resource
+      gherkin: |
+        When I make a DELETE request to "users/9999"
+        Then the HTTP status code is equal to 404
+
+
+'rest.response.statusCode':
+  expression: 'the HTTP status code {{integer-assertion}}'
+  assertion-hints:
+    - 'is equal to 200'
+    - 'is equal to 201'
+    - 'is equal to 204'
+    - 'is equal to 400'
+    - 'is equal to 401'
+    - 'is equal to 403'
+    - 'is equal to 404'
+    - 'is not equal to 500'
+    - 'is greater than 199'
+    - 'is less than 300'
+    - 'is between 200 and 299'
+  example: |
+    Then the HTTP status code is equal to 200
+  scenarios:
+    - title: Verify a successful GET response
+      gherkin: |
+        When I make a GET request to "users"
+        Then the HTTP status code is equal to 200
+    - title: Verify a resource was created
+      gherkin: |
+        When I make a POST request to "users" with body:
+        """json
+        {"name": "Alice"}
+        """
+        Then the HTTP status code is equal to 201
+    - title: Verify a successful deletion
+      gherkin: |
+        When I make a DELETE request to "users/1"
+        Then the HTTP status code is equal to 204
+    - title: Verify an error response
+      gherkin: |
+        When I make a GET request to "users/9999"
+        Then the HTTP status code is equal to 404
+
+
+'rest.response.body':
+  expression: 'the response body is:'
+  example: |
+    Then the response body is:
+    """json
+    {
+      "id": 123,
+      "name": "John",
+      "age": 30
+    }
+    """
+  scenarios:
+    - title: Verify exact response body after a GET
+      gherkin: |
+        When I make a GET request to "users/1"
+        Then the HTTP status code is equal to 200
+        And the response body is:
+        """json
+        {"id": 1, "name": "Alice", "age": 25}
+        """
+    - title: Verify exact response body after a POST
+      gherkin: |
+        When I make a POST request to "users" with body:
+        """json
+        {"name": "Bob", "age": 22}
+        """
+        Then the HTTP status code is equal to 201
+        And the response body is:
+        """json
+        {"id": 2, "name": "Bob", "age": 22}
+        """
+
+
+'rest.response.body.file':
+  expression: 'the response body is the content of file {file:text}'
+  example: |
+    Then the response body is the content of file "expected_response.json"
+  scenarios:
+    - title: Verify response body matches a reference file
+      gherkin: |
+        When I make a GET request to "users/1"
+        Then the HTTP status code is equal to 200
+        And the response body is the content of file "fixtures/expected_user.json"
+
+
+'rest.response.body.contains':
+  expression: 'the response body contains:'
+  example: |
+    Then the response body contains:
+    """json
+    {
+      "id": 123,
+      "name": "John"
+    }
+    """
+  scenarios:
+    - title: Verify a field is present in the response after a GET
+      gherkin: |
+        When I make a GET request to "users/1"
+        Then the HTTP status code is equal to 200
+        And the response body contains:
+        """json
+        {"name": "Alice"}
+        """
+    - title: Verify a new resource appears in a collection
+      gherkin: |
+        When I make a POST request to "users" with body:
+        """json
+        {"name": "Carol"}
+        """
+        Then the HTTP status code is equal to 201
+        And the response body contains:
+        """json
+        {"name": "Carol"}
+        """
+
+
+'rest.response.extracts.field':
+  expression: 'I store the value of field {field:text} from the response body into variable {variable:id}'
+  example: |
+    Then I store the value of field "id" from the response body into variable userId
+  scenarios:
+    - title: Store a field and use it in a subsequent request
+      gherkin: |
+        When I make a POST request to "users" with body:
+        """json
+        {"name": "Carol"}
+        """
+        Then I store the value of field "id" from the response body into variable newUserId
+        And I make a GET request to "users/${newUserId}"
+        Then the HTTP status code is equal to 200
+    - title: Use a stored variable in a subsequent request
+      gherkin: |
+        When I make a GET request to "users/1"
+        Then the HTTP status code is equal to 200
+        And I store the value of field "id" from the response body into variable existingUserId
+        And I make a GET request to "users/${existingUserId}"
+        Then the HTTP status code is equal to 200
