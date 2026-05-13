@@ -2,29 +2,44 @@
   "name": "azertio",
   "displayName": "Azertio",
   "description": "Language support for Azertio feature files",
-  "version": "1.0.0-alpha1",
-  "publisher": "myjtools.org",
+  "version": "0.1.0",
+  "publisher": "azertio",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/org-azertio/azertio"
+  },
   "engines": {
     "vscode": "^1.90.0"
   },
-  "categories": ["Testing"],
+  "categories": [
+    "Testing"
+  ],
   "activationEvents": [
     "workspaceContains:azertio.yaml"
   ],
-  "icon": "./resources/azertio-icon.svg",
+  "icon": "./resources/azertio-icon.png",
   "main": "./out/extension.js",
   "contributes": {
     "languages": [
       {
         "id": "feature",
-        "aliases": ["Gherkin", "Feature"],
-        "extensions": [".feature"],
-        "mimetypes": ["text/x-feature"],
+        "aliases": [
+          "Gherkin",
+          "Feature"
+        ],
+        "extensions": [
+          ".feature"
+        ],
+        "mimetypes": [
+          "text/x-feature"
+        ],
         "configuration": "./language-configuration.json"
       },
       {
         "id": "yaml",
-        "filenames": ["azertio.yaml"]
+        "filenames": [
+          "azertio.yaml"
+        ]
       }
     ],
     "commands": [
