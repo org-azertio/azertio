@@ -95,7 +95,7 @@
                     <plugin>
                         <groupId>org.azertio</groupId>
                         <artifactId>azertio-docgen-maven-plugin</artifactId>
-                        <version>${project.version}</version>
+                        <version>${azertio-docgen.version}</version>
                         <executions>
                             <execution>
                                 <id>generate-step-docs</id>
