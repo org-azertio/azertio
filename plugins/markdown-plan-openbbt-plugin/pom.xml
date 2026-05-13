@@ -5,18 +5,18 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.myjtools.openbbt</groupId>
-        <artifactId>openbbt-plugin-starter</artifactId>
-		<relativePath>../../openbbt-plugin-starter/pom.xml</relativePath>
+        <groupId>org.azertio</groupId>
+        <artifactId>azertio-plugin-starter</artifactId>
+		<relativePath>../../azertio-plugin-starter/pom.xml</relativePath>
         <version>1.0.0-alpha1</version>
     </parent>
 
 
-    <groupId>org.myjtools.openbbt.plugins</groupId>
-    <artifactId>markdown-testPlan-openbbt-plugin</artifactId>
+    <groupId>org.azertio.plugins</groupId>
+    <artifactId>markdown-testPlan-azertio-plugin</artifactId>
     <version>1.0.0-alpha1</version>
 
-    <name>Markdown Plan OpenBBT Plugin</name>
+    <name>Markdown Plan Azertio Plugin</name>
     <description>Plugin that allows to define test plans using Markdown</description>
     <licenses>
         <license>
@@ -42,8 +42,8 @@
 
         <!-- Test dependencies -->
         <dependency>
-            <groupId>org.myjtools.openbbt</groupId>
-            <artifactId>openbbt-persistence</artifactId>
+            <groupId>org.azertio</groupId>
+            <artifactId>azertio-persistence</artifactId>
             <version>1.0.0-alpha1</version>
             <scope>test</scope>
         </dependency>

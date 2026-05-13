@@ -5,20 +5,20 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.myjtools.openbbt</groupId>
-        <artifactId>openbbt</artifactId>
+        <groupId>org.azertio</groupId>
+        <artifactId>azertio</artifactId>
         <version>1.0.0-alpha1</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>openbbt-test-support</artifactId>
-    <name>OpenBBT Test Support</name>
-    <description>JUnit 5 extension and utilities for integration testing of OpenBBT plugins</description>
+    <artifactId>azertio-test-support</artifactId>
+    <name>Azertio Test Support</name>
+    <description>JUnit 5 extension and utilities for integration testing of Azertio plugins</description>
 
     <dependencies>
         <dependency>
-            <groupId>org.myjtools.openbbt</groupId>
-            <artifactId>openbbt-core</artifactId>
+            <groupId>org.azertio</groupId>
+            <artifactId>azertio-core</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

@@ -5,19 +5,19 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>org.myjtools.openbbt</groupId>
-		<artifactId>openbbt-plugin-starter</artifactId>
-		<relativePath>../../openbbt-plugin-starter/pom.xml</relativePath>
+		<groupId>org.azertio</groupId>
+		<artifactId>azertio-plugin-starter</artifactId>
+		<relativePath>../../azertio-plugin-starter/pom.xml</relativePath>
 		<version>1.0.0-alpha1</version>
 	</parent>
 
 
-	<groupId>org.myjtools.openbbt.plugins</groupId>
-	<artifactId>gherkin-openbbt-plugin</artifactId>
+	<groupId>org.azertio.plugins</groupId>
+	<artifactId>gherkin-azertio-plugin</artifactId>
 	<version>1.0.0-alpha1</version>
 
-	<name>Gherkin OpenBBT Plugin</name>
-	<description>A plugin that integrates Gherkin feature files into OpenBBT</description>
+	<name>Gherkin Azertio Plugin</name>
+	<description>A plugin that integrates Gherkin feature files into Azertio</description>
 	<licenses>
 		<license>
 			<name>MIT License</name>
@@ -53,8 +53,8 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.myjtools.openbbt</groupId>
-			<artifactId>openbbt-persistence</artifactId>
+			<groupId>org.azertio</groupId>
+			<artifactId>azertio-persistence</artifactId>
 			<version>1.0.0-alpha1</version>
 			<scope>test</scope>
 		</dependency>

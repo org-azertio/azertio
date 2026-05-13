@@ -5,25 +5,25 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.myjtools.openbbt</groupId>
-        <artifactId>openbbt-plugin-starter</artifactId>
-        <relativePath>../../openbbt-plugin-starter/pom.xml</relativePath>
+        <groupId>org.azertio</groupId>
+        <artifactId>azertio-plugin-starter</artifactId>
+        <relativePath>../../azertio-plugin-starter/pom.xml</relativePath>
         <version>1.0.0-alpha1</version>
     </parent>
 
-    <groupId>org.myjtools.openbbt.plugins</groupId>
-    <artifactId>pdfreport-openbbt-plugin</artifactId>
+    <groupId>org.azertio.plugins</groupId>
+    <artifactId>pdfreport-azertio-plugin</artifactId>
     <version>1.0.0-alpha1</version>
 
-    <name>PDF Report OpenBBT Plugin</name>
-    <description>A plugin that generates PDF execution reports for OpenBBT test runs</description>
+    <name>PDF Report Azertio Plugin</name>
+    <description>A plugin that generates PDF execution reports for Azertio test runs</description>
 
     <properties>
         <!-- No step doc: this plugin provides no steps -->
-        <openbbt.docgen.skip>true</openbbt.docgen.skip>
-        <openbbt.docgen.configFile>${project.basedir}/src/main/resources/config.yaml</openbbt.docgen.configFile>
-        <openbbt.docgen.outputDirectory>${project.basedir}/../../docs</openbbt.docgen.outputDirectory>
-        <openbbt.docgen.configTitle>PDF Report Plugin — Configuration Reference</openbbt.docgen.configTitle>
+        <azertio.docgen.skip>true</azertio.docgen.skip>
+        <azertio.docgen.configFile>${project.basedir}/src/main/resources/config.yaml</azertio.docgen.configFile>
+        <azertio.docgen.outputDirectory>${project.basedir}/../../docs</azertio.docgen.outputDirectory>
+        <azertio.docgen.configTitle>PDF Report Plugin — Configuration Reference</azertio.docgen.configTitle>
     </properties>
 
     <licenses>
@@ -33,7 +33,7 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-    <url>https://myjtools.org/openbbt/plugins/pdfreport</url>
+    <url>https://myjtools.org/azertio/plugins/pdfreport</url>
 
     <dependencies>
         <!-- PDF generation (Apache License 2.0) -->
@@ -63,8 +63,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.myjtools.openbbt</groupId>
-            <artifactId>openbbt-persistence</artifactId>
+            <groupId>org.azertio</groupId>
+            <artifactId>azertio-persistence</artifactId>
             <version>1.0.0-alpha1</version>
             <scope>test</scope>
         </dependency>

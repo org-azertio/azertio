@@ -4,12 +4,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.myjtools.openbbt</groupId>
-    <artifactId>openbbt-plugin-starter</artifactId>
+    <groupId>org.azertio</groupId>
+    <artifactId>azertio-plugin-starter</artifactId>
     <version>1.0.0-alpha1</version>
     <packaging>pom</packaging>
 
-    <name>OpenBBT Plugin Starter</name>
+    <name>Azertio Plugin Starter</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -17,21 +17,21 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <java.version>21</java.version>
-        <openbbt-core.version>1.0.0-alpha1</openbbt-core.version>
+        <azertio-core.version>1.0.0-alpha1</azertio-core.version>
         <jexten.version>1.0.0-alpha5</jexten.version>
         <!-- Doc generation: override in child pom to customise paths and titles -->
-        <openbbt.docgen.stepDocFile>${project.basedir}/src/main/resources/steps.yaml</openbbt.docgen.stepDocFile>
-        <openbbt.docgen.configFile>${project.basedir}/src/main/resources/config.yaml</openbbt.docgen.configFile>
-        <openbbt.docgen.outputDirectory>${project.basedir}/docs</openbbt.docgen.outputDirectory>
-        <openbbt.docgen.stepTitle>Step Reference</openbbt.docgen.stepTitle>
-        <openbbt.docgen.configTitle>Configuration Reference</openbbt.docgen.configTitle>
+        <azertio.docgen.stepDocFile>${project.basedir}/src/main/resources/steps.yaml</azertio.docgen.stepDocFile>
+        <azertio.docgen.configFile>${project.basedir}/src/main/resources/config.yaml</azertio.docgen.configFile>
+        <azertio.docgen.outputDirectory>${project.basedir}/docs</azertio.docgen.outputDirectory>
+        <azertio.docgen.stepTitle>Step Reference</azertio.docgen.stepTitle>
+        <azertio.docgen.configTitle>Configuration Reference</azertio.docgen.configTitle>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>org.myjtools.openbbt</groupId>
-            <artifactId>openbbt-core</artifactId>
-            <version>${openbbt-core.version}</version>
+            <groupId>org.azertio</groupId>
+            <artifactId>azertio-core</artifactId>
+            <version>${azertio-core.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
@@ -52,33 +52,33 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.myjtools.openbbt</groupId>
-                <artifactId>openbbt-docgen-maven-plugin</artifactId>
+                <groupId>org.azertio</groupId>
+                <artifactId>azertio-docgen-maven-plugin</artifactId>
                 <version>${project.version}</version>
                 <executions>
                     <execution>
                         <id>generate-step-docs</id>
                         <goals><goal>generate</goal></goals>
                         <configuration>
-                            <inputFile>${openbbt.docgen.stepDocFile}</inputFile>
-                            <outputDirectory>${openbbt.docgen.outputDirectory}</outputDirectory>
-                            <title>${openbbt.docgen.stepTitle}</title>
+                            <inputFile>${azertio.docgen.stepDocFile}</inputFile>
+                            <outputDirectory>${azertio.docgen.outputDirectory}</outputDirectory>
+                            <title>${azertio.docgen.stepTitle}</title>
                         </configuration>
                     </execution>
                     <execution>
                         <id>generate-config-docs</id>
                         <goals><goal>generate-config</goal></goals>
                         <configuration>
-                            <inputFile>${openbbt.docgen.configFile}</inputFile>
-                            <outputDirectory>${openbbt.docgen.outputDirectory}</outputDirectory>
-                            <title>${openbbt.docgen.configTitle}</title>
+                            <inputFile>${azertio.docgen.configFile}</inputFile>
+                            <outputDirectory>${azertio.docgen.outputDirectory}</outputDirectory>
+                            <title>${azertio.docgen.configTitle}</title>
                         </configuration>
                     </execution>
                     <execution>
                         <id>generate-step-index</id>
                         <goals><goal>generate-step-index</goal></goals>
                         <configuration>
-                            <inputFile>${openbbt.docgen.stepDocFile}</inputFile>
+                            <inputFile>${azertio.docgen.stepDocFile}</inputFile>
                             <outputDirectory>${project.build.outputDirectory}</outputDirectory>
                         </configuration>
                     </execution>
@@ -97,8 +97,8 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <application>org.myjtools.openbbt</application>
-                    <hostModule>org.myjtools.openbbt.core</hostModule>
+                    <application>org.azertio</application>
+                    <hostModule>org.azertio.core</hostModule>
                 </configuration>
             </plugin>
         </plugins>

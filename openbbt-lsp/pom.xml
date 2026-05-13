@@ -5,19 +5,19 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.myjtools.openbbt</groupId>
-        <artifactId>openbbt</artifactId>
+        <groupId>org.azertio</groupId>
+        <artifactId>azertio</artifactId>
         <version>1.0.0-alpha1</version>
     </parent>
 
-    <artifactId>openbbt-lsp</artifactId>
-    <name>OpenBBT LSP Server</name>
-    <description>Language Server Protocol server for OpenBBT feature files</description>
+    <artifactId>azertio-lsp</artifactId>
+    <name>Azertio LSP Server</name>
+    <description>Language Server Protocol server for Azertio feature files</description>
 
     <dependencies>
         <dependency>
-            <groupId>org.myjtools.openbbt</groupId>
-            <artifactId>openbbt-core</artifactId>
+            <groupId>org.azertio</groupId>
+            <artifactId>azertio-core</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

@@ -5,25 +5,25 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.myjtools.openbbt</groupId>
-        <artifactId>openbbt-plugin-starter</artifactId>
-		<relativePath>../../openbbt-plugin-starter/pom.xml</relativePath>
+        <groupId>org.azertio</groupId>
+        <artifactId>azertio-plugin-starter</artifactId>
+		<relativePath>../../azertio-plugin-starter/pom.xml</relativePath>
         <version>1.0.0-alpha1</version>
     </parent>
 
 
-    <groupId>org.myjtools.openbbt.plugins</groupId>
-    <artifactId>rest-openbbt-plugin</artifactId>
+    <groupId>org.azertio.plugins</groupId>
+    <artifactId>rest-azertio-plugin</artifactId>
     <version>1.0.0-alpha1</version>
 
-    <name>REST OpenBBT Plugin</name>
+    <name>REST Azertio Plugin</name>
 
     <properties>
-        <openbbt.docgen.stepDocFile>${project.basedir}/src/main/resources/steps.yaml</openbbt.docgen.stepDocFile>
-        <openbbt.docgen.configFile>${project.basedir}/src/main/resources/config.yaml</openbbt.docgen.configFile>
-        <openbbt.docgen.outputDirectory>${project.basedir}/../../docs</openbbt.docgen.outputDirectory>
-        <openbbt.docgen.stepTitle>REST Plugin — Step Reference</openbbt.docgen.stepTitle>
-        <openbbt.docgen.configTitle>REST Plugin — Configuration Reference</openbbt.docgen.configTitle>
+        <azertio.docgen.stepDocFile>${project.basedir}/src/main/resources/steps.yaml</azertio.docgen.stepDocFile>
+        <azertio.docgen.configFile>${project.basedir}/src/main/resources/config.yaml</azertio.docgen.configFile>
+        <azertio.docgen.outputDirectory>${project.basedir}/../../docs</azertio.docgen.outputDirectory>
+        <azertio.docgen.stepTitle>REST Plugin — Step Reference</azertio.docgen.stepTitle>
+        <azertio.docgen.configTitle>REST Plugin — Configuration Reference</azertio.docgen.configTitle>
     </properties>
     <description>A plugin that provides RESTful application steps</description>
     <licenses>
@@ -56,20 +56,20 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.myjtools.openbbt</groupId>
-            <artifactId>openbbt-persistence</artifactId>
+            <groupId>org.azertio</groupId>
+            <artifactId>azertio-persistence</artifactId>
             <version>1.0.0-alpha1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.myjtools.openbbt.plugins</groupId>
-            <artifactId>gherkin-openbbt-plugin</artifactId>
+            <groupId>org.azertio.plugins</groupId>
+            <artifactId>gherkin-azertio-plugin</artifactId>
             <version>1.0.0-alpha1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.myjtools.openbbt</groupId>
-            <artifactId>openbbt-test-support</artifactId>
+            <groupId>org.azertio</groupId>
+            <artifactId>azertio-test-support</artifactId>
             <version>1.0.0-alpha1</version>
             <scope>test</scope>
         </dependency>
@@ -100,7 +100,7 @@
                         <configuration combine.children="append">
                             <compilerArgs>
                                 <arg>--add-reads</arg>
-                                <arg>org.myjtools.openbbt.plugins.rest.test=ALL-UNNAMED</arg>
+                                <arg>org.azertio.plugins.rest.test=ALL-UNNAMED</arg>
                             </compilerArgs>
                         </configuration>
                     </execution>
@@ -113,7 +113,7 @@
                     <classpathDependencyExcludes>
                         <classpathDependencyExclude>org.slf4j:slf4j-simple</classpathDependencyExclude>
                     </classpathDependencyExcludes>
-                    <argLine>--add-reads org.myjtools.openbbt.plugins.rest.test=ALL-UNNAMED</argLine>
+                    <argLine>--add-reads org.azertio.plugins.rest.test=ALL-UNNAMED</argLine>
                 </configuration>
             </plugin>
         </plugins>
