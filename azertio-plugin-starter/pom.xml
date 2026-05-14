@@ -30,7 +30,7 @@
         <java.version>21</java.version>
         <azertio-core.version>1.0.0-alpha1-SNAPSHOT</azertio-core.version>
         <azertio-docgen.version>1.0.0-alpha1-SNAPSHOT</azertio-docgen.version>
-        <jexten.version>1.0.0-alpha5</jexten.version>
+        <jexten.version>1.0.0</jexten.version>
         <!-- Doc generation: override in child pom to customise paths and titles -->
         <azertio.docgen.stepDocFile>${project.basedir}/src/main/resources/steps.yaml</azertio.docgen.stepDocFile>
         <azertio.docgen.configFile>${project.basedir}/src/main/resources/config.yaml</azertio.docgen.configFile>
