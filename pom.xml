@@ -192,6 +192,70 @@
 			</modules>
 		</profile>
 
+		<!-- ── Release: publish all modules to Maven Central ───────────── -->
+		<profile>
+			<id>release</id>
+			<properties>
+				<maven.test.skip>true</maven.test.skip>
+			</properties>
+			<modules>
+				<module>azertio-plugin-starter</module>
+				<module>plugins/gherkin-azertio-plugin</module>
+				<module>plugins/markdown-plan-azertio-plugin</module>
+				<module>plugins/rest-azertio-plugin</module>
+				<module>plugins/db-azertio-plugin</module>
+				<module>plugins/pdfreport-azertio-plugin</module>
+				<module>azertio-it</module>
+			</modules>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<version>3.6.3</version>
+						<configuration>
+							<doclint>none</doclint>
+							<failOnError>false</failOnError>
+						</configuration>
+						<executions>
+							<execution>
+								<id>attach-javadocs</id>
+								<goals><goal>jar</goal></goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>3.2.4</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals><goal>sign</goal></goals>
+								<configuration>
+									<gpgArguments>
+										<arg>--pinentry-mode</arg>
+										<arg>loopback</arg>
+									</gpgArguments>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.sonatype.central</groupId>
+						<artifactId>central-publishing-maven-plugin</artifactId>
+						<version>0.6.0</version>
+						<extensions>true</extensions>
+						<configuration>
+							<publishingServerId>sonatype</publishingServerId>
+							<autoPublish>false</autoPublish>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
 		<!-- ── Maven Central (Sonatype Central Portal) ───────────── -->
 		<profile>
 			<id>maven-central</id>
