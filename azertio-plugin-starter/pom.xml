@@ -6,7 +6,7 @@
 
     <groupId>org.azertio</groupId>
     <artifactId>azertio-plugin-starter</artifactId>
-    <version>1.0.0-alpha1</version>
+    <version>1.0.0-alpha2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Azertio Plugin Starter</name>
@@ -53,8 +53,8 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <java.version>21</java.version>
-        <azertio-core.version>1.0.0-alpha1</azertio-core.version>
-        <azertio-docgen.version>1.0.0-alpha1</azertio-docgen.version>
+        <azertio-core.version>1.0.0-alpha2-SNAPSHOT</azertio-core.version>
+        <azertio-docgen.version>1.0.0-alpha2-SNAPSHOT</azertio-docgen.version>
         <jexten.version>1.0.0</jexten.version>
         <!-- Doc generation: override in child pom to customise paths and titles -->
         <azertio.docgen.stepDocFile>${project.basedir}/src/main/resources/steps.yaml</azertio.docgen.stepDocFile>
