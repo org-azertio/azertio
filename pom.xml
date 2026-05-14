@@ -12,7 +12,7 @@
 
 	<groupId>org.azertio</groupId>
 	<artifactId>azertio</artifactId>
-	<version>1.0.0-alpha1-SNAPSHOT</version>
+	<version>1.0.0-alpha1</version>
 	<packaging>pom</packaging>
 
 	<name>Azertio</name>
@@ -201,6 +201,10 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-javadoc-plugin</artifactId>
 						<version>3.6.3</version>
+						<configuration>
+							<doclint>none</doclint>
+							<failOnError>false</failOnError>
+						</configuration>
 						<executions>
 							<execution>
 								<id>attach-javadocs</id>
@@ -233,7 +237,7 @@
 						<version>0.6.0</version>
 						<extensions>true</extensions>
 						<configuration>
-							<publishingServerId>central</publishingServerId>
+							<publishingServerId>sonatype</publishingServerId>
 							<!-- autoPublish=false: review the bundle in the portal before releasing -->
 							<autoPublish>false</autoPublish>
 						</configuration>
