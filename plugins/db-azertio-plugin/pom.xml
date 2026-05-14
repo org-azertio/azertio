@@ -8,13 +8,13 @@
         <groupId>org.azertio</groupId>
         <artifactId>azertio-plugin-starter</artifactId>
 		<relativePath>../../azertio-plugin-starter/pom.xml</relativePath>
-        <version>1.0.0-alpha1</version>
+        <version>1.0.0-alpha2-SNAPSHOT</version>
     </parent>
 
 
     <groupId>org.azertio.plugins</groupId>
     <artifactId>db-azertio-plugin</artifactId>
-    <version>1.0.0-alpha1</version>
+    <version>1.0.0-alpha2-SNAPSHOT</version>
 
     <name>Database Azertio Plugin</name>
 
@@ -72,19 +72,19 @@
         <dependency>
             <groupId>org.azertio</groupId>
             <artifactId>azertio-persistence</artifactId>
-            <version>1.0.0-alpha1-SNAPSHOT</version>
+            <version>1.0.0-alpha2-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.azertio.plugins</groupId>
             <artifactId>gherkin-azertio-plugin</artifactId>
-            <version>1.0.0-alpha1</version>
+            <version>1.0.0-alpha2-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.azertio</groupId>
             <artifactId>azertio-test-support</artifactId>
-            <version>1.0.0-alpha1-SNAPSHOT</version>
+            <version>1.0.0-alpha2-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <dependency>
