@@ -2,6 +2,7 @@
 
 Azertio is an extensible, plugin-based black-box testing platform for Java. Write expressive tests in plain DSL, run them against REST APIs, databases, or any custom system — with zero boilerplate and zero glue code.
 
+[![CI](https://github.com/org-azertio/azertio/actions/workflows/ci.yml/badge.svg)](https://github.com/org-azertio/azertio/actions/workflows/ci.yml)
 [![Maven Central](https://img.shields.io/maven-central/v/org.azertio/azertio-core.svg)](https://central.sonatype.com/artifact/org.azertio/azertio-core)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=org-azertio_azertio&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=org-azertio_azertio)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=org-azertio_azertio&metric=coverage)](https://sonarcloud.io/summary/new_code?id=org-azertio_azertio)
