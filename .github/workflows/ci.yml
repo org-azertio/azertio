@@ -22,8 +22,11 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Build and install core modules
+      - name: Install core modules
         run: ./mvnw -B install -DskipTests
+
+      - name: Install plugin modules
+        run: ./mvnw -B install -DskipTests -Pplugins
 
       - name: Test all modules
         run: ./mvnw -B verify -Pplugins
