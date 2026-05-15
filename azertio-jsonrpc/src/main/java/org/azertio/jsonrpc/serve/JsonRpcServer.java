@@ -13,6 +13,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
@@ -40,6 +41,12 @@ public class JsonRpcServer {
     @FunctionalInterface
     public interface StepIndexProvider {
         String getIndex();
+    }
+
+    public interface HelpRegistryProvider {
+        record Entry(String id, String displayName) {}
+        List<Entry> list();
+        Optional<String> content(String id);
     }
 
     @FunctionalInterface
@@ -80,6 +87,7 @@ public class JsonRpcServer {
     private final PlanHandler planHandler;
     private final ContributorsProvider contributorsProvider;
     private final StepIndexProvider stepIndexProvider;
+    private final HelpRegistryProvider helpRegistryProvider;
     private TestPlanRepository repository;
     private TestExecutionRepository executionRepository;
     private AttachmentRepository attachmentRepository;
@@ -102,6 +110,10 @@ public class JsonRpcServer {
     }
 
     public JsonRpcServer(InputStream in, OutputStream out, RepositoryFactory factory, ExecHandler execHandler, PlanHandler planHandler, ContributorsProvider contributorsProvider, StepIndexProvider stepIndexProvider) {
+        this(in, out, factory, execHandler, planHandler, contributorsProvider, stepIndexProvider, null);
+    }
+
+    public JsonRpcServer(InputStream in, OutputStream out, RepositoryFactory factory, ExecHandler execHandler, PlanHandler planHandler, ContributorsProvider contributorsProvider, StepIndexProvider stepIndexProvider, HelpRegistryProvider helpRegistryProvider) {
         this.in = in;
         this.out = out;
         this.factory = factory;
@@ -109,6 +121,7 @@ public class JsonRpcServer {
         this.planHandler = planHandler;
         this.contributorsProvider = contributorsProvider;
         this.stepIndexProvider = stepIndexProvider;
+        this.helpRegistryProvider = helpRegistryProvider;
     }
 
     public void run() {
@@ -197,6 +210,8 @@ public class JsonRpcServer {
                 case "executions/delete" -> { handleDeleteExecution(params); yield JsonNull.INSTANCE; }
                 case "contributors/list" -> handleContributors();
                 case "steps/index"       -> handleStepsIndex();
+                case "help/list"         -> handleHelpList();
+                case "help/get"          -> handleHelpGet(params);
                 case "exec"                   -> handleExec(params);
                 case "refresh"         -> { handleRefresh(); yield JsonNull.INSTANCE; }
                 case "shutdown"        -> { running = false; yield JsonNull.INSTANCE; }
@@ -512,6 +527,31 @@ public class JsonRpcServer {
         if (stepIndexProvider == null)
             throw new IllegalStateException("Step index provider not configured");
         return JsonParser.parseString(stepIndexProvider.getIndex());
+    }
+
+    private JsonArray handleHelpList() {
+        if (helpRegistryProvider == null)
+            throw new IllegalStateException("Help registry provider not configured");
+        JsonArray arr = new JsonArray();
+        for (var entry : helpRegistryProvider.list()) {
+            JsonObject obj = new JsonObject();
+            obj.addProperty("id", entry.id());
+            obj.addProperty("displayName", entry.displayName());
+            arr.add(obj);
+        }
+        return arr;
+    }
+
+    private JsonObject handleHelpGet(JsonObject params) {
+        if (helpRegistryProvider == null)
+            throw new IllegalStateException("Help registry provider not configured");
+        String id = params.get("id").getAsString();
+        String content = helpRegistryProvider.content(id)
+            .orElseThrow(() -> new IllegalArgumentException("Help provider not found: " + id));
+        JsonObject obj = new JsonObject();
+        obj.addProperty("id", id);
+        obj.addProperty("content", content);
+        return obj;
     }
 
     private void handleDeleteExecution(JsonObject params) {
