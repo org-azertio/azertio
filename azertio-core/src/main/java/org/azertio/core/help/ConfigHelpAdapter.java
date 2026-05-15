@@ -9,26 +9,33 @@ public abstract class ConfigHelpAdapter implements HelpProvider {
 
     private static final Log log = Log.of();
 
-    @Override
-    public String help() {
-        return generateHelp();
+    private final String id;
+    private final String displayName;
+    private final String title;
+    private final String resource;
+
+    protected ConfigHelpAdapter(String id, String displayName, String title, String resource) {
+        this.id = id;
+        this.displayName = displayName;
+        this.title = title;
+        this.resource = resource;
     }
 
-    protected abstract String resource();
+    @Override public String id()          { return id; }
+    @Override public String displayName() { return displayName; }
 
-    protected abstract String title();
-
-    private String generateHelp() {
+    @Override
+    public String help() {
         var mod = getClass().getModule();
-        try (var stream = mod.getResourceAsStream(resource())) {
+        try (var stream = mod.getResourceAsStream(resource)) {
             if (stream == null) {
-                log.warn("[help] resource not found in module {}: {}", mod.getName(), resource());
+                log.warn("[help] resource not found in module {}: {}", mod.getName(), resource);
                 return "";
             }
             var docs = ConfigDocLoader.load(stream);
-            return new ConfigDocMarkdownGenerator().generate(title(), docs);
+            return new ConfigDocMarkdownGenerator().generate(title, docs);
         } catch (Exception e) {
-            log.error(e, "Failed to generate config help for {}", id());
+            log.error(e, "Failed to generate config help for {}", id);
             return "";
         }
     }

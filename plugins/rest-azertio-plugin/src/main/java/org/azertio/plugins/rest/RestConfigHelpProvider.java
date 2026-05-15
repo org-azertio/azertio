@@ -8,12 +8,7 @@ import org.azertio.core.help.ConfigHelpAdapter;
 @Extension(scope = Scope.SINGLETON)
 public class RestConfigHelpProvider extends ConfigHelpAdapter implements HelpProvider {
 
-    @Override public String id()          { return "rest.config"; }
-    @Override public String displayName() { return "REST Configuration"; }
-    @Override protected String title()    { return "REST Configuration"; }
-
-    @Override
-    protected String resource() {
-        return "config.yaml";
+    public RestConfigHelpProvider() {
+        super("rest.config", "REST Configuration", "REST Configuration", "config.yaml");
     }
 }

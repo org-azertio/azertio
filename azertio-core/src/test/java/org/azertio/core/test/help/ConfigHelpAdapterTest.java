@@ -7,27 +7,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class ConfigHelpAdapterTest {
 
+    static class TestConfigAdapter extends ConfigHelpAdapter {
+        TestConfigAdapter(String resource) {
+            super("test.id", "Test", "Test Config", resource);
+        }
+    }
+
     @Test
     void help_whenResourceNotFound_returnsEmpty() {
-        var adapter = new ConfigHelpAdapter() {
-            @Override public String id() { return "test"; }
-            @Override public String displayName() { return "Test"; }
-            @Override protected String resource() { return "nonexistent-resource.yaml"; }
-            @Override protected String title() { return "Test"; }
-        };
-        assertThat(adapter.help()).isEmpty();
+        assertThat(new TestConfigAdapter("nonexistent-resource.yaml").help()).isEmpty();
     }
 
     @Test
     void help_whenResourceFound_returnsMarkdownWithTitle() {
-        var adapter = new ConfigHelpAdapter() {
-            @Override public String id() { return "test"; }
-            @Override public String displayName() { return "Test"; }
-            @Override protected String resource() { return "config.yaml"; }
-            @Override protected String title() { return "Test Configuration"; }
-        };
-        String result = adapter.help();
+        String result = new TestConfigAdapter("config.yaml").help();
         assertThat(result).isNotEmpty();
-        assertThat(result).startsWith("# Test Configuration");
+        assertThat(result).startsWith("# Test Config");
     }
 }
