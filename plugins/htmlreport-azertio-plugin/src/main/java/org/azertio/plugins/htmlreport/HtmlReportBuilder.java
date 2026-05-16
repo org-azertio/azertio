@@ -41,6 +41,11 @@ public class HtmlReportBuilder implements ReportBuilder {
 
     @Override
     public void buildReport(UUID executionID) {
+
+        if (!config.get("htmlreport.enabled", Boolean.class).orElse(true)) {
+            return;
+        }
+
         Path outputDir = config.get("htmlreport.outputDir", Path::of)
             .orElse(Path.of(".azertio", "reports"));
         boolean includePassedSteps = config.get("htmlreport.includePassedSteps", Boolean.class).orElse(true);
