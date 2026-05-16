@@ -2,6 +2,7 @@ package org.azertio.persistence;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.azertio.core.AzertioException;
 import org.flywaydb.core.Flyway;
 import org.jooq.SQLDialect;
 import javax.sql.DataSource;
