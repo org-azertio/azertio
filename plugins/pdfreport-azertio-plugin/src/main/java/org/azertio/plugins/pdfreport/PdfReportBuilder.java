@@ -42,6 +42,11 @@ public class PdfReportBuilder implements ReportBuilder {
 
     @Override
     public void buildReport(UUID executionID) {
+
+        if (!config.get("pdfreport.enabled", Boolean.class).orElse(true)) {
+            return;
+        }
+
         Path outputDir = config.get("pdfreport.outputDir", Path::of)
             .orElse(Path.of(".azertio", "reports"));
         boolean includePassedSteps = config.get("pdfreport.includePassedSteps", Boolean.class).orElse(true);
