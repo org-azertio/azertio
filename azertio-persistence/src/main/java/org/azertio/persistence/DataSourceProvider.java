@@ -14,7 +14,7 @@ public class DataSourceProvider {
 
 
 	public enum DatabaseType {
-		HSQLDB("hsqldb", SQLDialect.HSQLDB),
+		H2("h2", SQLDialect.H2),
 		POSTGRESQL("postgresql", SQLDialect.POSTGRES);
 
 		private final String migrationFolder;
@@ -37,19 +37,25 @@ public class DataSourceProvider {
 		DatabaseType databaseType();
 	}
 
-	public static class HsqldbFileDataSource implements JdbcUrlProvider {
+	public static class H2FileDataSource implements JdbcUrlProvider {
 
 		private final Path file;
+		private final boolean autoServer;
 
-		public HsqldbFileDataSource(Path file) {
+		public H2FileDataSource(Path file, boolean autoServer) {
 			this.file = file;
+			this.autoServer = autoServer;
 		}
 
 		@Override
 		public String jdbcUrl() {
-			var url = "jdbc:hsqldb:file:" + file.toAbsolutePath() + ";DB_CLOSE_DELAY=-1;MODE=PostgreSQL";
-			url += ";hsqldb.default_table_type=cached;hsqldb.cache_rows=2000;hsqldb.cache_size=1000";
-			url += ";hsqldb.lock_file=false";
+			var url = "jdbc:h2:file:" + file.toAbsolutePath()
+				+ ";MODE=PostgreSQL;NON_KEYWORDS=KEY,VALUE";
+			if (autoServer) {
+				url += ";AUTO_SERVER=TRUE";
+			} else {
+				url += ";DB_CLOSE_ON_EXIT=FALSE";
+			}
 			return url;
 		}
 
@@ -65,7 +71,7 @@ public class DataSourceProvider {
 
 		@Override
 		public DatabaseType databaseType() {
-			return DatabaseType.HSQLDB;
+			return DatabaseType.H2;
 		}
 	}
 
@@ -102,8 +108,12 @@ public class DataSourceProvider {
 	}
 
 
-	public static DataSourceProvider hsqldb(Path file) {
-		return new DataSourceProvider(new HsqldbFileDataSource(file));
+	public static DataSourceProvider h2file(Path file) {
+		return new DataSourceProvider(new H2FileDataSource(file, true));
+	}
+
+	public static DataSourceProvider h2fileLocal(Path file) {
+		return new DataSourceProvider(new H2FileDataSource(file, false));
 	}
 
 
@@ -148,15 +158,10 @@ public class DataSourceProvider {
 
 	/**
 	 * Opens a direct JDBC connection without HikariCP pool or Flyway migration.
-	 * For HSQLDB, opens in read-only mode (no lock file, no transaction log) for faster startup.
 	 * Intended for read-only operations where fast startup is required.
 	 */
 	public Connection openConnection() throws SQLException {
-		String url = jdbcUrlProvider.jdbcUrl();
-		if (jdbcUrlProvider.databaseType() == DatabaseType.HSQLDB) {
-			url += ";readonly=true";
-		}
-		return DriverManager.getConnection(url, jdbcUrlProvider.username(), jdbcUrlProvider.password());
+		return DriverManager.getConnection(jdbcUrlProvider.jdbcUrl(), jdbcUrlProvider.username(), jdbcUrlProvider.password());
 	}
 
 

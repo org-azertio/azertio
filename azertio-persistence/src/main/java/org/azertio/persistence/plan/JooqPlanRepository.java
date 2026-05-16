@@ -54,6 +54,7 @@ public class JooqPlanRepository implements TestPlanRepository, AutoCloseable {
 	private static final Field<String> FIELD_VALIDATION_MESSAGE = DSL.field("validation_message", String.class);
 	private static final Field<Boolean> FIELD_HAS_ISSUES = DSL.field("has_issues", Boolean.class);
 	private static final Field<UUID> FIELD_PROJECT_ID = DSL.field("project_id", UUID.class);
+	private static final Field<UUID> FIELD_PLAN_PROJECT_ID = DSL.field("plan.project_id", UUID.class);
 	private static final Field<String> FIELD_ORGANIZATION_NAME = DSL.field("organization_name", String.class);
 	private static final Field<String> FIELD_PROJECT_NAME = DSL.field("project_name", String.class);
 	private static final Field<LocalDateTime> FIELD_CREATED_AT = DSL.field("created_at", LocalDateTime.class);
@@ -627,7 +628,7 @@ public class JooqPlanRepository implements TestPlanRepository, AutoCloseable {
 						.from(TABLE_PLAN_NODE)
 						.where(FIELD_PARENT_NODE.eq(parent))
 					.unionAll(
-						DSL.select(FIELD_NODE_ID, dDepth.add(1))
+						DSL.select(DSL.field("plan_node.node_id", UUID.class), dDepth.add(1))
 							.from(TABLE_PLAN_NODE)
 							.join(descendantsTable)
 							.on(FIELD_PARENT_NODE.eq(dNodeId))
@@ -792,11 +793,6 @@ public class JooqPlanRepository implements TestPlanRepository, AutoCloseable {
 			   .where(pid.isNotNull())
 		   ))
 		   .execute();
-		// Force HSQLDB to flush committed changes to disk so a subsequent
-		// JVM (e.g. 'azertio serve') sees the updated HAS_ISSUES values.
-		if (dsl.dialect() == SQLDialect.HSQLDB) {
-			dsl.execute("CHECKPOINT");
-		}
 	}
 
 
@@ -980,12 +976,12 @@ public class JooqPlanRepository implements TestPlanRepository, AutoCloseable {
 	@Override
 	public List<TestPlan> listPlans(String organization, String project, int offset, int max) {
 		var query = dsl.select(
-				FIELD_PLAN_ID, FIELD_PROJECT_ID, FIELD_CREATED_AT,
+				FIELD_PLAN_ID, FIELD_PLAN_PROJECT_ID.as("project_id"), FIELD_CREATED_AT,
 				FIELD_RESOURCE_SET_HASH, FIELD_CONFIGURATION_HASH, FIELD_PLAN_NODE_ROOT,
 				FIELD_TEST_CASE_COUNT, FIELD_SUITES
 			)
 			.from(TABLE_PLAN)
-			.join(TABLE_PROJECT).using(FIELD_PROJECT_ID)
+			.join(TABLE_PROJECT).on(FIELD_PLAN_PROJECT_ID.eq(DSL.field("project.project_id", UUID.class)))
 			.where(FIELD_ORGANIZATION_NAME.eq(organization))
 			.and(FIELD_PROJECT_NAME.eq(project))
 			.orderBy(FIELD_CREATED_AT.desc())
@@ -1004,12 +1000,12 @@ public class JooqPlanRepository implements TestPlanRepository, AutoCloseable {
 				.where(DSL.field("plan_id", UUID.class).eq(DSL.field("plan.plan_id", UUID.class)))
 		);
 		var query = dsl.select(
-				FIELD_PLAN_ID, FIELD_PROJECT_ID, FIELD_CREATED_AT,
+				FIELD_PLAN_ID, FIELD_PLAN_PROJECT_ID.as("project_id"), FIELD_CREATED_AT,
 				FIELD_RESOURCE_SET_HASH, FIELD_CONFIGURATION_HASH, FIELD_PLAN_NODE_ROOT,
 				FIELD_TEST_CASE_COUNT, FIELD_SUITES
 			)
 			.from(TABLE_PLAN)
-			.join(TABLE_PROJECT).using(FIELD_PROJECT_ID)
+			.join(TABLE_PROJECT).on(FIELD_PLAN_PROJECT_ID.eq(DSL.field("project.project_id", UUID.class)))
 			.where(FIELD_ORGANIZATION_NAME.eq(organization))
 			.and(FIELD_PROJECT_NAME.eq(project))
 			.and(existsExecution)

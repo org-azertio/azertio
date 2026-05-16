@@ -90,7 +90,7 @@ public class DefaultRepositoryFactory implements RepositoryFactory {
 					Path filePath = config.get(PERSISTENCE_FILE, Path::of).orElseThrow(
 						() -> new AzertioException("Repository file path not configured: {}", PERSISTENCE_FILE)
 					);
-					yield DataSourceProvider.hsqldb(envPath.resolve(filePath));
+					yield DataSourceProvider.h2file(envPath.resolve(filePath));
 				}
 				case PERSISTENCE_MODE_REMOTE -> {
 					String url = config.get(PERSISTENCE_DB_URL, String::toString).orElseThrow(
@@ -149,7 +149,7 @@ public class DefaultRepositoryFactory implements RepositoryFactory {
 
 
 	private static Object createFileRepository(Class<?> type, Path filePath) {
-		DataSourceProvider provider = DataSourceProvider.hsqldb(filePath);
+		DataSourceProvider provider = DataSourceProvider.h2file(filePath);
 		if (type.equals(TestPlanRepository.class)) {
 			return new JooqPlanRepository(provider);
 		}

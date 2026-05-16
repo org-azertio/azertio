@@ -15,7 +15,7 @@ module org.azertio.persistence {
 	exports org.azertio.persistence;
 
 	opens org.azertio.persistence;
-	opens org.azertio.persistence.migration.hsqldb;
+	opens org.azertio.persistence.migration.h2;
 	opens org.azertio.persistence.migration.postgresql;
 	exports org.azertio.persistence.plan;
 	opens org.azertio.persistence.plan;
