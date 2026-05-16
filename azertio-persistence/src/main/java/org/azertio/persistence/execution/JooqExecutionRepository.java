@@ -173,6 +173,15 @@ public class JooqExecutionRepository implements TestExecutionRepository, AutoClo
 
 
 	@Override
+	public Optional<UUID> getLastExecutionId() {
+		return dsl.select(FIELD_EXECUTION_ID)
+			.from(TABLE_EXECUTION)
+			.orderBy(FIELD_EXECUTED_AT.desc())
+			.limit(1)
+			.fetchOptional(rec -> rec.value1());
+	}
+
+	@Override
 	public Optional<TestExecution> getExecution(UUID executionId) {
 		return dsl.select(FIELD_EXECUTION_ID, FIELD_PLAN_ID, FIELD_EXECUTED_AT, FIELD_PROFILE,
 				FIELD_TEST_PASSED_COUNT, FIELD_TEST_ERROR_COUNT, FIELD_TEST_FAILED_COUNT)
@@ -360,8 +369,7 @@ public class JooqExecutionRepository implements TestExecutionRepository, AutoClo
 
 	@Override
 	public void storeExecutionNodeStats(UUID executionNodeID, ExecutionNodeStats stats) {
-		dsl.insertInto(TABLE_EXECUTION_NODE_STATS)
-		   .set(FIELD_EXECUTION_NODE_ID, executionNodeID)
+		int updated = dsl.update(TABLE_EXECUTION_NODE_STATS)
 		   .set(FIELD_STATS_NUM_EXECUTIONS, stats.numExecutions())
 		   .set(FIELD_STATS_NUM_THREADS,    stats.numThreads())
 		   .set(FIELD_STATS_MIN_MS,         stats.min())
@@ -372,19 +380,23 @@ public class JooqExecutionRepository implements TestExecutionRepository, AutoClo
 		   .set(FIELD_STATS_P99_MS,         stats.p99())
 		   .set(FIELD_STATS_THROUGHPUT,     stats.throughput())
 		   .set(FIELD_STATS_ERROR_RATE,     stats.errorRate())
-		   .onConflict(FIELD_EXECUTION_NODE_ID)
-		   .doUpdate()
-		   .set(FIELD_STATS_NUM_EXECUTIONS, stats.numExecutions())
-		   .set(FIELD_STATS_NUM_THREADS,    stats.numThreads())
-		   .set(FIELD_STATS_MIN_MS,         stats.min())
-		   .set(FIELD_STATS_MAX_MS,         stats.max())
-		   .set(FIELD_STATS_MEAN_MS,        stats.mean())
-		   .set(FIELD_STATS_P50_MS,         stats.p50())
-		   .set(FIELD_STATS_P95_MS,         stats.p95())
-		   .set(FIELD_STATS_P99_MS,         stats.p99())
-		   .set(FIELD_STATS_THROUGHPUT,     stats.throughput())
-		   .set(FIELD_STATS_ERROR_RATE,     stats.errorRate())
+		   .where(FIELD_EXECUTION_NODE_ID.eq(executionNodeID))
 		   .execute();
+		if (updated == 0) {
+			dsl.insertInto(TABLE_EXECUTION_NODE_STATS)
+			   .set(FIELD_EXECUTION_NODE_ID, executionNodeID)
+			   .set(FIELD_STATS_NUM_EXECUTIONS, stats.numExecutions())
+			   .set(FIELD_STATS_NUM_THREADS,    stats.numThreads())
+			   .set(FIELD_STATS_MIN_MS,         stats.min())
+			   .set(FIELD_STATS_MAX_MS,         stats.max())
+			   .set(FIELD_STATS_MEAN_MS,        stats.mean())
+			   .set(FIELD_STATS_P50_MS,         stats.p50())
+			   .set(FIELD_STATS_P95_MS,         stats.p95())
+			   .set(FIELD_STATS_P99_MS,         stats.p99())
+			   .set(FIELD_STATS_THROUGHPUT,     stats.throughput())
+			   .set(FIELD_STATS_ERROR_RATE,     stats.errorRate())
+			   .execute();
+		}
 	}
 
 	@Override

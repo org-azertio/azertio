@@ -35,6 +35,17 @@ public final class ServeCommand extends AbstractCommand {
         AzertioContext context = getContext();
         Config inputParams = Config.ofMap(parent.params == null ? Map.of() : parent.params);
 
+        if (!context.plugins().isEmpty()) {
+            AzertioPluginManager pluginManager = new AzertioPluginManager(context.configuration());
+            for (String plugin : context.plugins()) {
+                try {
+                    pluginManager.installPlugin(plugin);
+                } catch (Exception e) {
+                    log.error(e, "Failed to install plugin {}", plugin);
+                }
+            }
+        }
+
         // Single full-mode runtime shared by both the repository factory and the
         // exec handler. Using repositoryOnly() would open HSQLDB in read-only mode,
         // which would prevent exec from writing execution records.

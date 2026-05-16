@@ -1,20 +1,20 @@
 package org.azertio.persistence;
 
-import org.myjtools.imconfig.Config;
-import org.myjtools.jexten.Extension;
-import org.myjtools.jexten.Inject;
 import org.azertio.core.AzertioException;
 import org.azertio.core.contributors.RepositoryFactory;
 import org.azertio.core.persistence.AttachmentRepository;
+import org.azertio.core.persistence.Repository;
 import org.azertio.core.persistence.TestExecutionRepository;
 import org.azertio.core.persistence.TestPlanRepository;
-import org.azertio.core.persistence.Repository;
+import org.azertio.core.util.FileUtil;
 import org.azertio.persistence.attachment.LocalAttachmentRepository;
 import org.azertio.persistence.attachment.MinioAttachmentRepository;
 import org.azertio.persistence.execution.JooqExecutionRepository;
 import org.azertio.persistence.plan.JooqPlanRepository;
+import org.myjtools.imconfig.Config;
+import org.myjtools.jexten.Extension;
+import org.myjtools.jexten.Inject;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.util.List;
@@ -35,9 +35,9 @@ public class DefaultRepositoryFactory implements RepositoryFactory {
 			case PERSISTENCE_MODE_TRANSIENT -> {
 				try {
 					if (type.equals(AttachmentRepository.class)) {
-						yield (T) new LocalAttachmentRepository(Files.createTempDirectory("azertio-attachments"));
+						yield (T) new LocalAttachmentRepository(FileUtil.createSafeTempDirectory("azertio-attachments"));
 					}
-					yield (T) createFileRepository(type, Files.createTempFile("azertio", "db"));
+					yield (T) createFileRepository(type, FileUtil.createSafeTempFile("azertio", "db"));
 				} catch (IOException e) {
 					throw new AzertioException(e);
 				}
@@ -90,7 +90,7 @@ public class DefaultRepositoryFactory implements RepositoryFactory {
 					Path filePath = config.get(PERSISTENCE_FILE, Path::of).orElseThrow(
 						() -> new AzertioException("Repository file path not configured: {}", PERSISTENCE_FILE)
 					);
-					yield DataSourceProvider.hsqldb(envPath.resolve(filePath));
+					yield DataSourceProvider.h2file(envPath.resolve(filePath));
 				}
 				case PERSISTENCE_MODE_REMOTE -> {
 					String url = config.get(PERSISTENCE_DB_URL, String::toString).orElseThrow(
@@ -149,7 +149,7 @@ public class DefaultRepositoryFactory implements RepositoryFactory {
 
 
 	private static Object createFileRepository(Class<?> type, Path filePath) {
-		DataSourceProvider provider = DataSourceProvider.hsqldb(filePath);
+		DataSourceProvider provider = DataSourceProvider.h2file(filePath);
 		if (type.equals(TestPlanRepository.class)) {
 			return new JooqPlanRepository(provider);
 		}

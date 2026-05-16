@@ -24,6 +24,7 @@ let serveClient: AzertioClient | undefined;
 let extensionContext: vscode.ExtensionContext | undefined;
 let errorNotificationShowing = false;
 const outputChannel = vscode.window.createOutputChannel('Azertio');
+const lspOutputChannel = vscode.window.createOutputChannel('Azertio LSP');
 
 function logOutput(msg: string): void {
     outputChannel.appendLine(`[${new Date().toISOString()}] ${msg}`);
@@ -185,7 +186,7 @@ async function startClient(): Promise<void> {
             { scheme: 'file', pattern: '**/azertio.yaml' },
         ],
         workspaceFolder,
-        outputChannelName: 'Azertio LSP',
+        outputChannel: lspOutputChannel,
         initializationFailedHandler: (_error) => {
             showConnectionError(
                 `Azertio LSP could not connect to '${executable}'. ` +
@@ -276,7 +277,7 @@ export function activate(context: vscode.ExtensionContext): void {
             contributorsProvider.setClient(serveClient);
             helpTreeProvider.setClient(serveClient);
             helpDocumentProvider.setClient(serveClient);
-            serveClient.onConnected = () => { helpTreeProvider.refresh(); };
+            serveClient.addOnConnectedListener(() => { helpTreeProvider.refresh(); });
             serveClient.connect();
             testPlanProvider.setClient(serveClient);
             testPlanProvider.invalidate();
@@ -335,7 +336,7 @@ export function activate(context: vscode.ExtensionContext): void {
         contributorsProvider.setClient(serveClient);
         helpTreeProvider.setClient(serveClient);
         helpDocumentProvider.setClient(serveClient);
-        serveClient.onConnected = () => { helpTreeProvider.refresh(); };
+        serveClient.addOnConnectedListener(() => { helpTreeProvider.refresh(); });
         serveClient.connect();
         testPlanProvider.setClient(serveClient);
         executionProvider.setClient(serveClient);
@@ -371,6 +372,12 @@ export function activate(context: vscode.ExtensionContext): void {
             await vscode.window.showTextDocument(doc, {
                 selection: new vscode.Range(pos, pos),
             });
+        })
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('azertio.executions.refresh', () => {
+            executionProvider.refresh();
         })
     );
 
@@ -445,6 +452,36 @@ export function activate(context: vscode.ExtensionContext): void {
                 const msg = err instanceof Error ? err.message : String(err);
                 vscode.window.showErrorMessage(`Azertio: re-run failed — ${msg}`);
             }
+        })
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('azertio.executions.report', async (item) => {
+            const executionId: string = item?.execution?.executionId;
+            if (!executionId) { return; }
+            const config = vscode.workspace.getConfiguration('azertio');
+            const executable = config.get<string>('executablePath', 'azertio');
+            const cwd = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+
+            const success = await vscode.window.withProgress(
+                { location: vscode.ProgressLocation.Window, title: 'Azertio: generating reports…' },
+                () => new Promise<boolean>((resolve) => {
+                    logOutput(`[report] running: ${executable} report --execution-id ${executionId} (cwd=${cwd})`);
+                    execFile(executable, ['report', '--execution-id', executionId], { cwd }, (err, stdout, stderr) => {
+                        logOutput(`[report] stdout: ${stdout.trim() || '(empty)'}`);
+                        logOutput(`[report] stderr: ${stderr.trim() || '(empty)'}`);
+                        if (err) { logOutput(`[report] exit error: ${err.message}`); }
+                        resolve(!err);
+                    });
+                })
+            );
+
+            if (!success) {
+                vscode.window.showErrorMessage('Azertio: report generation failed. See the Azertio output channel for details.');
+                outputChannel.show(true);
+                return;
+            }
+            vscode.window.showInformationMessage('Azertio: reports generated successfully.');
         })
     );
 

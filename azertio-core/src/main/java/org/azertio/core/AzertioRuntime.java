@@ -17,8 +17,10 @@ import org.azertio.core.testplan.PlanBuilder;
 import org.azertio.core.testplan.TestPlan;
 import org.azertio.core.util.Lazy;
 import org.azertio.core.util.Log;
+import org.azertio.core.util.TimeZonedClock;
 import java.nio.file.Path;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -49,14 +51,13 @@ public class AzertioRuntime implements InjectionProvider {
 	private final EventBus eventBus;
 
 	public AzertioRuntime(Config configuration) {
-		this(configuration, Instant::now);
+		this(configuration, null);
 	}
 
 
 	public AzertioRuntime(Config configuration, Clock clock) {
 		this.profile = Profile.NONE;
 		this.readOnly = false;
-		this.clock = clock;
 		this.pluginManager = new AzertioPluginManager(configuration);
 		this.extensionManager = ExtensionManager
 			.create(ModuleLayerProvider.compose(ModuleLayerProvider.boot(),pluginManager.moduleLayerProvider()))
@@ -66,14 +67,19 @@ public class AzertioRuntime implements InjectionProvider {
 			.reduce(Config.empty(), Config::append)
 			.append(configuration);
 		this.config = profile.applyProfile(rawConfig);
+		this.clock = clock != null ? clock : clockFromConfig(this.config);
 		this.repositoryFactory = extensionManager.getExtension(RepositoryFactory.class)
 			.orElse(null);
 		this.resourceFinder = new ResourceFinder(config.get(AzertioConfig.RESOURCE_PATH, Path::of).orElseThrow(
 			()-> new AzertioException("Resource path not configured {}: ",AzertioConfig.RESOURCE_PATH)
 		));
-		this.resourceSet = resourceFinder.findResources(configuration().getString(AzertioConfig.RESOURCE_FILTER).orElseThrow(
-			()-> new AzertioException("Resource filter not configured {}: ",AzertioConfig.RESOURCE_FILTER)
-		));
+		Path envPath = config.get(AzertioConfig.ENV_PATH, Path::of).orElse(AzertioConfig.ENV_DEFAULT_PATH);
+		this.resourceSet = resourceFinder.findResources(
+			configuration().getString(AzertioConfig.RESOURCE_FILTER).orElseThrow(
+				()-> new AzertioException("Resource filter not configured {}: ",AzertioConfig.RESOURCE_FILTER)
+			),
+			List.of(envPath)
+		);
 		if (this.resourceSet.isEmpty()) {
 			log.warn("No resources found with path {} and filter {}",
 			configuration().getString(AzertioConfig.RESOURCE_PATH).orElse(""),
@@ -152,6 +158,12 @@ public class AzertioRuntime implements InjectionProvider {
 	}
 
 
+	private static Clock clockFromConfig(Config config) {
+		return config.getString(AzertioConfig.TIME_ZONE)
+			.map(ZoneId::of)
+			.<Clock>map(TimeZonedClock::new)
+			.orElse(Instant::now);
+	}
 
 
 	@Override

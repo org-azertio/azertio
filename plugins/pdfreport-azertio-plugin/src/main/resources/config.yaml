@@ -1,3 +1,9 @@
+pdfreport.enabled:
+  description: |
+    Whether to enable PDF report generation. When false, no PDF report will be generated.
+  type: boolean
+  defaultValue: true
+
 pdfreport.outputDir:
   description: |
     Directory where generated PDF reports will be written.

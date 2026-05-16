@@ -1,5 +1,6 @@
 package org.azertio.test;
 
+import org.azertio.core.util.FileUtil;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
@@ -63,7 +64,7 @@ public class AzertioExtension implements ParameterResolver, AfterEachCallback {
                     "Feature directory not found in test classpath: /features/" + featureDir);
             }
             Path featureDirPath = Path.of(resource.toURI());
-            Path tempDir = Files.createTempDirectory("azertio-test-");
+            Path tempDir = FileUtil.createSafeTempDirectory("azertio-test-");
 
             extensionContext.getStore(NAMESPACE).put(TEMP_DIR_KEY, tempDir);
 
@@ -88,12 +89,20 @@ public class AzertioExtension implements ParameterResolver, AfterEachCallback {
     private void deleteQuietly(Path dir) {
         try {
             if (Files.exists(dir)) {
-                Files.walk(dir)
-                    .sorted(Comparator.reverseOrder())
-                    .forEach(path -> {
-                        try { Files.delete(path); } catch (IOException ignored) {}
-                    });
+                try (var walker = Files.walk(dir)) {
+                    walker
+                            .sorted(Comparator.reverseOrder())
+                            .forEach(path -> {
+                                try {
+                                    Files.delete(path);
+                                } catch (IOException ignored) {
+                                    // intentionally blank
+                                }
+                            });
+                }
             }
-        } catch (IOException ignored) {}
+        } catch (IOException ignored) {
+            // intentionally blank
+        }
     }
 }

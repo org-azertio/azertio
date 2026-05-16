@@ -23,6 +23,7 @@ plugins:
     - org.azertio.plugins:gherkin-azertio-plugin:1.0.0-alpha2-SNAPSHOT
     - org.azertio.plugins:rest-azertio-plugin:1.0.0-alpha2-SNAPSHOT
     - "org.azertio.plugins:db-azertio-plugin:1.0.0-alpha2-SNAPSHOT with org.postgresql:postgresql"
+    - org.azertio.plugins:htmlreport-azertio-plugin:1.0.0-alpha2-SNAPSHOT
 
 configuration:
     rest:

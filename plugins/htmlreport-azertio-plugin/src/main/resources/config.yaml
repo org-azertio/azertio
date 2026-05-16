@@ -1,3 +1,9 @@
+htmlreport.enabled:
+    description: |
+        Whether to enable the HTML report plugin. When disabled, no HTML report will be generated.
+    type: boolean
+    defaultValue: true
+
 htmlreport.outputDir:
   description: |
     Directory where generated HTML reports will be written.

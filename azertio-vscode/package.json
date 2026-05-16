@@ -68,6 +68,11 @@
         "icon": "$(run-all)"
       },
       {
+        "command": "azertio.executions.report",
+        "title": "Azertio: Generate Reports",
+        "icon": "$(graph)"
+      },
+      {
         "command": "azertio.executions.deleteExecution",
         "title": "Azertio: Delete Execution",
         "icon": "$(trash)"
@@ -76,6 +81,11 @@
         "command": "azertio.executions.deletePlan",
         "title": "Azertio: Delete Plan",
         "icon": "$(trash)"
+      },
+      {
+        "command": "azertio.executions.refresh",
+        "title": "Azertio: Refresh Executions",
+        "icon": "$(refresh)"
       },
       {
         "command": "azertio.executions.pruneEmpty",
@@ -142,6 +152,11 @@
     "menus": {
       "view/title": [
         {
+          "command": "azertio.executions.refresh",
+          "when": "view == azertio.executions",
+          "group": "navigation"
+        },
+        {
           "command": "azertio.executions.pruneEmpty",
           "when": "view == azertio.executions",
           "group": "navigation"
@@ -174,9 +189,14 @@
           "group": "inline@1"
         },
         {
-          "command": "azertio.executions.deleteExecution",
+          "command": "azertio.executions.report",
           "when": "view == azertio.executions && viewItem == execution",
           "group": "inline@2"
+        },
+        {
+          "command": "azertio.executions.deleteExecution",
+          "when": "view == azertio.executions && viewItem == execution",
+          "group": "inline@3"
         },
         {
           "command": "azertio.executions.deletePlan",

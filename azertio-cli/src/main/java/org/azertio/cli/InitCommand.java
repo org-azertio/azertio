@@ -1,5 +1,9 @@
 package org.azertio.cli;
 
+import org.azertio.core.AzertioConfig;
+import org.azertio.core.AzertioContext;
+import org.azertio.core.AzertioRuntime;
+import org.azertio.core.persistence.TestPlanRepository;
 import picocli.CommandLine;
 
 import java.io.Console;
@@ -9,7 +13,7 @@ import java.nio.file.Path;
 
 @CommandLine.Command(
 	name = "init",
-	description = "Create a skeleton azertio.yaml in the current directory"
+	description = "Create a skeleton azertio.yaml and initialize the local environment"
 )
 public final class InitCommand extends AbstractCommand {
 
@@ -22,26 +26,34 @@ public final class InitCommand extends AbstractCommand {
 	@Override
 	protected void execute() {
 		Path target = Path.of(parent.configurationFile);
+		boolean yamlExists = Files.exists(target);
 
-		if (Files.exists(target)) {
-			throw new RuntimeException(target + " already exists. Remove it first if you want to reinitialise.");
+		if (!yamlExists) {
+			if (organization == null || projectName == null) {
+				Console console = System.console();
+				if (organization == null) organization = prompt(console, "Organization: ");
+				if (projectName  == null) projectName  = prompt(console, "Project name: ");
+			}
+			try {
+				Files.writeString(target, buildYaml(organization, projectName));
+			} catch (IOException e) {
+				throw new RuntimeException("Could not write " + target + ": " + e.getMessage(), e);
+			}
+			out().println("Created " + target.toAbsolutePath());
 		}
 
-		if (organization == null || projectName == null) {
-			Console console = System.console();
-			if (organization == null) organization = prompt(console, "Organization: ");
-			if (projectName  == null) projectName  = prompt(console, "Project name: ");
+		AzertioContext context = getContext();
+		Path envPath = context.configuration()
+			.get(AzertioConfig.ENV_PATH, Path::of)
+			.orElse(AzertioConfig.ENV_DEFAULT_PATH);
+
+		if (yamlExists && Files.exists(envPath)) {
+			out().println("Already initialized at " + envPath.toAbsolutePath());
+			return;
 		}
 
-		String yaml = buildYaml(organization, projectName);
-
-		try {
-			Files.writeString(target, yaml);
-		} catch (IOException e) {
-			throw new RuntimeException("Could not write " + target + ": " + e.getMessage(), e);
-		}
-
-		System.out.println("Created " + target.toAbsolutePath());
+		AzertioRuntime.repositoryOnly(context.configuration()).getRepository(TestPlanRepository.class);
+		out().println("Initialized environment at " + envPath.toAbsolutePath());
 	}
 
 	private String prompt(Console console, String message) {

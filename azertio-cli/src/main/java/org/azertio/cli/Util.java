@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
+import java.util.stream.Stream;
 
 public class Util {
 
@@ -13,8 +14,8 @@ public class Util {
 
 	static void deleteDirectory(Path pluginsPath) {
 		if (pluginsPath.toFile().exists()) {
-			try {
-				Files.walk(pluginsPath)
+			try (Stream<Path> walker = Files.walk(pluginsPath)) {
+				walker
 						.sorted(Comparator.reverseOrder())
 						.forEach(p -> {
 							try {
