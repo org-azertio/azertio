@@ -101,11 +101,14 @@ public class XMLContentType implements ContentType {
 	public void assertComplyWithSchema(String content, String schema) {
 		try {
 			SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+
 			Schema xsdSchema = sf.newSchema(new StreamSource(new StringReader(schema)));
+			sf.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+			sf.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
 			Validator validator = xsdSchema.newValidator();
 			List<String> errors = new ArrayList<>();
 			validator.setErrorHandler(new org.xml.sax.ErrorHandler() {
-				@Override public void warning(SAXParseException e) {}
+				@Override public void warning(SAXParseException e) { /* method intentionally empty */ }
 				@Override public void error(SAXParseException e)      { errors.add(e.getMessage()); }
 				@Override public void fatalError(SAXParseException e) { errors.add(e.getMessage()); }
 			});
@@ -127,6 +130,10 @@ public class XMLContentType implements ContentType {
 	private Document parseXml(String xml, String label) {
 		try {
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+			dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+			dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
+			dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+			dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
 			dbf.setNamespaceAware(true);
 			dbf.setIgnoringElementContentWhitespace(true);
 			DocumentBuilder db = dbf.newDocumentBuilder();
@@ -206,7 +213,11 @@ public class XMLContentType implements ContentType {
 
 	private String pretty(Node node) {
 		try {
-			Transformer tf = TransformerFactory.newInstance().newTransformer();
+			TransformerFactory tfactory = TransformerFactory.newInstance();
+			tfactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+			tfactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+			tfactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+			Transformer tf = tfactory.newTransformer();
 			tf.setOutputProperty(OutputKeys.INDENT, "yes");
 			tf.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
 			StringWriter sw = new StringWriter();
