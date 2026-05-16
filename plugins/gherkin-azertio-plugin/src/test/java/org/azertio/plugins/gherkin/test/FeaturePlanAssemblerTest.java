@@ -25,7 +25,7 @@ class FeaturePlanAssemblerTest {
 	@Test
 	void testAssemble() throws IOException {
 
-		TestPlanRepository repository = new JooqPlanRepository(DataSourceProvider.hsqldb(tempDir.resolve("testdb")));
+		TestPlanRepository repository = new JooqPlanRepository(DataSourceProvider.h2fileLocal(tempDir.resolve("testdb")));
 		var writer = new TestPlanRepositoryWriter(repository);
 		Optional<UUID> testPlan = assembleFeature(repository,"");
 		assertThat(testPlan).isPresent();
@@ -60,7 +60,7 @@ class FeaturePlanAssemblerTest {
 	@Test
 	void testAssembleScenarioWithTags() throws IOException {
 
-		TestPlanRepository repository = new JooqPlanRepository(DataSourceProvider.hsqldb(tempDir.resolve("testdb")));
+		TestPlanRepository repository = new JooqPlanRepository(DataSourceProvider.h2fileLocal(tempDir.resolve("testdb")));
 		var writer = new TestPlanRepositoryWriter(repository);
 		Optional<UUID> testPlan = assembleFeature(repository,"ScenarioA");
 		assertThat(testPlan).isPresent();
@@ -83,7 +83,7 @@ class FeaturePlanAssemblerTest {
 	@Test
 	void testAssembleScenarioOutlineWithTags() throws IOException {
 
-		TestPlanRepository repository = new JooqPlanRepository(DataSourceProvider.hsqldb(tempDir.resolve("testdb")));
+		TestPlanRepository repository = new JooqPlanRepository(DataSourceProvider.h2fileLocal(tempDir.resolve("testdb")));
 		var writer = new TestPlanRepositoryWriter(repository);
 		Optional<UUID> testPlan = assembleFeature(repository,"ScenarioB");
 		assertThat(testPlan).isPresent();
@@ -111,7 +111,7 @@ class FeaturePlanAssemblerTest {
 
 	@Test
 	void testAssembleScenarioWithInvalidTags() throws IOException {
-		TestPlanRepository repository = new JooqPlanRepository(DataSourceProvider.hsqldb(tempDir.resolve("testdb")));
+		TestPlanRepository repository = new JooqPlanRepository(DataSourceProvider.h2fileLocal(tempDir.resolve("testdb")));
 		Optional<UUID> testPlan = assembleFeature(repository,"InvalidTag");
 		assertThat(testPlan).isEmpty();
 	}
@@ -119,7 +119,7 @@ class FeaturePlanAssemblerTest {
 
 	@Test
 	void testTagsAndPropertiesAreInheritedFromParentToChild() throws IOException {
-		TestPlanRepository repository = new JooqPlanRepository(DataSourceProvider.hsqldb(tempDir.resolve("testdb")));
+		TestPlanRepository repository = new JooqPlanRepository(DataSourceProvider.h2fileLocal(tempDir.resolve("testdb")));
 		UUID featureId = assembleFeature(repository, "").orElseThrow();
 
 		// Feature: own tags and properties
