@@ -83,6 +83,11 @@
         "icon": "$(trash)"
       },
       {
+        "command": "azertio.executions.refresh",
+        "title": "Azertio: Refresh Executions",
+        "icon": "$(refresh)"
+      },
+      {
         "command": "azertio.executions.pruneEmpty",
         "title": "Azertio: Delete Plans Without Executions",
         "icon": "$(clear-all)"
@@ -146,6 +151,11 @@
     },
     "menus": {
       "view/title": [
+        {
+          "command": "azertio.executions.refresh",
+          "when": "view == azertio.executions",
+          "group": "navigation"
+        },
         {
           "command": "azertio.executions.pruneEmpty",
           "when": "view == azertio.executions",

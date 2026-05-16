@@ -375,6 +375,12 @@ export function activate(context: vscode.ExtensionContext): void {
     );
 
     context.subscriptions.push(
+        vscode.commands.registerCommand('azertio.executions.refresh', () => {
+            executionProvider.refresh();
+        })
+    );
+
+    context.subscriptions.push(
         vscode.commands.registerCommand('azertio.executions.run', async (_item) => {
             if (!serveClient) {
                 vscode.window.showErrorMessage('Azertio: serve connection not available.');
