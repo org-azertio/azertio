@@ -49,7 +49,7 @@ export class ContributorsProvider implements vscode.TreeDataProvider<TreeItem> {
 
     setClient(client: AzertioClient): void {
         this.client = client;
-        client.onConnected = () => this.refresh();
+        client.addOnConnectedListener(() => this.refresh());
     }
 
     async refresh(): Promise<void> {

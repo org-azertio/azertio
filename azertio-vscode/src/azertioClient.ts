@@ -124,7 +124,11 @@ export class AzertioClient {
     private readonly cwd: string;
     private readonly executable: string;
     private readonly log: (msg: string) => void;
-    onConnected: (() => void) | undefined = undefined;
+    private readonly connectedListeners: Array<() => void> = [];
+
+    addOnConnectedListener(listener: () => void): void {
+        this.connectedListeners.push(listener);
+    }
 
     constructor(executable: string, cwd: string, log: (msg: string) => void = () => {}) {
         this.executable = executable;
@@ -160,7 +164,7 @@ export class AzertioClient {
             this.rejectAll(new Error(`azertio serve process exited (code ${code})`));
         });
         this.process = proc;
-        this.onConnected?.();
+        this.connectedListeners.forEach(l => l());
     }
 
     async refresh(): Promise<void> {

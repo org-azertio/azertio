@@ -277,7 +277,7 @@ export function activate(context: vscode.ExtensionContext): void {
             contributorsProvider.setClient(serveClient);
             helpTreeProvider.setClient(serveClient);
             helpDocumentProvider.setClient(serveClient);
-            serveClient.onConnected = () => { helpTreeProvider.refresh(); };
+            serveClient.addOnConnectedListener(() => { helpTreeProvider.refresh(); });
             serveClient.connect();
             testPlanProvider.setClient(serveClient);
             testPlanProvider.invalidate();
@@ -336,7 +336,7 @@ export function activate(context: vscode.ExtensionContext): void {
         contributorsProvider.setClient(serveClient);
         helpTreeProvider.setClient(serveClient);
         helpDocumentProvider.setClient(serveClient);
-        serveClient.onConnected = () => { helpTreeProvider.refresh(); };
+        serveClient.addOnConnectedListener(() => { helpTreeProvider.refresh(); });
         serveClient.connect();
         testPlanProvider.setClient(serveClient);
         executionProvider.setClient(serveClient);
