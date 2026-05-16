@@ -567,7 +567,7 @@ public class JooqPlanRepository implements TestPlanRepository, AutoCloseable {
 			case TestPlanNodeCriteria.IsAscendantCriteria(UUID child, int depth) ->
 				buildAscendantCondition(child, depth);
 
-			case TestPlanNodeCriteria.AndCriteria(TestPlanNodeCriteria[] conditions) -> {
+			case TestPlanNodeCriteria.AndCriteria(List<TestPlanNodeCriteria> conditions) -> {
 				Condition result = DSL.trueCondition();
 				for (TestPlanNodeCriteria c : conditions) {
 					result = result.and(buildCondition(c));
@@ -575,7 +575,7 @@ public class JooqPlanRepository implements TestPlanRepository, AutoCloseable {
 				yield result;
 			}
 
-			case TestPlanNodeCriteria.OrCriteria(TestPlanNodeCriteria[] conditions) -> {
+			case TestPlanNodeCriteria.OrCriteria(List<TestPlanNodeCriteria> conditions) -> {
 				Condition result = DSL.falseCondition();
 				for (TestPlanNodeCriteria c : conditions) {
 					result = result.or(buildCondition(c));

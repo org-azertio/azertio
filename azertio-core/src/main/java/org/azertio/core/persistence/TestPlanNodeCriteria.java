@@ -1,9 +1,9 @@
 package org.azertio.core.persistence;
 
-import java.util.UUID;
 import org.azertio.core.testplan.NodeType;
+import java.util.List;
 import java.util.Objects;
-
+import java.util.UUID;
 
 
 /**
@@ -28,9 +28,9 @@ public sealed interface TestPlanNodeCriteria {
 
 	record IsAscendantCriteria(UUID parent, int depth) implements TestPlanNodeCriteria {}
 
-	record AndCriteria(TestPlanNodeCriteria... conditions) implements TestPlanNodeCriteria {}
+	record AndCriteria(List<TestPlanNodeCriteria> conditions) implements TestPlanNodeCriteria {}
 
-	record OrCriteria(TestPlanNodeCriteria... conditions) implements TestPlanNodeCriteria {}
+	record OrCriteria(List<TestPlanNodeCriteria> conditions) implements TestPlanNodeCriteria {}
 
 	record NotCriteria(TestPlanNodeCriteria condition) implements TestPlanNodeCriteria {}
 
@@ -84,11 +84,11 @@ public sealed interface TestPlanNodeCriteria {
 	}
 
 	static TestPlanNodeCriteria and(TestPlanNodeCriteria... conditions) {
-		return new AndCriteria(conditions);
+		return new AndCriteria(List.of(conditions));
 	}
 
 	static TestPlanNodeCriteria or(TestPlanNodeCriteria... conditions) {
-		return new OrCriteria(conditions);
+		return new OrCriteria(List.of(conditions));
 	}
 
 	static TestPlanNodeCriteria not(TestPlanNodeCriteria condition) {
