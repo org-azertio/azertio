@@ -24,6 +24,7 @@ let serveClient: AzertioClient | undefined;
 let extensionContext: vscode.ExtensionContext | undefined;
 let errorNotificationShowing = false;
 const outputChannel = vscode.window.createOutputChannel('Azertio');
+const lspOutputChannel = vscode.window.createOutputChannel('Azertio LSP');
 
 function logOutput(msg: string): void {
     outputChannel.appendLine(`[${new Date().toISOString()}] ${msg}`);
@@ -185,7 +186,7 @@ async function startClient(): Promise<void> {
             { scheme: 'file', pattern: '**/azertio.yaml' },
         ],
         workspaceFolder,
-        outputChannelName: 'Azertio LSP',
+        outputChannel: lspOutputChannel,
         initializationFailedHandler: (_error) => {
             showConnectionError(
                 `Azertio LSP could not connect to '${executable}'. ` +
