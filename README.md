@@ -1,13 +1,18 @@
 # Azertio — Open Black-Box Testing
 
-Azertio is an extensible, plugin-based black-box testing platform for Java. Write expressive tests in plain DSL, run them against REST APIs, databases, or any custom system — with zero boilerplate and zero glue code.
+Test REST APIs and databases in plain Gherkin — no glue code, no boilerplate, no test framework to wire up. Plugins load at runtime; results live in VS Code.
 
+[![CI](https://github.com/org-azertio/azertio/actions/workflows/ci.yml/badge.svg)](https://github.com/org-azertio/azertio/actions/workflows/ci.yml)
 [![Maven Central](https://img.shields.io/maven-central/v/org.azertio/azertio-core.svg)](https://central.sonatype.com/artifact/org.azertio/azertio-core)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=org-azertio_azertio&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=org-azertio_azertio)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=org-azertio_azertio&metric=coverage)](https://sonarcloud.io/summary/new_code?id=org-azertio_azertio)
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=org-azertio_azertio&metric=bugs)](https://sonarcloud.io/summary/new_code?id=org-azertio_azertio)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Java 21+](https://img.shields.io/badge/Java-21%2B-blue.svg)](https://openjdk.org/projects/jdk/21/)
+
+![Azertio VS Code Extension](images/screenshot1.png)
+
+![Azertio CLI output](images/screenshot3.png)
 
 ---
 
@@ -237,6 +242,8 @@ In **remote mode**, every CI run writes its full execution to the shared databas
 
 ## VS Code Extension
 
+![Azertio VS Code step documentation](images/screenshot2.png)
+
 The VS Code extension connects to the CLI via a JSON-RPC 2.0 server over stdio and provides a complete test management UI:
 
 - **Execution history** — every run listed with date, duration, and overall status.
@@ -244,8 +251,6 @@ The VS Code extension connects to the CLI via a JSON-RPC 2.0 server over stdio a
 - **Attachments** — response bodies, CSV query results, and other step outputs stored with the execution and openable inline.
 - **Benchmark statistics** — P50/P95/P99/throughput/errorRate visible per step.
 - **One-click re-run** — replay any past execution against its original test plan and profile.
-
-![Azertio VS Code Extension](images/screenshot1.png)
 
 ---
 

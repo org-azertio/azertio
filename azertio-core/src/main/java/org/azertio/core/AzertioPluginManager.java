@@ -8,6 +8,8 @@ import org.myjtools.jexten.plugin.PluginID;
 import org.myjtools.jexten.plugin.PluginManager;
 import org.myjtools.mavenfetcher.MavenFetcherProperties;
 import org.azertio.core.util.Log;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Properties;
 
@@ -28,6 +30,20 @@ public class AzertioPluginManager {
 		);
 		Properties mavenFetcherProperties = computeMavenFetcherProperties(config, envPath);
 		this.pluginManager.setArtifactStore(new MavenArtifactStore().configure(mavenFetcherProperties));
+		logPluginArtifacts(envPath.resolve(AzertioConfig.PLUGINS_PATH));
+	}
+
+	private void logPluginArtifacts(Path pluginsPath) {
+		Path artifactsPath = pluginsPath.resolve("artifacts");
+		if (!Files.isDirectory(artifactsPath)) {
+			return;
+		}
+		try (var stream = Files.walk(artifactsPath)) {
+			stream.filter(p -> p.toString().endsWith(".jar"))
+				.forEach(jar -> log.debug("[plugins] artifact: {}", jar.toAbsolutePath()));
+		} catch (IOException e) {
+			log.warn("[plugins] could not list artifacts: {}", e.getMessage());
+		}
 	}
 
 	public ModuleLayerProvider moduleLayerProvider() {

@@ -9,6 +9,7 @@ import { ExecutionProvider } from './executionProvider';
 import { openExecutionDetail } from './executionDetailPanel';
 import { ISSUE_URI_SCHEME, TestPlanProvider } from './testPlanProvider';
 import { ContributorsProvider } from './contributorsProvider';
+import { HelpProvider as HelpTreeProvider, HelpDocumentProvider, HELP_URI_SCHEME } from './helpProvider';
 import { AiCompletionProvider } from './aiCompletionProvider';
 import {
     CloseAction,
@@ -252,6 +253,14 @@ export function activate(context: vscode.ExtensionContext): void {
     const contributorsProvider = new ContributorsProvider(logOutput);
     vscode.window.registerTreeDataProvider('azertio.contributors', contributorsProvider);
 
+    const helpTreeProvider = new HelpTreeProvider(logOutput);
+    vscode.window.registerTreeDataProvider('azertio.help', helpTreeProvider);
+
+    const helpDocumentProvider = new HelpDocumentProvider();
+    context.subscriptions.push(
+        vscode.workspace.registerTextDocumentContentProvider(HELP_URI_SCHEME, helpDocumentProvider)
+    );
+
     // Auto-populate the tree on startup using existing plan data (no plan re-run).
     const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
 
@@ -265,6 +274,9 @@ export function activate(context: vscode.ExtensionContext): void {
             logOutput('[startup] starting serve connection');
             serveClient = new AzertioClient(executable, workspaceFolder.uri.fsPath, logOutput);
             contributorsProvider.setClient(serveClient);
+            helpTreeProvider.setClient(serveClient);
+            helpDocumentProvider.setClient(serveClient);
+            serveClient.onConnected = () => { helpTreeProvider.refresh(); };
             serveClient.connect();
             testPlanProvider.setClient(serveClient);
             testPlanProvider.invalidate();
@@ -321,6 +333,9 @@ export function activate(context: vscode.ExtensionContext): void {
         logOutput(`[build] starting new serve connection`);
         serveClient = new AzertioClient(executable, cwd, logOutput);
         contributorsProvider.setClient(serveClient);
+        helpTreeProvider.setClient(serveClient);
+        helpDocumentProvider.setClient(serveClient);
+        serveClient.onConnected = () => { helpTreeProvider.refresh(); };
         serveClient.connect();
         testPlanProvider.setClient(serveClient);
         executionProvider.setClient(serveClient);
@@ -518,6 +533,22 @@ export function activate(context: vscode.ExtensionContext): void {
                 const msg = err instanceof Error ? err.message : String(err);
                 vscode.window.showErrorMessage(`Azertio: failed to delete plan — ${msg}`);
             }
+        })
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('azertio.help.open', async (id: string) => {
+            await helpDocumentProvider.fetchAndCache(id);
+            await vscode.commands.executeCommand(
+                'markdown.showPreview',
+                HelpDocumentProvider.uriFor(id)
+            );
+        })
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('azertio.help.refresh', async () => {
+            await helpTreeProvider.refresh();
         })
     );
 

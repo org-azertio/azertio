@@ -95,6 +95,15 @@
       {
         "command": "azertio.ai.toggle",
         "title": "Azertio: Toggle AI Completions"
+      },
+      {
+        "command": "azertio.help.open",
+        "title": "Azertio: Open Help Page"
+      },
+      {
+        "command": "azertio.help.refresh",
+        "title": "Azertio: Refresh Help",
+        "icon": "$(refresh)"
       }
     ],
     "viewsContainers": {
@@ -122,6 +131,11 @@
           "id": "azertio.contributors",
           "name": "Contributors",
           "icon": "$(extensions)"
+        },
+        {
+          "id": "azertio.help",
+          "name": "Help",
+          "icon": "$(book)"
         }
       ]
     },
@@ -145,6 +159,11 @@
         {
           "command": "azertio.contributors.refresh",
           "when": "view == azertio.contributors",
+          "group": "navigation"
+        },
+        {
+          "command": "azertio.help.refresh",
+          "when": "view == azertio.help",
           "group": "navigation"
         }
       ],

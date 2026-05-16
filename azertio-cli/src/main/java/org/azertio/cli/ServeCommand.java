@@ -17,6 +17,7 @@ import picocli.CommandLine;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -87,6 +88,22 @@ public final class ServeCommand extends AbstractCommand {
             }
         };
 
+        JsonRpcServer.HelpRegistryProvider helpRegistryProvider = new JsonRpcServer.HelpRegistryProvider() {
+            @Override
+            public List<JsonRpcServer.HelpRegistryProvider.Entry> list() {
+                return runtime.getExtensions(org.azertio.core.contributors.HelpProvider.class)
+                    .map(p -> new JsonRpcServer.HelpRegistryProvider.Entry(p.id(), p.displayName()))
+                    .toList();
+            }
+            @Override
+            public Optional<String> content(String id) {
+                return runtime.getExtensions(org.azertio.core.contributors.HelpProvider.class)
+                    .filter(p -> p.id().equals(id))
+                    .findFirst()
+                    .map(org.azertio.core.contributors.HelpProvider::help);
+            }
+        };
+
         new JsonRpcServer(System.in, System.out, new JsonRpcServer.RepositoryFactory() {
             @Override public TestPlanRepository open() {
                 return runtime.getRepository(TestPlanRepository.class);
@@ -97,6 +114,6 @@ public final class ServeCommand extends AbstractCommand {
             @Override public AttachmentRepository openAttachment() {
                 return runtime.getRepository(AttachmentRepository.class);
             }
-        }, execHandler, planHandler, runtime::getContributors, runtime::getStepIndex).run();
+        }, execHandler, planHandler, runtime::getContributors, runtime::getStepIndex, helpRegistryProvider).run();
     }
 }

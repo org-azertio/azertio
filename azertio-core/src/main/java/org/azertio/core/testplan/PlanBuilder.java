@@ -96,7 +96,7 @@ public class PlanBuilder {
 					);
 				});
 			} else {
-				log.info("Test plan validated successfully with no issues");
+				log.info("Test plan validated successfully with no issues: {}", testPlan.planID());
 			}
 			log.debug("Registered new test plan: {}", testPlan.planID());
 			runtime.eventBus().publish(

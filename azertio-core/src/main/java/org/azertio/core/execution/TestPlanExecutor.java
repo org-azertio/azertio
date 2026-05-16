@@ -15,6 +15,7 @@ import org.azertio.core.persistence.TestPlanRepository;
 import org.azertio.core.testplan.NodeType;
 import org.azertio.core.testplan.TestPlan;
 import org.azertio.core.testplan.TestPlanNode;
+import org.azertio.core.util.AnsiColors;
 import org.azertio.core.util.Log;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -101,6 +102,9 @@ public class TestPlanExecutor {
 		testExecutionRepository.updateExecutionTestCounts(
 			execution.executionID(), rootResult.passedCount(), rootResult.errorCount(), rootResult.failedCount()
 		);
+		execution.testPassedCount(rootResult.passedCount());
+		execution.testErrorCount(rootResult.errorCount());
+		execution.testFailedCount(rootResult.failedCount());
 		runtime.eventBus().publish(
 			new ExecutionFinished(runtime.clock().now(), execution.executionID(), planID, profileName, rootResult.result)
 		);
@@ -156,8 +160,11 @@ public class TestPlanExecutor {
 
 		ExecutionResult ownResult = ExecutionResult.PASSED;
 		if (node.nodeType() == NodeType.STEP) {
-			ownResult = recordStepExecution(executionID, executionNodeID, backendExecutor, node);
+			Result stepResult = recordStepExecution(executionID, executionNodeID, backendExecutor, node);
+			ownResult = stepResult.result();
+			logStepResult(node, stepResult);
 		} else if (node.nodeType() == NodeType.TEST_CASE) {
+			logScenarioStart(node);
 			backendExecutor = new BackendExecutor(runtime);
 			backendExecutor.setUp(executionID, executionNodeID, node.properties());
 		}
@@ -229,7 +236,7 @@ public class TestPlanExecutor {
 	}
 
 
-	private ExecutionResult recordStepExecution(
+	private Result recordStepExecution(
 		UUID executionID, UUID executionNodeID, BackendExecutor backendExecutor, TestPlanNode node
 	) {
 		Benchmark benchmark = backendExecutor.currentBenchmark();
@@ -244,7 +251,7 @@ public class TestPlanExecutor {
 			testExecutionRepository.storeExecutionNodeStats(executionNodeID, benchmark.statistics());
 			backendExecutor.disableBenchmarkMode();
 		}
-		return stepResult.result();
+		return stepResult;
 	}
 
 
@@ -340,6 +347,29 @@ public class TestPlanExecutor {
 			case PASSED   -> 1;
 			default       -> 4; // UNDEFINED treated as ERROR
 		};
+	}
+
+
+	private static void logScenarioStart(TestPlanNode node) {
+		String name = node.name() != null ? node.name() : "";
+		log.info("\n{}", AnsiColors.color("Scenario: " + name, AnsiColors.BOLD));
+	}
+
+	private static void logStepResult(TestPlanNode node, Result stepResult) {
+		String keyword = node.keyword() != null ? node.keyword().trim() : "";
+		String name = node.name() != null ? node.name() : "";
+		String text = keyword.isEmpty() ? name : keyword + " " + name;
+		String label = switch (stepResult.result()) {
+			case PASSED  -> AnsiColors.color("[PASSED]",    AnsiColors.GREEN);
+			case FAILED  -> AnsiColors.color("[FAILED]",    AnsiColors.RED);
+			case SKIPPED -> AnsiColors.color("[SKIPPED]",   AnsiColors.YELLOW);
+			case ERROR   -> AnsiColors.color("[ERROR]",     AnsiColors.RED);
+			default      -> AnsiColors.color("[UNDEFINED]", AnsiColors.YELLOW);
+		};
+		log.info("  {}{}", String.format("%-70s", text), label);
+		if (stepResult.message() != null && stepResult.result() != ExecutionResult.PASSED) {
+			log.info("    {}", AnsiColors.color(stepResult.message(), AnsiColors.RED));
+		}
 	}
 
 }

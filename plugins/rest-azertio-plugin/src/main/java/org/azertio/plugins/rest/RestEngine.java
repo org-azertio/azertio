@@ -10,6 +10,7 @@ public interface RestEngine {
 	int requestPOST(String endpoint, String content);
 	int requestPUT(String endpoint, String content);
 	int requestPATCH(String endpoint, String content);
+	void setContentType(String contentType);
 	int requestDELETE(String endpoint);
 	Integer responseHttpCode();
 	String responseBody();
