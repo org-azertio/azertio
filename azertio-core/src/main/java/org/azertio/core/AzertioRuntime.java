@@ -71,9 +71,13 @@ public class AzertioRuntime implements InjectionProvider {
 		this.resourceFinder = new ResourceFinder(config.get(AzertioConfig.RESOURCE_PATH, Path::of).orElseThrow(
 			()-> new AzertioException("Resource path not configured {}: ",AzertioConfig.RESOURCE_PATH)
 		));
-		this.resourceSet = resourceFinder.findResources(configuration().getString(AzertioConfig.RESOURCE_FILTER).orElseThrow(
-			()-> new AzertioException("Resource filter not configured {}: ",AzertioConfig.RESOURCE_FILTER)
-		));
+		Path envPath = config.get(AzertioConfig.ENV_PATH, Path::of).orElse(AzertioConfig.ENV_DEFAULT_PATH);
+		this.resourceSet = resourceFinder.findResources(
+			configuration().getString(AzertioConfig.RESOURCE_FILTER).orElseThrow(
+				()-> new AzertioException("Resource filter not configured {}: ",AzertioConfig.RESOURCE_FILTER)
+			),
+			List.of(envPath)
+		);
 		if (this.resourceSet.isEmpty()) {
 			log.warn("No resources found with path {} and filter {}",
 			configuration().getString(AzertioConfig.RESOURCE_PATH).orElse(""),

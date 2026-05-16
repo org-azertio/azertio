@@ -93,4 +93,45 @@ class TestPlanBuilderTest {
 		assertThat(testPlan2.planID()).isEqualTo(testPlan1.planID());
 	}
 
+	/**
+	 * Regression test for plan deduplication: two consecutive `azertio exec` calls must reuse
+	 * the same plan even when volatile runtime parameters (env vars, CLI flags) change between
+	 * runs.  The configurationHash must be derived only from the stable project/suite definitions
+	 * in azertio.yaml, NOT from the full runtime configuration.
+	 *
+	 * Before the fix, `configurationHash` was computed from `runtime.configuration().toString()`
+	 * which includes env vars; a different env var value produced a different hash and a duplicate
+	 * plan was created.
+	 */
+	@Test
+	void buildTestPlan_reusesExistingPlanWhenEnvVarsChangeBetweenRuns(@TempDir Path tempDir) throws IOException {
+		AzertioFile file = AzertioFile.read(new FileReader("src/test/resources/azertio.yaml"));
+		String dbFile = tempDir.resolve("plan-envvar.db").toString();
+
+		Map<String, String> baseParams = Map.of(
+			AzertioConfig.ENV_PATH, ENV_PATH,
+			AzertioConfig.RESOURCE_PATH, "src/test/resources/test-features",
+			AzertioConfig.PERSISTENCE_MODE, AzertioConfig.PERSISTENCE_MODE_FILE,
+			AzertioConfig.PERSISTENCE_FILE, dbFile
+		);
+
+		// First run: ENV_VAR_ONE=first-value (e.g. set in the environment on Monday)
+		var params1 = new java.util.HashMap<>(baseParams);
+		params1.put("ENV_VAR_ONE", "first-value");
+		var context1 = file.createContext(Config.ofMap(params1), List.of("suiteA"));
+		TestPlan plan1 = new AzertioRuntime(context1.configuration()).buildTestPlan(context1);
+		assertThat(plan1.planID()).isNotNull();
+
+		// Second run: ENV_VAR_ONE=second-value (different env var, same project/suite definitions)
+		var params2 = new java.util.HashMap<>(baseParams);
+		params2.put("ENV_VAR_ONE", "second-value");
+		var context2 = file.createContext(Config.ofMap(params2), List.of("suiteA"));
+		TestPlan plan2 = new AzertioRuntime(context2.configuration()).buildTestPlan(context2);
+
+		// Must reuse the same plan — env var changes must not affect plan identity
+		assertThat(plan2.planID())
+			.as("second run with different env var must reuse the same plan (not create a new one)")
+			.isEqualTo(plan1.planID());
+	}
+
 }
