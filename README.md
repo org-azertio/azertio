@@ -296,7 +296,15 @@ The CLI distribution ZIP is produced at `azertio-cli/target/azertio-cli-<version
 
 ## Contributing
 
-Contributions are welcome. Please open an issue to discuss proposed changes before submitting a pull request. See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Azertio is a work in progress. Core features are functional, but the project is still evolving — APIs may change, some rough edges remain, and there is plenty of room to grow.
+
+If you try it out, your feedback genuinely matters:
+
+- **Found a bug?** Open an issue describing what you did, what you expected, and what actually happened.
+- **Missing a feature?** Open an issue explaining the use case — even a rough idea is worth sharing.
+- **Want to contribute code?** Open an issue first to discuss the approach, then submit a pull request. See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+All feedback and participation are welcome.
 
 ---
 
