@@ -37,6 +37,7 @@ public class RestStepProvider implements StepProvider  {
 		restEngine.setBaseUrl(config.getString("rest.baseURL").orElse(""));
 		restEngine.setHttpCodeThreshold(config.getInteger("rest.httpCodeThreshold").orElse(500));
 		restEngine.setTimeout(config.getLong("rest.timeout").orElse(10000L));
+		restEngine.setContentType(config.getString("rest.contentType").orElse("application/json"));
 	}
 
 

@@ -1,0 +1,41 @@
+project:
+    name: PetClinic Example
+    organization: Test Organization
+    description: |
+      REST and database tests against the Spring PetClinic REST API.
+      Start the stack first: docker compose up -d
+      API docs: http://localhost:9966/petclinic/swagger-ui/index.html
+    test-suites:
+      - name: smoke
+        description: Read-only GET requests against seeded data
+        tag-expression: smoke and GET
+      - name: crud
+        description: Create/update/delete operations
+        tag-expression: crud
+      - name: db
+        description: Database assertions against the PostgreSQL backend
+        tag-expression: DB
+      - name: all
+        description: All tests
+        tag-expression: "smoke or crud or DB"
+
+plugins:
+    - org.azertio.plugins:gherkin-azertio-plugin:1.0.0-alpha2-SNAPSHOT
+    - org.azertio.plugins:rest-azertio-plugin:1.0.0-alpha2-SNAPSHOT
+    - "org.azertio.plugins:db-azertio-plugin:1.0.0-alpha2-SNAPSHOT with org.postgresql:postgresql"
+
+configuration:
+    rest:
+        baseURL: 'http://localhost:9966/petclinic/api'
+        timeout: 5000
+    db:
+        datasources:
+            petclinic:
+                url: 'jdbc:postgresql://localhost:5432/petclinic'
+                username: petclinic
+                password: petclinic
+                driver: org.postgresql.Driver
+                dialect: POSTGRES
+
+profiles:
+    default: {}

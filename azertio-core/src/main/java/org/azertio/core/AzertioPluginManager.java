@@ -40,7 +40,7 @@ public class AzertioPluginManager {
 		}
 		try (var stream = Files.walk(artifactsPath)) {
 			stream.filter(p -> p.toString().endsWith(".jar"))
-				.forEach(jar -> log.info("[plugins] artifact: {}", jar.toAbsolutePath()));
+				.forEach(jar -> log.debug("[plugins] artifact: {}", jar.toAbsolutePath()));
 		} catch (IOException e) {
 			log.warn("[plugins] could not list artifacts: {}", e.getMessage());
 		}

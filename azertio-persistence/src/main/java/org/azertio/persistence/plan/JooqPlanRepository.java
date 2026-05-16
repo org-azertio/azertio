@@ -862,9 +862,10 @@ public class JooqPlanRepository implements TestPlanRepository, AutoCloseable {
 
 	@Override
 	public UUID persistProject(TestProject testProject) {
+		String organization = Objects.requireNonNullElse(testProject.organization(), "");
 		Optional<UUID> existing = dsl.select(FIELD_PROJECT_ID)
 			.from(TABLE_PROJECT)
-			.where(FIELD_ORGANIZATION_NAME.eq(testProject.organization()))
+			.where(FIELD_ORGANIZATION_NAME.eq(organization))
 			.and(FIELD_PROJECT_NAME.eq(testProject.name()))
 			.fetchOptional()
 			.map(r -> r.get(FIELD_PROJECT_ID));
@@ -878,7 +879,7 @@ public class JooqPlanRepository implements TestPlanRepository, AutoCloseable {
 		UUID id = UUIDGenerator.generateUUID();
 		dsl.insertInto(TABLE_PROJECT)
 			.set(FIELD_PROJECT_ID, id)
-			.set(FIELD_ORGANIZATION_NAME, testProject.organization())
+			.set(FIELD_ORGANIZATION_NAME, organization)
 			.set(FIELD_PROJECT_NAME, testProject.name())
 			.set(FIELD_DESCRIPTION, testProject.description())
 			.execute();
@@ -1021,7 +1022,7 @@ public class JooqPlanRepository implements TestPlanRepository, AutoCloseable {
 	public Optional<TestPlan> getPlan(TestProject testProject, String resourceSetHash, String configurationHash) {
 		return dsl.select(FIELD_PROJECT_ID)
 			.from(TABLE_PROJECT)
-			.where(FIELD_ORGANIZATION_NAME.eq(testProject.organization()))
+			.where(FIELD_ORGANIZATION_NAME.eq(Objects.requireNonNullElse(testProject.organization(), "")))
 			.and(FIELD_PROJECT_NAME.eq(testProject.name()))
 			.fetchOptional()
 			.map(r -> r.get(FIELD_PROJECT_ID))

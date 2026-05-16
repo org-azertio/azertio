@@ -24,6 +24,8 @@ public abstract sealed class AbstractCommand implements Callable<Integer> permit
 	@CommandLine.Spec
 	CommandLine.Model.CommandSpec spec;
 
+	protected int exitCode = 0;
+
 	protected abstract void execute();
 
 	protected PrintWriter out() {
@@ -122,7 +124,7 @@ public abstract sealed class AbstractCommand implements Callable<Integer> permit
 			}
 			execute();
 			out().flush();
-			return 0;
+			return exitCode;
 		} catch (Exception e) {
 			err().println(e.getMessage());
 			return 1;

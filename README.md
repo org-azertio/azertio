@@ -12,6 +12,8 @@ Test REST APIs and databases in plain Gherkin — no glue code, no boilerplate, 
 
 ![Azertio VS Code Extension](images/screenshot1.png)
 
+![Azertio CLI output](images/screenshot3.png)
+
 ---
 
 ## Features
@@ -239,6 +241,8 @@ In **remote mode**, every CI run writes its full execution to the shared databas
 ---
 
 ## VS Code Extension
+
+![Azertio VS Code step documentation](images/screenshot2.png)
 
 The VS Code extension connects to the CLI via a JSON-RPC 2.0 server over stdio and provides a complete test management UI:
 
