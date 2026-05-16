@@ -10,9 +10,12 @@ import org.azertio.core.execution.TestExecution;
 import org.azertio.core.execution.TestPlanExecutor;
 import org.azertio.core.persistence.TestExecutionRepository;
 import org.azertio.core.testplan.TestPlan;
+import org.azertio.core.util.AnsiColors;
 import org.azertio.core.util.Log;
 import picocli.CommandLine;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
@@ -40,6 +43,13 @@ public final class ExecCommand extends AbstractCommand {
     )
     boolean json;
 
+    @CommandLine.Option(
+        names = {"--exit-zero"},
+        description = "Always exit with code 0, even if tests failed",
+        defaultValue = "false"
+    )
+    boolean exitZero;
+
     @Override
     protected void execute() {
         AzertioContext context = getContext();
@@ -54,9 +64,17 @@ public final class ExecCommand extends AbstractCommand {
     private void executeAttached(AzertioContext context) {
         AzertioRuntime runtime = buildRuntime(context);
         TestPlan plan = buildPlan(context, runtime);
-        TestExecution execution = new TestPlanExecutor(runtime).execute(plan.planID(), null);
+        Instant startTime = Instant.now();
 
-        // TODO: step 4 - reports
+        TestExecution execution = new TestPlanExecutor(runtime).execute(plan.planID(), id -> {
+            if (json) {
+                JsonObject obj = new JsonObject();
+                obj.addProperty("executionId", id.toString());
+                out().println(obj);
+            }
+        });
+
+        Duration elapsed = Duration.between(startTime, Instant.now());
 
         Optional<ExecutionResult> result = Optional.empty();
         if (execution.executionRootNodeID() != null) {
@@ -67,12 +85,43 @@ public final class ExecCommand extends AbstractCommand {
 
         if (json) {
             JsonObject obj = new JsonObject();
-            obj.addProperty("executionId", execution.executionID().toString());
             obj.addProperty("result", resultName);
-            System.out.println(obj);
+            obj.addProperty("executionId", execution.executionID().toString());
+            obj.addProperty("passed", execution.testPassedCount());
+            obj.addProperty("failed", execution.testFailedCount());
+            obj.addProperty("error", execution.testErrorCount());
+            obj.addProperty("durationMs", elapsed.toMillis());
+            out().println(obj);
         } else {
-            System.out.println(execution.executionID() + " " + resultName);
+            printSummary(execution, resultName, elapsed);
         }
+
+        boolean passed = ExecutionResult.PASSED.name().equals(resultName);
+        if (!passed && !exitZero) {
+            exitCode = 1;
+        }
+    }
+
+    private void printSummary(TestExecution execution, String resultName, Duration elapsed) {
+        int passed  = execution.testPassedCount() != null ? execution.testPassedCount() : 0;
+        int failed  = execution.testFailedCount() != null ? execution.testFailedCount() : 0;
+        int error   = execution.testErrorCount()  != null ? execution.testErrorCount()  : 0;
+        int total   = passed + failed + error;
+
+        String resultColor = "PASSED".equals(resultName) ? AnsiColors.GREEN : AnsiColors.RED;
+        out().println(AnsiColors.color(resultName, resultColor));
+        String passedStr = AnsiColors.color(passed + " passed", AnsiColors.GREEN);
+        String failedStr = failed > 0 ? AnsiColors.color(failed + " failed", AnsiColors.RED) : (failed + " failed");
+        String errorStr  = error  > 0 ? AnsiColors.color(error  + " error",  AnsiColors.RED) : (error  + " error");
+        out().printf("Tests: %d total, %s, %s, %s  |  Time: %s%n",
+            total, passedStr, failedStr, errorStr, formatDuration(elapsed));
+        out().println("ExecutionID: " + execution.executionID());
+    }
+
+    private static String formatDuration(Duration d) {
+        long ms = d.toMillis();
+        if (ms < 1000) return ms + "ms";
+        return String.format("%.3fs", ms / 1000.0);
     }
 
     private void executeDetached(AzertioContext context) {
@@ -115,9 +164,9 @@ public final class ExecCommand extends AbstractCommand {
         if (json) {
             JsonObject obj = new JsonObject();
             obj.addProperty("executionId", executionIdRef.get().toString());
-            System.out.println(obj);
+            out().println(obj);
         } else {
-            System.out.println(executionIdRef.get());
+            out().println(executionIdRef.get());
         }
     }
 

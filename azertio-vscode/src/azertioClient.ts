@@ -96,6 +96,16 @@ export interface PluginContributors {
     contributors: ContributorTypeInfo[];
 }
 
+export interface HelpEntry {
+    id: string;
+    displayName: string;
+}
+
+export interface HelpContent {
+    id: string;
+    content: string;
+}
+
 type PendingRequest = {
     resolve: (result: unknown) => void;
     reject: (err: Error) => void;
@@ -164,6 +174,14 @@ export class AzertioClient {
     async getStepsIndex(): Promise<string> {
         const result = await this.call('steps/index', {});
         return JSON.stringify(result);
+    }
+
+    async listHelp(): Promise<HelpEntry[]> {
+        return this.call('help/list', {}) as Promise<HelpEntry[]>;
+    }
+
+    async getHelp(id: string): Promise<HelpContent> {
+        return this.call('help/get', { id }) as Promise<HelpContent>;
     }
 
     async listPlans(): Promise<PlanInfo[]> {

@@ -15,6 +15,7 @@ public class JdkHttpEngine implements RestEngine {
     private String baseUrl;
     private Integer httpCodeThreshold;
     private Duration timeout = Duration.ofSeconds(10);
+    private String contentType;
     private HttpRequest lastRequest;
     private String lastRequestBody;
     private HttpResponse<String> lastResponse;
@@ -48,17 +49,22 @@ public class JdkHttpEngine implements RestEngine {
 
     @Override
     public int requestPOST(String endpoint, String content) {
-        return send(builder(endpoint).POST(HttpRequest.BodyPublishers.ofString(content)).build(), content);
+        return send(bodyBuilder(endpoint).POST(HttpRequest.BodyPublishers.ofString(content)).build(), content);
     }
 
     @Override
     public int requestPUT(String endpoint, String content) {
-        return send(builder(endpoint).PUT(HttpRequest.BodyPublishers.ofString(content)).build(), content);
+        return send(bodyBuilder(endpoint).PUT(HttpRequest.BodyPublishers.ofString(content)).build(), content);
     }
 
     @Override
     public int requestPATCH(String endpoint, String content) {
-        return send(builder(endpoint).method("PATCH", HttpRequest.BodyPublishers.ofString(content)).build(), content);
+        return send(bodyBuilder(endpoint).method("PATCH", HttpRequest.BodyPublishers.ofString(content)).build(), content);
+    }
+
+    @Override
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
     }
 
     @Override
@@ -93,6 +99,14 @@ public class JdkHttpEngine implements RestEngine {
         return HttpRequest.newBuilder()
             .uri(URI.create(url))
             .timeout(timeout);
+    }
+
+    private HttpRequest.Builder bodyBuilder(String endpoint) {
+        HttpRequest.Builder b = builder(endpoint);
+        if (contentType != null && !contentType.isBlank()) {
+            b.header("Content-Type", contentType);
+        }
+        return b;
     }
 
     @Override

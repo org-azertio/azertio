@@ -1195,4 +1195,91 @@ class JsonRpcServerTest {
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getAsJsonObject().get("id").getAsString()).isEqualTo("my.step");
     }
+
+    @Test
+    void helpListWithoutProviderReturnsError() {
+        List<JsonObject> responses = run(
+            () -> new StubPlanRepo() {},
+            req(1, "help/list", "{}"),
+            req(99, "shutdown", "{}")
+        );
+        assertThat(responses.get(0).has("error")).isTrue();
+    }
+
+    @Test
+    void helpListReturnsEntries() {
+        JsonRpcServer.HelpRegistryProvider provider = new JsonRpcServer.HelpRegistryProvider() {
+            @Override public List<JsonRpcServer.HelpRegistryProvider.Entry> list() {
+                return List.of(
+                    new JsonRpcServer.HelpRegistryProvider.Entry("core.steps", "Core Steps"),
+                    new JsonRpcServer.HelpRegistryProvider.Entry("db.steps", "DB Steps")
+                );
+            }
+            @Override public Optional<String> content(String id) { return Optional.empty(); }
+        };
+
+        byte[][] frames = {frame(req(1, "help/list", "{}")), frame(req(99, "shutdown", "{}"))};
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        new JsonRpcServer(
+            new ByteArrayInputStream(concat(frames)), out,
+            () -> new StubPlanRepo() {},
+            null, null, null, null, provider
+        ).run();
+
+        var arr = parseResponses(out.toByteArray()).get(0).getAsJsonArray("result");
+        assertThat(arr).hasSize(2);
+        assertThat(arr.get(0).getAsJsonObject().get("id").getAsString()).isEqualTo("core.steps");
+        assertThat(arr.get(0).getAsJsonObject().get("displayName").getAsString()).isEqualTo("Core Steps");
+        assertThat(arr.get(1).getAsJsonObject().get("id").getAsString()).isEqualTo("db.steps");
+    }
+
+    @Test
+    void helpGetWithoutProviderReturnsError() {
+        List<JsonObject> responses = run(
+            () -> new StubPlanRepo() {},
+            req(1, "help/get", "{\"id\":\"core.steps\"}"),
+            req(99, "shutdown", "{}")
+        );
+        assertThat(responses.get(0).has("error")).isTrue();
+    }
+
+    @Test
+    void helpGetReturnsContent() {
+        JsonRpcServer.HelpRegistryProvider provider = new JsonRpcServer.HelpRegistryProvider() {
+            @Override public List<JsonRpcServer.HelpRegistryProvider.Entry> list() { return List.of(); }
+            @Override public Optional<String> content(String id) {
+                return id.equals("core.steps") ? Optional.of("# Core Steps\n\nContent here") : Optional.empty();
+            }
+        };
+
+        byte[][] frames = {frame(req(1, "help/get", "{\"id\":\"core.steps\"}")), frame(req(99, "shutdown", "{}"))};
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        new JsonRpcServer(
+            new ByteArrayInputStream(concat(frames)), out,
+            () -> new StubPlanRepo() {},
+            null, null, null, null, provider
+        ).run();
+
+        var result = parseResponses(out.toByteArray()).get(0).getAsJsonObject("result");
+        assertThat(result.get("id").getAsString()).isEqualTo("core.steps");
+        assertThat(result.get("content").getAsString()).isEqualTo("# Core Steps\n\nContent here");
+    }
+
+    @Test
+    void helpGetNotFoundReturnsError() {
+        JsonRpcServer.HelpRegistryProvider provider = new JsonRpcServer.HelpRegistryProvider() {
+            @Override public List<JsonRpcServer.HelpRegistryProvider.Entry> list() { return List.of(); }
+            @Override public Optional<String> content(String id) { return Optional.empty(); }
+        };
+
+        byte[][] frames = {frame(req(1, "help/get", "{\"id\":\"unknown\"}")), frame(req(99, "shutdown", "{}"))};
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        new JsonRpcServer(
+            new ByteArrayInputStream(concat(frames)), out,
+            () -> new StubPlanRepo() {},
+            null, null, null, null, provider
+        ).run();
+
+        assertThat(parseResponses(out.toByteArray()).get(0).has("error")).isTrue();
+    }
 }

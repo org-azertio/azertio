@@ -188,6 +188,7 @@
 				<module>plugins/rest-azertio-plugin</module>
 				<module>plugins/db-azertio-plugin</module>
 				<module>plugins/pdfreport-azertio-plugin</module>
+				<module>plugins/htmlreport-azertio-plugin</module>
 			</modules>
 		</profile>
 
@@ -204,6 +205,7 @@
 				<module>plugins/rest-azertio-plugin</module>
 				<module>plugins/db-azertio-plugin</module>
 				<module>plugins/pdfreport-azertio-plugin</module>
+				<module>plugins/htmlreport-azertio-plugin</module>
 				<module>azertio-it</module>
 			</modules>
 			<build>

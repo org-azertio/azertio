@@ -228,7 +228,8 @@ public class AzertioRuntime implements InjectionProvider {
 			ReportBuilder.class,
 			StepProvider.class,
 			SuiteAssembler.class,
-			AIIndexProvider.class
+			AIIndexProvider.class,
+			HelpProvider.class
 		);
 	}
 
