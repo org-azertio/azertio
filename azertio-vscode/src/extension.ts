@@ -449,6 +449,36 @@ export function activate(context: vscode.ExtensionContext): void {
     );
 
     context.subscriptions.push(
+        vscode.commands.registerCommand('azertio.executions.report', async (item) => {
+            const executionId: string = item?.execution?.executionId;
+            if (!executionId) { return; }
+            const config = vscode.workspace.getConfiguration('azertio');
+            const executable = config.get<string>('executablePath', 'azertio');
+            const cwd = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+
+            const success = await vscode.window.withProgress(
+                { location: vscode.ProgressLocation.Window, title: 'Azertio: generating reports…' },
+                () => new Promise<boolean>((resolve) => {
+                    logOutput(`[report] running: ${executable} report --execution-id ${executionId} (cwd=${cwd})`);
+                    execFile(executable, ['report', '--execution-id', executionId], { cwd }, (err, stdout, stderr) => {
+                        logOutput(`[report] stdout: ${stdout.trim() || '(empty)'}`);
+                        logOutput(`[report] stderr: ${stderr.trim() || '(empty)'}`);
+                        if (err) { logOutput(`[report] exit error: ${err.message}`); }
+                        resolve(!err);
+                    });
+                })
+            );
+
+            if (!success) {
+                vscode.window.showErrorMessage('Azertio: report generation failed. See the Azertio output channel for details.');
+                outputChannel.show(true);
+                return;
+            }
+            vscode.window.showInformationMessage('Azertio: reports generated successfully.');
+        })
+    );
+
+    context.subscriptions.push(
         vscode.commands.registerCommand('azertio.executions.openDetail', async (execution) => {
             if (!serveClient) {
                 vscode.window.showErrorMessage('Azertio: serve connection not available.');
