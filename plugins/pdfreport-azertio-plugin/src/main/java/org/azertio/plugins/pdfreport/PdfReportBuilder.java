@@ -3,6 +3,7 @@ package org.azertio.plugins.pdfreport;
 import org.myjtools.imconfig.Config;
 import org.myjtools.jexten.Extension;
 import org.myjtools.jexten.Inject;
+import org.azertio.core.Clock;
 import org.azertio.core.contributors.ReportBuilder;
 import org.azertio.core.execution.ExecutionResult;
 import org.azertio.core.execution.TestExecution;
@@ -13,6 +14,7 @@ import org.azertio.core.testplan.NodeType;
 import org.azertio.core.testplan.TestPlan;
 import org.azertio.core.testplan.TestPlanNode;
 import org.azertio.core.testplan.TestProject;
+import org.azertio.core.util.FileUtil;
 import org.azertio.core.util.Log;
 
 import java.io.BufferedOutputStream;
@@ -22,8 +24,6 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -37,6 +37,7 @@ public class PdfReportBuilder implements ReportBuilder {
     private static final Log log = Log.of("plugins.pdfreport");
 
     @Inject Config config;
+    @Inject Clock clock;
     @Inject TestExecutionRepository executionRepository;
     @Inject TestPlanRepository planRepository;
 
@@ -58,8 +59,8 @@ public class PdfReportBuilder implements ReportBuilder {
         TestExecution execution = executionRepository.getExecution(executionID)
             .orElseThrow(() -> new IllegalArgumentException("Execution not found: " + executionID));
 
-        Instant reportTime = execution.executedAt() != null ? execution.executedAt() : Instant.now();
-        Path outputFile = outputDir.resolve(resolvePattern(filePattern, reportTime));
+        Instant reportTime = execution.executedAt() != null ? execution.executedAt() : clock.now();
+        Path outputFile = outputDir.resolve(FileUtil.resolvePattern(filePattern, () -> reportTime));
 
         log.info("Generating PDF report for execution {} -> {}", executionID, outputFile);
         TestPlan plan = planRepository.getPlan(execution.planID())
@@ -218,14 +219,4 @@ public class PdfReportBuilder implements ReportBuilder {
         return new float[]{r / 255f, g / 255f, b / 255f};
     }
 
-    private String resolvePattern(String pattern, Instant instant) {
-        ZonedDateTime dt = instant.atZone(ZoneId.systemDefault());
-        return pattern
-            .replace("%Y", String.format("%04d", dt.getYear()))
-            .replace("%m", String.format("%02d", dt.getMonthValue()))
-            .replace("%d", String.format("%02d", dt.getDayOfMonth()))
-            .replace("%h", String.format("%02d", dt.getHour()))
-            .replace("%M", String.format("%02d", dt.getMinute()))
-            .replace("%s", String.format("%02d", dt.getSecond()));
-    }
 }

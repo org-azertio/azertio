@@ -13,6 +13,7 @@ public class AzertioConfig extends ConfigAdapter implements ConfigProvider {
 	public static final String RESOURCE_PATH = "core.resourcePath";
 	public static final String RESOURCE_FILTER = "core.resourceFilter";
 	public static final String ENV_PATH = "core.environmentPath";
+	public static final String TIME_ZONE = "core.timeZone";
 
 	public static final String STEP_EXECUTION_TIMEOUT = "core.stepExecutionTimeout";
 
