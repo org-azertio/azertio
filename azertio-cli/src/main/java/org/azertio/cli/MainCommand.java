@@ -21,6 +21,7 @@ import java.util.Map;
 		VersionCommand.class,
 		PurgeCommand.class,
 		PlanCommand.class,
+		ReportCommand.class,
 		ServeCommand.class,
 		ShowConfigCommand.class,
 		LspCommand.class

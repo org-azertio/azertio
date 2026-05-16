@@ -173,6 +173,15 @@ public class JooqExecutionRepository implements TestExecutionRepository, AutoClo
 
 
 	@Override
+	public Optional<UUID> getLastExecutionId() {
+		return dsl.select(FIELD_EXECUTION_ID)
+			.from(TABLE_EXECUTION)
+			.orderBy(FIELD_EXECUTED_AT.desc())
+			.limit(1)
+			.fetchOptional(rec -> rec.value1());
+	}
+
+	@Override
 	public Optional<TestExecution> getExecution(UUID executionId) {
 		return dsl.select(FIELD_EXECUTION_ID, FIELD_PLAN_ID, FIELD_EXECUTED_AT, FIELD_PROFILE,
 				FIELD_TEST_PASSED_COUNT, FIELD_TEST_ERROR_COUNT, FIELD_TEST_FAILED_COUNT)

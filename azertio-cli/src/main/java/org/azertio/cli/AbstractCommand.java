@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Callable;
 
-public abstract sealed class AbstractCommand implements Callable<Integer> permits BrowseCommand, DeleteExecutionCommand, DeletePlanCommand, ExecCommand, GetExecutionNodeCommand, InitCommand, InstallCommand, ListContributorsCommand, ListExecutionsCommand, ListPlansCommand, LspCommand, PlanCommand, PurgeCommand, ServeCommand, ShowConfigCommand {
+public abstract class AbstractCommand implements Callable<Integer> {
 
 	@CommandLine.ParentCommand
 	MainCommand parent;
