@@ -5,6 +5,8 @@ import com.zaxxer.hikari.HikariDataSource;
 import org.flywaydb.core.Flyway;
 import org.jooq.SQLDialect;
 import javax.sql.DataSource;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -132,6 +134,14 @@ public class DataSourceProvider {
 
 
 	public DataSource obtainDataSource() {
+
+		if (jdbcUrlProvider instanceof H2FileDataSource h2 && h2.file.getParent() != null) {
+			try {
+				Files.createDirectories(h2.file.getParent());
+			} catch (IOException e) {
+				throw new AzertioException(e, "Cannot create database directory: {}", h2.file.getParent());
+			}
+		}
 
 		HikariConfig config = new HikariConfig();
 		config.setJdbcUrl(jdbcUrlProvider.jdbcUrl());
