@@ -23,6 +23,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -73,11 +74,22 @@ public class TestPlanExecutor {
 		);
 	}
 
+	private void validateConfiguration() {
+		Map<String, List<String>> violations = runtime.configuration().validations();
+		if (!violations.isEmpty()) {
+			violations.forEach((key, messages) ->
+				messages.forEach(msg -> log.error("Configuration violation - {}: {}", key, msg))
+			);
+			throw new AzertioException("Configuration is invalid, cannot execute test plan");
+		}
+	}
+
 	public TestExecution execute(UUID planID) {
 		return execute(planID, null);
 	}
 
 	public TestExecution execute(UUID planID, Consumer<UUID> onExecutionCreated) {
+		validateConfiguration();
 		TestPlan testPlan = testPlanRepository.getPlan(planID).orElseThrow(
 			() -> new AzertioException("Test plan with ID {} not found", planID)
 		);

@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class TestPlanExecutorTest {
 
@@ -195,6 +196,23 @@ class TestPlanExecutorTest {
 		assertThat(stats.get().errorRate()).isEqualTo(0.0);
 		assertThat(stats.get().min()).isGreaterThanOrEqualTo(0);
 		assertThat(stats.get().max()).isGreaterThanOrEqualTo(stats.get().min());
+	}
+
+	@Test
+	void execute_invalidConfiguration_throwsBeforeExecution(@TempDir Path tempDir) {
+		var ctx = setup("execPassingStep", tempDir);
+
+		Config invalidConfig = Config.ofMap(Map.of(
+			AzertioConfig.ENV_PATH,            tempDir.toString(),
+			AzertioConfig.PERSISTENCE_MODE,    AzertioConfig.PERSISTENCE_MODE_FILE,
+			AzertioConfig.PERSISTENCE_FILE,    tempDir.resolve("test.db").toString(),
+			AzertioConfig.PARALLEL_EXECUTION_TAG, "invalid tag!" // violates [\w\-\_]+ pattern
+		));
+		AzertioRuntime invalidRuntime = new AzertioRuntime(invalidConfig);
+
+		assertThatThrownBy(() -> new TestPlanExecutor(invalidRuntime).execute(ctx.plan().planID()))
+			.isInstanceOf(org.azertio.core.AzertioException.class)
+			.hasMessageContaining("invalid");
 	}
 
 	// ---- helpers ----
