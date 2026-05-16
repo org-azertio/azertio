@@ -607,10 +607,12 @@
       letter-spacing: 0.04em;
     }
 
-    .badge-gherkin { background: rgba(74,222,128,0.12); color: #4ade80; border: 1px solid rgba(74,222,128,0.25); }
-    .badge-rest    { background: rgba(251,191,36,0.12);  color: #fbbf24; border: 1px solid rgba(251,191,36,0.25); }
-    .badge-db      { background: rgba(96,165,250,0.12);  color: #60a5fa; border: 1px solid rgba(96,165,250,0.25); }
-    .badge-custom  { background: rgba(167,139,250,0.12); color: #a78bfa; border: 1px solid rgba(167,139,250,0.25); }
+    .badge-gherkin   { background: rgba(74,222,128,0.12);  color: #4ade80; border: 1px solid rgba(74,222,128,0.25); }
+    .badge-rest      { background: rgba(251,191,36,0.12);  color: #fbbf24; border: 1px solid rgba(251,191,36,0.25); }
+    .badge-db        { background: rgba(96,165,250,0.12);  color: #60a5fa; border: 1px solid rgba(96,165,250,0.25); }
+    .badge-custom    { background: rgba(167,139,250,0.12); color: #a78bfa; border: 1px solid rgba(167,139,250,0.25); }
+    .badge-htmlrpt   { background: rgba(20,184,166,0.12);  color: #2dd4bf; border: 1px solid rgba(20,184,166,0.25); }
+    .badge-pdfrpt    { background: rgba(249,115,22,0.12);  color: #fb923c; border: 1px solid rgba(249,115,22,0.25); }
 
     .plugin-name {
       font-size: 1rem;
@@ -959,7 +961,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <span class="proof-sep">·</span>
     <span class="proof-chip">Gherkin DSL</span>
     <span class="proof-sep">·</span>
-    <span class="proof-chip">5 official plugins</span>
+    <span class="proof-chip">6 official plugins</span>
     <span class="proof-sep">·</span>
     <span class="proof-chip">VS Code extension</span>
   </div>
@@ -1096,6 +1098,21 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="vscode-screenshot reveal">
           <a href="images/screenshot3.png" target="_blank" rel="noopener">
             <img src="images/screenshot3.png" alt="Azertio CLI output showing colored test results" style="cursor:zoom-in" loading="lazy" />
+          </a>
+        </div>
+      </div>
+
+      <div class="qs-step reveal">
+        <div class="qs-step-info">
+          <div class="qs-num">5</div>
+          <div>
+            <h3>View the report</h3>
+            <p>Add the <code>htmlreport</code> plugin and Azertio writes a self-contained HTML file after each run — donut charts, collapsible result tree, and step-level error details, no server needed.</p>
+          </div>
+        </div>
+        <div class="vscode-screenshot reveal">
+          <a href="images/screenshot4.png" target="_blank" rel="noopener">
+            <img src="images/screenshot4.png" alt="Azertio HTML execution report showing test results with donut charts" style="cursor:zoom-in" loading="lazy" />
           </a>
         </div>
       </div>
@@ -1321,6 +1338,48 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="plugin-snippet">
 <span class="sk">plugins</span>:
   - <span class="sv">"db with com.mysql:mysql-connector-j"</span></div>
+      </div>
+
+      <div class="plugin-card reveal">
+        <div class="plugin-header">
+          <span class="plugin-badge badge-htmlrpt">htmlreport</span>
+          <span class="plugin-name">HTML Report</span>
+        </div>
+        <p class="plugin-desc">
+          Generates a self-contained HTML execution report — donut charts, collapsible result tree, step-level error details, and a configurable accent color. Single file, no external dependencies.
+        </p>
+        <div class="plugin-tags">
+          <span class="tag-chip">Self-contained</span>
+          <span class="tag-chip">Donut charts</span>
+          <span class="tag-chip">Result tree</span>
+        </div>
+        <div class="plugin-snippet">
+<span class="sk">plugins</span>:
+  - <span class="sv">htmlreport</span>
+<span class="sk">configuration</span>:
+  <span class="sc">htmlreport</span>:
+    <span class="sc">outputDir</span>: <span class="sv">reports/</span></div>
+      </div>
+
+      <div class="plugin-card reveal">
+        <div class="plugin-header">
+          <span class="plugin-badge badge-pdfrpt">pdfreport</span>
+          <span class="plugin-name">PDF Report</span>
+        </div>
+        <p class="plugin-desc">
+          Generates a paginated PDF execution report with cover page, statistics and full result tree. Ready to share or archive after each run.
+        </p>
+        <div class="plugin-tags">
+          <span class="tag-chip">Paginated PDF</span>
+          <span class="tag-chip">Cover page</span>
+          <span class="tag-chip">Statistics</span>
+        </div>
+        <div class="plugin-snippet">
+<span class="sk">plugins</span>:
+  - <span class="sv">pdfreport</span>
+<span class="sk">configuration</span>:
+  <span class="sc">pdfreport</span>:
+    <span class="sc">outputDir</span>: <span class="sv">reports/</span></div>
       </div>
 
       <div class="plugin-card reveal">

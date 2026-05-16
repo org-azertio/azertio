@@ -14,6 +14,8 @@ Test REST APIs and databases in plain Gherkin — no glue code, no boilerplate, 
 
 ![Azertio CLI output](images/screenshot3.png)
 
+![Azertio HTML execution report](images/screenshot4.png)
+
 ---
 
 ## Features
@@ -28,6 +30,7 @@ Test REST APIs and databases in plain Gherkin — no glue code, no boilerplate, 
 - **VS Code extension** — browse executions, inspect result trees, view attachments, and re-run past executions directly from the editor.
 - **Profiles** — named environment configurations in `azertio.yaml`, switched with a single CLI flag.
 - **Tag-based suite filtering** — boolean tag expressions (`GET and not slow`) define named test suites in configuration.
+- **HTML & PDF reports** — add the `htmlreport` or `pdfreport` plugin to generate self-contained execution reports after each run.
 
 ---
 
@@ -92,7 +95,9 @@ azertio/
 │   ├── gherkin-azertio-plugin/         # Gherkin .feature file parser and suite assembler
 │   ├── rest-azertio-plugin/            # REST API step provider
 │   ├── db-azertio-plugin/              # Database step provider (JDBC)
-│   └── markdown-plan-azertio-plugin/   # Markdown-based test plan format
+│   ├── markdown-plan-azertio-plugin/   # Markdown-based test plan format
+│   ├── htmlreport-azertio-plugin/      # Self-contained HTML execution report
+│   └── pdfreport-azertio-plugin/       # Paginated PDF execution report
 └── examples/
     └── test-plan/                      # Working example against JSONPlaceholder + Rfam MySQL
 ```
