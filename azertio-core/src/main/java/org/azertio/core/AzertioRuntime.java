@@ -108,8 +108,38 @@ public class AzertioRuntime implements InjectionProvider {
 	}
 
 
+	private AzertioRuntime(AzertioRuntime copy, Config rawConfig, Profile profile) {
+		this.clock = copy.clock;
+		this.extensionManager = copy.extensionManager;
+		this.pluginManager = copy.pluginManager;
+		this.config = profile.applyProfile(rawConfig);
+		this.repositoryFactory = copy.repositoryFactory;
+		this.resourceFinder = copy.resourceFinder;
+		this.resourceSet = copy.resourceSet;
+		this.planBuilder = copy.planBuilder;
+		this.contentTypes = copy.contentTypes;
+		this.readOnly = copy.readOnly;
+		this.profile = profile;
+		this.eventBus = copy.eventBus;
+	}
+
+
 	public AzertioRuntime withProfile(Profile profile) {
 		return new AzertioRuntime(this,profile);
+	}
+
+
+	/**
+	 * Returns a new runtime with the same extension infrastructure (plugins, repositories, etc.)
+	 * but with config values rebuilt from the given user config. Use this to pick up config
+	 * changes without restarting the server.
+	 */
+	public AzertioRuntime withUpdatedUserConfig(Config userConfig) {
+		Config rawConfig = extensionManager.getExtensions(ConfigProvider.class)
+			.map(ConfigProvider::config)
+			.reduce(Config.empty(), Config::append)
+			.append(userConfig);
+		return new AzertioRuntime(this, rawConfig, profile);
 	}
 
 

@@ -64,11 +64,14 @@ public final class ServeCommand extends AbstractCommand {
                         }
                     }
                 }
+                AzertioContext freshContext = readConfigurationFile().createContext(inputParams, List.of());
                 AzertioContext execContext = suites.isEmpty()
-                    ? context
+                    ? freshContext
                     : readConfigurationFile().createContext(inputParams, suites);
                 TestPlan plan;
-                AzertioRuntime execRuntime = runtime.withProfile(profile(profileName));
+                AzertioRuntime execRuntime = runtime
+                    .withUpdatedUserConfig(freshContext.configuration())
+                    .withProfile(profile(profileName));
                 try {
                     plan = execRuntime.buildTestPlan(execContext, suites);
                 } catch (Exception e) {
@@ -83,7 +86,10 @@ public final class ServeCommand extends AbstractCommand {
 
             @Override
             public TestExecution rerun(java.util.function.BiConsumer<UUID, UUID> onExecutionCreated, UUID planID, String profileName) {
-                AzertioRuntime execRuntime = runtime.withProfile(profile(profileName));
+                AzertioContext freshContext = readConfigurationFile().createContext(inputParams, List.of());
+                AzertioRuntime execRuntime = runtime
+                    .withUpdatedUserConfig(freshContext.configuration())
+                    .withProfile(profile(profileName));
                 Consumer<UUID> cb = onExecutionCreated != null
                     ? id -> onExecutionCreated.accept(id, planID)
                     : null;
