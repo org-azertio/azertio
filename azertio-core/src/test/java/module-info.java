@@ -19,6 +19,7 @@ module org.azertio.core.test {
 	opens org.azertio.core.test.datatypes to org.junit.platform.commons;
 	opens org.azertio.core.test.expressions to org.junit.platform.commons;
 	opens org.azertio.core.test.docgen to org.junit.platform.commons;
+	opens org.azertio.core.test.help to org.junit.platform.commons;
 	opens org.azertio.core.test.messages to org.junit.platform.commons;
 	opens org.azertio.core.test.execution to org.junit.platform.commons;
 	opens org.azertio.core.test.contenttypes to org.junit.platform.commons;

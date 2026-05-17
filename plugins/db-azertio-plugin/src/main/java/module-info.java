@@ -1,6 +1,8 @@
 import org.azertio.plugins.db.DbAIIndexProvider;
+import org.azertio.plugins.db.DbConfigHelpProvider;
 import org.azertio.plugins.db.DbConfigProvider;
 import org.azertio.plugins.db.DbMessageProvider;
+import org.azertio.plugins.db.DbStepHelpProvider;
 import org.azertio.plugins.db.DbStepProvider;
 
 module org.azertio.plugins.db {
@@ -18,6 +20,7 @@ requires org.apache.poi.ooxml;
 	provides org.azertio.core.contributors.ConfigProvider with DbConfigProvider;
 	provides org.azertio.core.messages.MessageProvider with DbMessageProvider;
 	provides org.azertio.core.contributors.AIIndexProvider with DbAIIndexProvider;
+	provides org.azertio.core.contributors.HelpProvider with DbStepHelpProvider, DbConfigHelpProvider;
 
 	exports org.azertio.plugins.db;
 	opens org.azertio.plugins.db to org.myjtools.jexten;

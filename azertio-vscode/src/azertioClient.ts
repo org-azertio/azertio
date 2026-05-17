@@ -96,6 +96,16 @@ export interface PluginContributors {
     contributors: ContributorTypeInfo[];
 }
 
+export interface HelpEntry {
+    id: string;
+    displayName: string;
+}
+
+export interface HelpContent {
+    id: string;
+    content: string;
+}
+
 type PendingRequest = {
     resolve: (result: unknown) => void;
     reject: (err: Error) => void;
@@ -114,7 +124,11 @@ export class AzertioClient {
     private readonly cwd: string;
     private readonly executable: string;
     private readonly log: (msg: string) => void;
-    onConnected: (() => void) | undefined = undefined;
+    private readonly connectedListeners: Array<() => void> = [];
+
+    addOnConnectedListener(listener: () => void): void {
+        this.connectedListeners.push(listener);
+    }
 
     constructor(executable: string, cwd: string, log: (msg: string) => void = () => {}) {
         this.executable = executable;
@@ -150,7 +164,7 @@ export class AzertioClient {
             this.rejectAll(new Error(`azertio serve process exited (code ${code})`));
         });
         this.process = proc;
-        this.onConnected?.();
+        this.connectedListeners.forEach(l => l());
     }
 
     async refresh(): Promise<void> {
@@ -164,6 +178,14 @@ export class AzertioClient {
     async getStepsIndex(): Promise<string> {
         const result = await this.call('steps/index', {});
         return JSON.stringify(result);
+    }
+
+    async listHelp(): Promise<HelpEntry[]> {
+        return this.call('help/list', {}) as Promise<HelpEntry[]>;
+    }
+
+    async getHelp(id: string): Promise<HelpContent> {
+        return this.call('help/get', { id }) as Promise<HelpContent>;
     }
 
     async listPlans(): Promise<PlanInfo[]> {

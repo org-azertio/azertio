@@ -16,13 +16,15 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Callable;
 
-public abstract sealed class AbstractCommand implements Callable<Integer> permits BrowseCommand, DeleteExecutionCommand, DeletePlanCommand, ExecCommand, GetExecutionNodeCommand, InitCommand, InstallCommand, ListContributorsCommand, ListExecutionsCommand, ListPlansCommand, LspCommand, PlanCommand, PurgeCommand, ServeCommand, ShowConfigCommand {
+public abstract class AbstractCommand implements Callable<Integer> {
 
 	@CommandLine.ParentCommand
 	MainCommand parent;
 
 	@CommandLine.Spec
 	CommandLine.Model.CommandSpec spec;
+
+	protected int exitCode = 0;
 
 	protected abstract void execute();
 
@@ -122,7 +124,7 @@ public abstract sealed class AbstractCommand implements Callable<Integer> permit
 			}
 			execute();
 			out().flush();
-			return 0;
+			return exitCode;
 		} catch (Exception e) {
 			err().println(e.getMessage());
 			return 1;

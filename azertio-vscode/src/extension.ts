@@ -9,6 +9,7 @@ import { ExecutionProvider } from './executionProvider';
 import { openExecutionDetail } from './executionDetailPanel';
 import { ISSUE_URI_SCHEME, TestPlanProvider } from './testPlanProvider';
 import { ContributorsProvider } from './contributorsProvider';
+import { HelpProvider as HelpTreeProvider, HelpDocumentProvider, HELP_URI_SCHEME } from './helpProvider';
 import { AiCompletionProvider } from './aiCompletionProvider';
 import {
     CloseAction,
@@ -23,6 +24,7 @@ let serveClient: AzertioClient | undefined;
 let extensionContext: vscode.ExtensionContext | undefined;
 let errorNotificationShowing = false;
 const outputChannel = vscode.window.createOutputChannel('Azertio');
+const lspOutputChannel = vscode.window.createOutputChannel('Azertio LSP');
 
 function logOutput(msg: string): void {
     outputChannel.appendLine(`[${new Date().toISOString()}] ${msg}`);
@@ -184,7 +186,7 @@ async function startClient(): Promise<void> {
             { scheme: 'file', pattern: '**/azertio.yaml' },
         ],
         workspaceFolder,
-        outputChannelName: 'Azertio LSP',
+        outputChannel: lspOutputChannel,
         initializationFailedHandler: (_error) => {
             showConnectionError(
                 `Azertio LSP could not connect to '${executable}'. ` +
@@ -252,6 +254,14 @@ export function activate(context: vscode.ExtensionContext): void {
     const contributorsProvider = new ContributorsProvider(logOutput);
     vscode.window.registerTreeDataProvider('azertio.contributors', contributorsProvider);
 
+    const helpTreeProvider = new HelpTreeProvider(logOutput);
+    vscode.window.registerTreeDataProvider('azertio.help', helpTreeProvider);
+
+    const helpDocumentProvider = new HelpDocumentProvider();
+    context.subscriptions.push(
+        vscode.workspace.registerTextDocumentContentProvider(HELP_URI_SCHEME, helpDocumentProvider)
+    );
+
     // Auto-populate the tree on startup using existing plan data (no plan re-run).
     const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
 
@@ -265,6 +275,9 @@ export function activate(context: vscode.ExtensionContext): void {
             logOutput('[startup] starting serve connection');
             serveClient = new AzertioClient(executable, workspaceFolder.uri.fsPath, logOutput);
             contributorsProvider.setClient(serveClient);
+            helpTreeProvider.setClient(serveClient);
+            helpDocumentProvider.setClient(serveClient);
+            serveClient.addOnConnectedListener(() => { helpTreeProvider.refresh(); });
             serveClient.connect();
             testPlanProvider.setClient(serveClient);
             testPlanProvider.invalidate();
@@ -321,6 +334,9 @@ export function activate(context: vscode.ExtensionContext): void {
         logOutput(`[build] starting new serve connection`);
         serveClient = new AzertioClient(executable, cwd, logOutput);
         contributorsProvider.setClient(serveClient);
+        helpTreeProvider.setClient(serveClient);
+        helpDocumentProvider.setClient(serveClient);
+        serveClient.addOnConnectedListener(() => { helpTreeProvider.refresh(); });
         serveClient.connect();
         testPlanProvider.setClient(serveClient);
         executionProvider.setClient(serveClient);
@@ -356,6 +372,12 @@ export function activate(context: vscode.ExtensionContext): void {
             await vscode.window.showTextDocument(doc, {
                 selection: new vscode.Range(pos, pos),
             });
+        })
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('azertio.executions.refresh', () => {
+            executionProvider.refresh();
         })
     );
 
@@ -430,6 +452,36 @@ export function activate(context: vscode.ExtensionContext): void {
                 const msg = err instanceof Error ? err.message : String(err);
                 vscode.window.showErrorMessage(`Azertio: re-run failed — ${msg}`);
             }
+        })
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('azertio.executions.report', async (item) => {
+            const executionId: string = item?.execution?.executionId;
+            if (!executionId) { return; }
+            const config = vscode.workspace.getConfiguration('azertio');
+            const executable = config.get<string>('executablePath', 'azertio');
+            const cwd = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+
+            const success = await vscode.window.withProgress(
+                { location: vscode.ProgressLocation.Window, title: 'Azertio: generating reports…' },
+                () => new Promise<boolean>((resolve) => {
+                    logOutput(`[report] running: ${executable} report --execution-id ${executionId} (cwd=${cwd})`);
+                    execFile(executable, ['report', '--execution-id', executionId], { cwd }, (err, stdout, stderr) => {
+                        logOutput(`[report] stdout: ${stdout.trim() || '(empty)'}`);
+                        logOutput(`[report] stderr: ${stderr.trim() || '(empty)'}`);
+                        if (err) { logOutput(`[report] exit error: ${err.message}`); }
+                        resolve(!err);
+                    });
+                })
+            );
+
+            if (!success) {
+                vscode.window.showErrorMessage('Azertio: report generation failed. See the Azertio output channel for details.');
+                outputChannel.show(true);
+                return;
+            }
+            vscode.window.showInformationMessage('Azertio: reports generated successfully.');
         })
     );
 
@@ -518,6 +570,22 @@ export function activate(context: vscode.ExtensionContext): void {
                 const msg = err instanceof Error ? err.message : String(err);
                 vscode.window.showErrorMessage(`Azertio: failed to delete plan — ${msg}`);
             }
+        })
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('azertio.help.open', async (id: string) => {
+            await helpDocumentProvider.fetchAndCache(id);
+            await vscode.commands.executeCommand(
+                'markdown.showPreview',
+                HelpDocumentProvider.uriFor(id)
+            );
+        })
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('azertio.help.refresh', async () => {
+            await helpTreeProvider.refresh();
         })
     );
 

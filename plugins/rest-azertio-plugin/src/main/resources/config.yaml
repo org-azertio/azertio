@@ -13,8 +13,14 @@ rest.httpCodeThreshold:
 
 rest.timeout:
   description: |
-    The timeout duration (in milliseconds) for RESTful operations. If a request takes 
+    The timeout duration (in milliseconds) for RESTful operations. If a request takes
     longer than this duration, it will be aborted and treated as a failure.
   type: integer
   defaultValue: 60000
+
+rest.contentType:
+  description: |
+    The default Content-Type header sent with all requests that have a body (POST, PUT, PATCH).
+  type: text
+  defaultValue: application/json
 

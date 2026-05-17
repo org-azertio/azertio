@@ -17,6 +17,13 @@ core.environmentPath:
     type: text
     defaultValue: '.azertio'
 
+core.timeZone:
+  description: |
+    Time zone used when formatting timestamps in reports (e.g. in file name patterns and report dates).
+    Accepts any IANA time zone ID such as `Europe/Madrid` or `America/New_York`.
+    Defaults to the system time zone when not set.
+  type: text
+
 core.idTagPattern:
   description: |
     Regex for tags used as identifier. If it contains a regex group, 

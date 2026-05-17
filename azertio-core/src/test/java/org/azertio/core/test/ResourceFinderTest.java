@@ -5,6 +5,7 @@ import org.azertio.core.Resource;
 import org.azertio.core.ResourceFinder;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ResourceFinderTest {
@@ -152,6 +153,30 @@ class ResourceFinderTest {
 			assertThat(input).isNotNull();
 			assertThat(new String(input.readAllBytes())).isEqualTo("ffgdsfsdfagaffgasfd");
 		}
+	}
+
+	@Test
+	void findResources_excludesFilesUnderExcludePath() {
+		// subdir is excluded — file_d.txt must not appear
+		var resourceFinder = new ResourceFinder(Path.of("src/test/resources/files"));
+		var resourceSet = resourceFinder.findResources("**/*", List.of(Path.of("src/test/resources/files/subdir")));
+		assertThat(resourceSet.resources()).extracting(Resource::relativePath)
+			.containsExactlyInAnyOrder(
+				Path.of("src/test/resources/files/file_a.txt"),
+				Path.of("src/test/resources/files/file_b.txt"),
+				Path.of("src/test/resources/files/file_c.yml")
+			)
+			.doesNotContain(Path.of("src/test/resources/files/subdir/file_d.txt"));
+	}
+
+	@Test
+	void findResources_excludePathDoesNotAffectHashStability() {
+		// Hash of the same scan with exclusion must be identical across calls
+		var resourceFinder = new ResourceFinder(Path.of("src/test/resources/files"));
+		var excludes = List.of(Path.of("src/test/resources/files/subdir"));
+		var hash1 = resourceFinder.findResources("**/*", excludes).hash();
+		var hash2 = resourceFinder.findResources("**/*", excludes).hash();
+		assertThat(hash1).isEqualTo(hash2);
 	}
 
 }

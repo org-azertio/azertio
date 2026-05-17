@@ -17,6 +17,7 @@ import picocli.CommandLine;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -33,6 +34,17 @@ public final class ServeCommand extends AbstractCommand {
         LogConfig.redirectToFile(Path.of(System.getProperty("user.home"), ".azertio", "azertio.log"));
         AzertioContext context = getContext();
         Config inputParams = Config.ofMap(parent.params == null ? Map.of() : parent.params);
+
+        if (!context.plugins().isEmpty()) {
+            AzertioPluginManager pluginManager = new AzertioPluginManager(context.configuration());
+            for (String plugin : context.plugins()) {
+                try {
+                    pluginManager.installPlugin(plugin);
+                } catch (Exception e) {
+                    log.error(e, "Failed to install plugin {}", plugin);
+                }
+            }
+        }
 
         // Single full-mode runtime shared by both the repository factory and the
         // exec handler. Using repositoryOnly() would open HSQLDB in read-only mode,
@@ -52,11 +64,14 @@ public final class ServeCommand extends AbstractCommand {
                         }
                     }
                 }
+                AzertioContext freshContext = readConfigurationFile().createContext(inputParams, List.of());
                 AzertioContext execContext = suites.isEmpty()
-                    ? context
+                    ? freshContext
                     : readConfigurationFile().createContext(inputParams, suites);
                 TestPlan plan;
-                AzertioRuntime execRuntime = runtime.withProfile(profile(profileName));
+                AzertioRuntime execRuntime = runtime
+                    .withUpdatedUserConfig(freshContext.configuration())
+                    .withProfile(profile(profileName));
                 try {
                     plan = execRuntime.buildTestPlan(execContext, suites);
                 } catch (Exception e) {
@@ -71,7 +86,10 @@ public final class ServeCommand extends AbstractCommand {
 
             @Override
             public TestExecution rerun(java.util.function.BiConsumer<UUID, UUID> onExecutionCreated, UUID planID, String profileName) {
-                AzertioRuntime execRuntime = runtime.withProfile(profile(profileName));
+                AzertioContext freshContext = readConfigurationFile().createContext(inputParams, List.of());
+                AzertioRuntime execRuntime = runtime
+                    .withUpdatedUserConfig(freshContext.configuration())
+                    .withProfile(profile(profileName));
                 Consumer<UUID> cb = onExecutionCreated != null
                     ? id -> onExecutionCreated.accept(id, planID)
                     : null;
@@ -87,6 +105,22 @@ public final class ServeCommand extends AbstractCommand {
             }
         };
 
+        JsonRpcServer.HelpRegistryProvider helpRegistryProvider = new JsonRpcServer.HelpRegistryProvider() {
+            @Override
+            public List<JsonRpcServer.HelpRegistryProvider.Entry> list() {
+                return runtime.getExtensions(org.azertio.core.contributors.HelpProvider.class)
+                    .map(p -> new JsonRpcServer.HelpRegistryProvider.Entry(p.id(), p.displayName()))
+                    .toList();
+            }
+            @Override
+            public Optional<String> content(String id) {
+                return runtime.getExtensions(org.azertio.core.contributors.HelpProvider.class)
+                    .filter(p -> p.id().equals(id))
+                    .findFirst()
+                    .map(org.azertio.core.contributors.HelpProvider::help);
+            }
+        };
+
         new JsonRpcServer(System.in, System.out, new JsonRpcServer.RepositoryFactory() {
             @Override public TestPlanRepository open() {
                 return runtime.getRepository(TestPlanRepository.class);
@@ -97,6 +131,6 @@ public final class ServeCommand extends AbstractCommand {
             @Override public AttachmentRepository openAttachment() {
                 return runtime.getRepository(AttachmentRepository.class);
             }
-        }, execHandler, planHandler, runtime::getContributors, runtime::getStepIndex).run();
+        }, execHandler, planHandler, runtime::getContributors, runtime::getStepIndex, helpRegistryProvider).run();
     }
 }

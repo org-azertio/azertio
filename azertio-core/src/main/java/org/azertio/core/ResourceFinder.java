@@ -6,6 +6,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
+import java.util.List;
 
 
 
@@ -21,13 +22,24 @@ public class ResourceFinder {
 	}
 
 	public ResourceSet findResources(String globPattern) {
+		return findResources(globPattern, List.of());
+	}
+
+	public ResourceSet findResources(String globPattern, List<Path> excludePaths) {
 		if (!globPattern.contains("**")) {
 			globPattern = "**/" + globPattern;
 		}
 		PathMatcher pathMatcher = FileSystems.getDefault().getPathMatcher("glob:"+globPattern);
+		List<Path> absExcludes = excludePaths.stream()
+			.map(p -> p.toAbsolutePath().normalize())
+			.toList();
 		try (var stream = Files.walk(startingPath)) {
 			var resources = stream.filter(Files::isRegularFile)
 				.filter(path -> pathMatcher.matches(path))
+				.filter(path -> {
+					Path abs = path.toAbsolutePath().normalize();
+					return absExcludes.stream().noneMatch(abs::startsWith);
+				})
 				.map(file -> new Resource(file.toUri(), file, ()->newReader(file)))
 				.toList();
 			return new ResourceSet(resources);

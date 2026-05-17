@@ -17,9 +17,9 @@ project:
         tag-expression: DB
 
 plugins:
-    - gherkin
-    - rest
-    - "db with com.mysql:mysql-connector-j"
+    - org.azertio.plugins:gherkin-azertio-plugin:1.0.0-alpha2-SNAPSHOT
+    - org.azertio.plugins:rest-azertio-plugin:1.0.0-alpha2-SNAPSHOT
+    - "org.azertio.plugins:db-azertio-plugin:1.0.0-alpha2-SNAPSHOT with com.mysql:mysql-connector-j"
 
 configuration:
     core:

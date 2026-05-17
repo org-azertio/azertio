@@ -49,7 +49,7 @@ public class AzertioTextDocumentService implements TextDocumentService {
     private final StepProviderBackend backend;
     private final DefaultKeywordMapProvider keywordProvider;
     private final Config config;
-    private final YamlDiagnosticsProvider yamlDiagnostics = new YamlDiagnosticsProvider();
+    private final YamlDiagnosticsProvider yamlDiagnostics;
     private FeatureDiagnosticsProvider featureDiagnostics;
     private final Map<String, String> documents = new HashMap<>();
     private LanguageClient client;
@@ -58,6 +58,7 @@ public class AzertioTextDocumentService implements TextDocumentService {
         this.backend = backend;
         this.keywordProvider = keywordProvider;
         this.config = config;
+        this.yamlDiagnostics = new YamlDiagnosticsProvider(config);
         if (backend != null) {
             this.featureDiagnostics = new FeatureDiagnosticsProvider(backend, keywordProvider);
         }

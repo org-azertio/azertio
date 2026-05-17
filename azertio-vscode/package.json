@@ -68,6 +68,11 @@
         "icon": "$(run-all)"
       },
       {
+        "command": "azertio.executions.report",
+        "title": "Azertio: Generate Reports",
+        "icon": "$(graph)"
+      },
+      {
         "command": "azertio.executions.deleteExecution",
         "title": "Azertio: Delete Execution",
         "icon": "$(trash)"
@@ -76,6 +81,11 @@
         "command": "azertio.executions.deletePlan",
         "title": "Azertio: Delete Plan",
         "icon": "$(trash)"
+      },
+      {
+        "command": "azertio.executions.refresh",
+        "title": "Azertio: Refresh Executions",
+        "icon": "$(refresh)"
       },
       {
         "command": "azertio.executions.pruneEmpty",
@@ -95,6 +105,15 @@
       {
         "command": "azertio.ai.toggle",
         "title": "Azertio: Toggle AI Completions"
+      },
+      {
+        "command": "azertio.help.open",
+        "title": "Azertio: Open Help Page"
+      },
+      {
+        "command": "azertio.help.refresh",
+        "title": "Azertio: Refresh Help",
+        "icon": "$(refresh)"
       }
     ],
     "viewsContainers": {
@@ -122,11 +141,21 @@
           "id": "azertio.contributors",
           "name": "Contributors",
           "icon": "$(extensions)"
+        },
+        {
+          "id": "azertio.help",
+          "name": "Help",
+          "icon": "$(book)"
         }
       ]
     },
     "menus": {
       "view/title": [
+        {
+          "command": "azertio.executions.refresh",
+          "when": "view == azertio.executions",
+          "group": "navigation"
+        },
         {
           "command": "azertio.executions.pruneEmpty",
           "when": "view == azertio.executions",
@@ -146,6 +175,11 @@
           "command": "azertio.contributors.refresh",
           "when": "view == azertio.contributors",
           "group": "navigation"
+        },
+        {
+          "command": "azertio.help.refresh",
+          "when": "view == azertio.help",
+          "group": "navigation"
         }
       ],
       "view/item/context": [
@@ -155,9 +189,14 @@
           "group": "inline@1"
         },
         {
-          "command": "azertio.executions.deleteExecution",
+          "command": "azertio.executions.report",
           "when": "view == azertio.executions && viewItem == execution",
           "group": "inline@2"
+        },
+        {
+          "command": "azertio.executions.deleteExecution",
+          "when": "view == azertio.executions && viewItem == execution",
+          "group": "inline@3"
         },
         {
           "command": "azertio.executions.deletePlan",

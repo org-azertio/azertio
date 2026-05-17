@@ -1,3 +1,93 @@
+'rest.auth.headers':
+  expression: 'set HTTP persistent headers:'
+  example: |
+    * set HTTP persistent headers:
+      | X-Tenant-Id | acme |
+      | X-Version   | 2    |
+  scenarios:
+    - title: Set persistent headers for all requests
+      gherkin: |
+        * set HTTP persistent headers:
+          | X-Tenant-Id | acme |
+        * do HTTP GET "users"
+        * assert HTTP status code = 200
+
+
+'rest.auth.bearer':
+  expression: 'set HTTP auth Bearer {token:text}'
+  example: |
+    * set HTTP auth Bearer "mytoken"
+  scenarios:
+    - title: Authenticate with a Bearer token
+      gherkin: |
+        * set HTTP auth Bearer "mytoken"
+        * do HTTP GET "secure/resource"
+        * assert HTTP status code = 200
+
+
+'rest.auth.basic':
+  expression: 'set HTTP auth Basic {username:text} {password:text}'
+  example: |
+    * set HTTP auth Basic "admin" "secret"
+  scenarios:
+    - title: Authenticate with Basic credentials
+      gherkin: |
+        * set HTTP auth Basic "admin" "secret"
+        * do HTTP GET "admin/settings"
+        * assert HTTP status code = 200
+
+
+'rest.auth.apikey.header':
+  expression: 'set HTTP auth API key {key:text} in header {name:text}'
+  example: |
+    * set HTTP auth API key "abc123" in header "X-API-Key"
+  scenarios:
+    - title: Authenticate with an API key header
+      gherkin: |
+        * set HTTP auth API key "abc123" in header "X-API-Key"
+        * do HTTP GET "data"
+        * assert HTTP status code = 200
+
+
+'rest.auth.apikey.query':
+  expression: 'set HTTP auth API key {key:text} in query {name:text}'
+  example: |
+    * set HTTP auth API key "abc123" in query "api_key"
+  scenarios:
+    - title: Authenticate with an API key query parameter
+      gherkin: |
+        * set HTTP auth API key "abc123" in query "api_key"
+        * do HTTP GET "data"
+        * assert HTTP status code = 200
+
+
+'rest.auth.oauth2.client_credentials':
+  expression: 'OAuth2 client credentials {url:text} client {clientId:text} secret {clientSecret:text} into {variable:id}'
+  example: |
+    * OAuth2 client credentials "${auth.tokenUrl}" client "${auth.clientId}" secret "${auth.clientSecret}" into accessToken
+  scenarios:
+    - title: Obtain an OAuth2 token and access a protected resource
+      gherkin: |
+        * OAuth2 client credentials "${auth.tokenUrl}" client "${auth.clientId}" secret "${auth.clientSecret}" into accessToken
+        * set HTTP auth Bearer "${accessToken}"
+        * do HTTP GET "secure/resource"
+        * assert HTTP status code = 200
+
+
+'rest.request.headers':
+  expression: 'set HTTP request headers:'
+  example: |
+    * set HTTP request headers:
+      | Authorization | Bearer mytoken |
+  scenarios:
+    - title: Send custom headers with a request
+      gherkin: |
+        * set HTTP request headers:
+          | Authorization | Bearer ${token} |
+        * do HTTP GET "secure/resource"
+        * assert HTTP status code = 200
+
+
 'rest.request.GET':
   expression: 'do HTTP GET {endpoint:text}'
   example: |
@@ -250,6 +340,37 @@
         """json
         {"name": "Carol"}
         """
+
+
+'rest.response.headers':
+  expression: 'assert HTTP response headers include:'
+  example: |
+    * assert HTTP response headers include:
+      | Content-Type    | application/json |
+      | X-Custom-Header | my-value         |
+  scenarios:
+    - title: Verify expected headers are present in the response
+      gherkin: |
+        * do HTTP GET "users"
+        * assert HTTP status code = 200
+        * assert HTTP response headers include:
+          | Content-Type | application/json |
+
+
+'rest.response.extracts.header':
+  expression: 'var {variable:id} = header {header:text} from HTTP response'
+  example: |
+    * var requestId = header 'X-Request-Id' from HTTP response
+  scenarios:
+    - title: Store a response header and use it in a subsequent request
+      gherkin: |
+        * do HTTP POST "orders":
+        """json
+        {"product": "widget"}
+        """
+        * var orderId = header 'X-Order-Id' from HTTP response
+        * do HTTP GET "orders/${orderId}"
+        * assert HTTP status code = 200
 
 
 'rest.response.extracts.field':

@@ -53,7 +53,7 @@ class FeaturePlanAssemblerMemoryTest {
 
 		@BeforeEach
 		void setUp() {
-			repository = new JooqPlanRepository(DataSourceProvider.hsqldb(tempDir.resolve("testdb")));
+			repository = new JooqPlanRepository(DataSourceProvider.h2fileLocal(tempDir.resolve("testdb")));
 		}
 
 		@Test

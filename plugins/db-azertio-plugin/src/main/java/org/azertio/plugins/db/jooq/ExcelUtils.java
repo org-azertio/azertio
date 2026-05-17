@@ -1,6 +1,7 @@
 package org.azertio.plugins.db.jooq;
 
 import org.apache.poi.ss.usermodel.*;
+import org.azertio.core.util.FileUtil;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -9,7 +10,7 @@ import java.nio.file.Path;
 public class ExcelUtils {
 
 	public static Path sheetToCSV(Sheet sheet) throws IOException {
-		Path tempFile = Files.createTempFile("excel_sheet_", ".csv");
+		Path tempFile = FileUtil.createSafeTempFile("excel_sheet_", ".csv");
 		try (BufferedWriter writer = Files.newBufferedWriter(tempFile)) {
 			for (Row row : sheet) {
 				for (int i = 0; i < row.getLastCellNum(); i++) {

@@ -38,6 +38,7 @@ module org.azertio.core {
 	exports org.azertio.core.datatypes;
 	exports org.azertio.core.assertions;
 	exports org.azertio.core.docgen;
+	exports org.azertio.core.help;
 	exports org.azertio.core.validator;
 	exports org.azertio.core.steps;
 	exports org.azertio.core.contenttypes;
@@ -56,8 +57,10 @@ module org.azertio.core {
 	opens org.azertio.core.execution to org.myjtools.jexten;
 	opens org.azertio.core.validator to org.myjtools.jexten;
 	opens org.azertio.core.steps to org.myjtools.jexten;
+	opens org.azertio.core.help to org.myjtools.jexten;
 
 	uses org.azertio.core.contributors.AIIndexProvider;
+	uses HelpProvider;
 	uses ContentType;
 	uses AssertionFactoryProvider;
 	uses DataTypeProvider;
@@ -84,5 +87,8 @@ module org.azertio.core {
 	provides AssertionFactoryProvider with org.azertio.core.assertions.CoreAssertionFactories;
 	provides TestPlanValidator with DefaultPlanValidator;
 	provides StepProvider with org.azertio.core.steps.CoreStepProvider;
+	provides HelpProvider with
+		org.azertio.core.steps.CoreStepHelpProvider,
+		org.azertio.core.steps.CoreConfigHelpProvider;
 
 }

@@ -3,6 +3,8 @@ package org.azertio.lsp.test;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
+import org.myjtools.imconfig.Config;
+import org.myjtools.imconfig.PropertyDefinition;
 import org.azertio.lsp.YamlDiagnosticsProvider;
 
 import java.util.List;
@@ -254,6 +256,82 @@ class YamlDiagnosticsProviderTest {
         List<Diagnostic> diags = provider.validate(yaml);
         assertThat(diags).anyMatch(d ->
             d.getSeverity() == DiagnosticSeverity.Error && msg(d).contains("Duplicate key"));
+    }
+
+    @Test
+    void invalidConfigValueProducesError() {
+        var def = PropertyDefinition.builder("rest.timeout").integerType().build();
+        Config config = Config.withDefinitions(List.of(def));
+        var providerWithDefs = new YamlDiagnosticsProvider(config);
+
+        String yaml = """
+            project:
+              name: MyProject
+              organization: MyOrg
+            configuration:
+              rest:
+                timeout: 5000f
+            """;
+        List<Diagnostic> diags = providerWithDefs.validate(yaml);
+        assertThat(diags).anyMatch(d ->
+            d.getSeverity() == DiagnosticSeverity.Error && msg(d).contains("5000f"));
+    }
+
+    @Test
+    void validConfigValueProducesNoDiagnostic() {
+        var def = PropertyDefinition.builder("rest.timeout").integerType().build();
+        Config config = Config.withDefinitions(List.of(def));
+        var providerWithDefs = new YamlDiagnosticsProvider(config);
+
+        String yaml = """
+            project:
+              name: MyProject
+              organization: MyOrg
+            configuration:
+              rest:
+                timeout: 5000
+            """;
+        List<Diagnostic> diags = providerWithDefs.validate(yaml);
+        assertThat(diags).noneMatch(d -> d.getSeverity() == DiagnosticSeverity.Error);
+    }
+
+    @Test
+    void configValueWithoutDefinitionProducesNoDiagnostic() {
+        var def = PropertyDefinition.builder("rest.timeout").integerType().build();
+        Config config = Config.withDefinitions(List.of(def));
+        var providerWithDefs = new YamlDiagnosticsProvider(config);
+
+        String yaml = """
+            project:
+              name: MyProject
+              organization: MyOrg
+            configuration:
+              rest:
+                baseURL: http://localhost
+            """;
+        List<Diagnostic> diags = providerWithDefs.validate(yaml);
+        assertThat(diags).noneMatch(d -> d.getSeverity() == DiagnosticSeverity.Error);
+    }
+
+    @Test
+    void patternConstraintViolationProducesError() {
+        var def = PropertyDefinition.builder("core.parallelExecutionTag")
+            .textType("[\\w\\-\\_]+")
+            .build();
+        Config config = Config.withDefinitions(List.of(def));
+        var providerWithDefs = new YamlDiagnosticsProvider(config);
+
+        String yaml = """
+            project:
+              name: MyProject
+              organization: MyOrg
+            configuration:
+              core:
+                parallelExecutionTag: "invalid tag!"
+            """;
+        List<Diagnostic> diags = providerWithDefs.validate(yaml);
+        assertThat(diags).anyMatch(d ->
+            d.getSeverity() == DiagnosticSeverity.Error && msg(d).contains("invalid tag!"));
     }
 
     private static String msg(Diagnostic d) {

@@ -49,8 +49,11 @@ public class PlanBuilder {
 		UUID projectID = testPlanRepository.persistProject(context.testProject());
 
 		String resourceSetHash = runtime.resourceSet().hash();
-		String configurationHash = Hash.of(runtime.configuration().toString() + context.testSuites().toString());
+		// Hash only the stable structural identity: project/suite definitions + selected suites.
+		// runtime.configuration() includes env vars and CLI params that change between runs.
+		String configurationHash = Hash.of(context.testProject().toString() + context.testSuites().toString());
 
+		log.info("Plan lookup: project={}, resourceSetHash={}, configurationHash={}", context.testProject().name(), resourceSetHash, configurationHash);
 		TestPlan testPlan = testPlanRepository.getPlan(context.testProject(), resourceSetHash, configurationHash).orElse(null);
 		if (testPlan == null) {
 			// No existing plan found, assemble a new one
@@ -96,7 +99,7 @@ public class PlanBuilder {
 					);
 				});
 			} else {
-				log.info("Test plan validated successfully with no issues");
+				log.info("Test plan validated successfully with no issues: {}", testPlan.planID());
 			}
 			log.debug("Registered new test plan: {}", testPlan.planID());
 			runtime.eventBus().publish(
