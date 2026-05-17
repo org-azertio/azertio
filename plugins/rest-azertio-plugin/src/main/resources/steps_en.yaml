@@ -28,7 +28,7 @@
         Then the HTTP status code is equal to 200
     - title: Authenticate with a token stored in a variable
       gherkin: |
-        Given the authorization is Bearer ${accessToken}
+        Given the authorization is Bearer "${accessToken}"
         When I make a GET request to "secure/resource"
         Then the HTTP status code is equal to 200
 
@@ -95,13 +95,13 @@
     - title: Obtain an OAuth2 token and use it to access a protected resource
       gherkin: |
         Given I obtain an OAuth2 client credentials token from "${auth.tokenUrl}" with client "${auth.clientId}" and secret "${auth.clientSecret}" into variable accessToken
-        And the authorization is Bearer ${accessToken}
+        And the authorization is Bearer "${accessToken}"
         When I make a GET request to "secure/resource"
         Then the HTTP status code is equal to 200
     - title: Obtain a token and verify the protected resource response body
       gherkin: |
         Given I obtain an OAuth2 client credentials token from "${auth.tokenUrl}" with client "${auth.clientId}" and secret "${auth.clientSecret}" into variable accessToken
-        And the authorization is Bearer ${accessToken}
+        And the authorization is Bearer "${accessToken}"
         When I make a POST request to "orders" with body:
         """json
         {"product": "widget", "qty": 5}
