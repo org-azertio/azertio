@@ -1,3 +1,89 @@
+'rest.auth.headers':
+  role: given
+  description: |
+    Sets headers that will be sent with every subsequent HTTP request in the scenario.
+  additional-data: |
+    A two-column table where each row specifies a header name and its value.
+
+
+'rest.auth.bearer':
+  role: given
+  description: |
+    Sets a Bearer token as the authorization for every subsequent HTTP request in the scenario.
+  parameters:
+    - name: token
+      type: text
+      description: The Bearer token value
+
+
+'rest.auth.basic':
+  role: given
+  description: |
+    Sets HTTP Basic authentication credentials for every subsequent HTTP request in the scenario.
+    The credentials are Base64-encoded and sent as an Authorization header.
+  parameters:
+    - name: username
+      type: text
+      description: The username
+    - name: password
+      type: text
+      description: The password
+
+
+'rest.auth.apikey.header':
+  role: given
+  description: |
+    Sets an API key that will be sent as a request header with every subsequent HTTP request in the scenario.
+  parameters:
+    - name: key
+      type: text
+      description: The API key value
+    - name: name
+      type: text
+      description: The header name to use (e.g. X-API-Key)
+
+
+'rest.auth.apikey.query':
+  role: given
+  description: |
+    Sets an API key that will be appended as a query parameter to every subsequent HTTP request URL in the scenario.
+  parameters:
+    - name: key
+      type: text
+      description: The API key value
+    - name: name
+      type: text
+      description: The query parameter name (e.g. api_key)
+
+
+'rest.auth.oauth2.client_credentials':
+  role: given
+  description: |
+    Obtains an OAuth2 access token using the client credentials grant and stores it in a scenario variable.
+    The token can then be used with the rest.auth.bearer step.
+  parameters:
+    - name: url
+      type: text
+      description: The token endpoint URL
+    - name: clientId
+      type: text
+      description: The OAuth2 client ID
+    - name: clientSecret
+      type: text
+      description: The OAuth2 client secret
+    - name: variable
+      type: id
+      description: The variable name where the access token will be stored
+
+
+'rest.request.headers':
+  role: given
+  description: |
+    Sets headers to be sent with the next HTTP request only.
+  additional-data: |
+    A two-column table where each row specifies a header name and its value.
+
+
 'rest.request.GET':
   role: when
   description: |
@@ -135,6 +221,15 @@
     The expected content that should be present in the response body, provided as a multi-line text input.
 
 
+'rest.response.headers':
+  role: then
+  description: |
+    Asserts that the last REST response includes the specified headers with the given values.
+    Additional response headers not listed in the table are accepted.
+  additional-data: |
+    A two-column table where each row specifies an expected header name and its expected value.
+
+
 'rest.response.extracts.field':
   role: then
   description: |
@@ -146,4 +241,18 @@
     - name: variable
       type: id
       description: The name of the variable where the value will be stored
+
+
+'rest.response.extracts.header':
+  role: then
+  description: |
+    Stores the value of a response header into a variable for later use in the test scenario.
+    Fails if the header is not present in the response.
+  parameters:
+    - name: header
+      type: text
+      description: The name of the response header whose value should be stored
+    - name: variable
+      type: id
+      description: The name of the variable where the header value will be stored
 

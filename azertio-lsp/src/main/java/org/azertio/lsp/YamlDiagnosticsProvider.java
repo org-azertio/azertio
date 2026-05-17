@@ -4,6 +4,8 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
+import org.myjtools.imconfig.Config;
+import org.myjtools.imconfig.PropertyDefinition;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.Mark;
 import org.yaml.snakeyaml.error.MarkedYAMLException;
@@ -21,6 +23,16 @@ public class YamlDiagnosticsProvider {
     private static final Set<String> ALLOWED_ROOT_KEYS = Set.of("project", "plugins", "configuration", "profiles");
     private static final Set<String> ALLOWED_PROJECT_KEYS = Set.of("name", "organization", "description", "test-suites");
     private static final Set<String> ALLOWED_SUITE_KEYS = Set.of("name", "description", "tag-expression");
+
+    private final Map<String, PropertyDefinition> definitions;
+
+    public YamlDiagnosticsProvider() {
+        this.definitions = Map.of();
+    }
+
+    public YamlDiagnosticsProvider(Config config) {
+        this.definitions = config != null ? config.getDefinitions() : Map.of();
+    }
 
     public List<Diagnostic> validate(String content) {
         var diagnostics = new ArrayList<Diagnostic>();
@@ -96,8 +108,32 @@ public class YamlDiagnosticsProvider {
     }
 
     private void validateConfiguration(Node configNode, List<Diagnostic> diagnostics) {
-        if (configNode != null && !(configNode instanceof MappingNode)) {
+        if (configNode == null) return;
+        if (!(configNode instanceof MappingNode configMap)) {
             diagnostics.add(error(configNode, "'configuration' must be a mapping"));
+            return;
+        }
+        if (!definitions.isEmpty()) {
+            validateConfigValues(configMap, "", diagnostics);
+        }
+    }
+
+    private void validateConfigValues(MappingNode node, String prefix, List<Diagnostic> diagnostics) {
+        for (var tuple : node.getValue()) {
+            String key = scalarValue(tuple.getKeyNode());
+            if (key == null) continue;
+            String fullKey = prefix.isEmpty() ? key : prefix + "." + key;
+            Node valueNode = tuple.getValueNode();
+            if (valueNode instanceof MappingNode nested) {
+                validateConfigValues(nested, fullKey, diagnostics);
+            } else if (valueNode instanceof ScalarNode scalar) {
+                PropertyDefinition def = definitions.get(fullKey);
+                if (def == null) continue;
+                String raw = scalar.getValue();
+                // Treat YAML nulls as absent
+                String value = (raw == null || "null".equals(raw) || "~".equals(raw)) ? null : raw;
+                def.validate(value).ifPresent(msg -> diagnostics.add(error(valueNode, msg)));
+            }
         }
     }
 

@@ -4,6 +4,10 @@ import org.azertio.core.AzertioRuntime;
 import org.azertio.core.execution.ExecutionNodeStats;
 import org.azertio.core.persistence.AttachmentRepository;
 import org.azertio.core.persistence.TestExecutionRepository;
+import org.azertio.core.testplan.DataTable;
+import org.azertio.core.testplan.Document;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -74,6 +78,23 @@ public class ExecutionContext {
 			input = input.replace(placeholder, entry.getValue());
 		}
 		return input;
+	}
+
+	public Document interpolateDocument(Document document) {
+		return new Document(document.mimeType(), interpolateString(document.content()));
+	}
+
+
+	public DataTable interpolateDataTable(DataTable dataTable) {
+		List<List<String>> values = new ArrayList<>();
+		for (List<String> row : dataTable.values()) {
+			List<String> interpolatedRow = new ArrayList<>();
+			values.add(interpolatedRow);
+			for (String cell : row) {
+				interpolatedRow.add(interpolateString(cell));
+			}
+		}
+		return new DataTable(values);
 	}
 
 	public void storeAttachment(byte[] bytes, String contentType) {
