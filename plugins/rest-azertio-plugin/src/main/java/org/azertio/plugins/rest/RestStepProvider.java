@@ -12,8 +12,11 @@ import org.azertio.core.contributors.ContentType;
 import org.azertio.core.contributors.StatisticsProvider;
 import org.azertio.core.contributors.StepExpression;
 import org.azertio.core.contributors.StepProvider;
+import org.azertio.core.testplan.DataTable;
 import org.azertio.core.testplan.Document;
 import org.azertio.plugins.rest.jdk.JdkHttpEngine;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.function.IntSupplier;
 
 @Extension(
@@ -48,6 +51,18 @@ public class RestStepProvider implements StepProvider  {
 		if (!ExecutionContext.current().isBenchmarkMode()) {
 			storeHttpExchange();
 		}
+	}
+
+
+	@StepExpression("rest.request.headers")
+	public void setNextRequestHeaders(DataTable table) {
+		var headers = new LinkedHashMap<String, String>();
+		for (var row : ExecutionContext.current().interpolateDataTable(table).values()) {
+			if (row.size() >= 2) {
+				headers.put(row.get(0), row.get(1));
+			}
+		}
+		restEngine.setNextRequestHeaders(headers);
 	}
 
 
@@ -126,6 +141,26 @@ public class RestStepProvider implements StepProvider  {
 	public void checkResponseBodyContains(Document body) {
 		assertCompareContentType(body.content(), body.mimeType(), ContentType.ComparisonMode.LOOSE);
 	}
+
+	@StepExpression("rest.response.headers")
+	public void checkResponseHeaders(DataTable table) {
+		var errors = new ArrayList<String>();
+		for (var row : ExecutionContext.current().interpolateDataTable(table).values()) {
+			if (row.size() < 2) continue;
+			String name = row.get(0);
+			String expected = row.get(1);
+			String actual = restEngine.responseHeader(name);
+			if (actual == null) {
+				errors.add("Header '" + name + "' was not present in the response");
+			} else if (!expected.equals(actual)) {
+				errors.add("Header '" + name + "': expected '" + expected + "' but was '" + actual + "'");
+			}
+		}
+		if (!errors.isEmpty()) {
+			throw new AssertionError("Response headers mismatch:\n" + String.join("\n", errors));
+		}
+	}
+
 
 	@StepExpression(value = "rest.response.extracts.field", args = {"field:text", "variable:id"})
 	public void extractFieldFromResponse(String field, String variable) {

@@ -1,3 +1,17 @@
+'rest.request.headers':
+  expression: 'set HTTP request headers:'
+  example: |
+    * set HTTP request headers:
+      | Authorization | Bearer mytoken |
+  scenarios:
+    - title: Send custom headers with a request
+      gherkin: |
+        * set HTTP request headers:
+          | Authorization | Bearer ${token} |
+        * do HTTP GET "secure/resource"
+        * assert HTTP status code = 200
+
+
 'rest.request.GET':
   expression: 'do HTTP GET {endpoint:text}'
   example: |
@@ -250,6 +264,21 @@
         """json
         {"name": "Carol"}
         """
+
+
+'rest.response.headers':
+  expression: 'assert HTTP response headers include:'
+  example: |
+    * assert HTTP response headers include:
+      | Content-Type    | application/json |
+      | X-Custom-Header | my-value         |
+  scenarios:
+    - title: Verify expected headers are present in the response
+      gherkin: |
+        * do HTTP GET "users"
+        * assert HTTP status code = 200
+        * assert HTTP response headers include:
+          | Content-Type | application/json |
 
 
 'rest.response.extracts.field':

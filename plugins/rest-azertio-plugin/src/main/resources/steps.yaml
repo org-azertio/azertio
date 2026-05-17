@@ -1,3 +1,11 @@
+'rest.request.headers':
+  role: given
+  description: |
+    Sets headers to be sent with the next HTTP request only.
+  additional-data: |
+    A two-column table where each row specifies a header name and its value.
+
+
 'rest.request.GET':
   role: when
   description: |
@@ -133,6 +141,15 @@
     Asserts that the body of the last REST response contains the expected value.
   additional-data: |
     The expected content that should be present in the response body, provided as a multi-line text input.
+
+
+'rest.response.headers':
+  role: then
+  description: |
+    Asserts that the last REST response includes the specified headers with the given values.
+    Additional response headers not listed in the table are accepted.
+  additional-data: |
+    A two-column table where each row specifies an expected header name and its expected value.
 
 
 'rest.response.extracts.field':

@@ -48,6 +48,17 @@ class TestRestSteps {
 			.willReturn(ok()
 				.withHeader("Content-Type", "application/json")
 				.withBody("[{\"name\":\"Alice\"}]")));
+
+		wireMock.stubFor(get("/secure")
+			.withHeader("Authorization", equalTo("Bearer secret"))
+			.withHeader("X-Tenant-Id", equalTo("acme"))
+			.willReturn(ok()));
+
+		wireMock.stubFor(get("/headers-test")
+			.willReturn(ok()
+				.withHeader("Content-Type", "application/json")
+				.withHeader("X-Custom-Header", "my-value")
+				.withBody("{}")));
 	}
 
 	private String baseUrl() {
@@ -115,5 +126,23 @@ class TestRestSteps {
 	@FeatureDir("dsl-extract-field")
 	void dsl_extractField_storesValueAndUsesItInSubsequentRequest(JUnitAzertioPlan plan) {
 		plan.withConfig("rest.baseURL", baseUrl()).execute().assertAllPassed();
+	}
+
+	@Test
+	@FeatureDir("request-headers")
+	void requestHeaders_areSentWithNextRequestOnly(JUnitAzertioPlan plan) {
+		plan.withConfig("rest.baseURL", baseUrl()).execute().assertAllPassed();
+	}
+
+	@Test
+	@FeatureDir("response-headers")
+	void responseHeaders_passes(JUnitAzertioPlan plan) {
+		plan.withConfig("rest.baseURL", baseUrl()).execute().assertAllPassed();
+	}
+
+	@Test
+	@FeatureDir("wrong-response-headers")
+	void wrongResponseHeaders_fails(JUnitAzertioPlan plan) {
+		plan.withConfig("rest.baseURL", baseUrl()).execute().assertAllFailed();
 	}
 }

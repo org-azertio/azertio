@@ -1,3 +1,18 @@
+'rest.request.headers':
+  expression: 'the next request has the headers:'
+  example: |
+    Given the next request has the headers:
+      | Authorization | Bearer mytoken |
+      | X-Tenant-Id   | acme           |
+  scenarios:
+    - title: Send an authorization header with a GET request
+      gherkin: |
+        Given the next request has the headers:
+          | Authorization | Bearer ${token} |
+        When I make a GET request to "secure/resource"
+        Then the HTTP status code is equal to 200
+
+
 'rest.request.GET':
   expression: 'I make a GET request to {endpoint:text}'
   example: |
@@ -278,6 +293,21 @@
         """json
         {"name": "Carol"}
         """
+
+
+'rest.response.headers':
+  expression: 'the response headers include:'
+  example: |
+    Then the response headers include:
+      | Content-Type    | application/json |
+      | X-Custom-Header | my-value         |
+  scenarios:
+    - title: Verify expected headers are present in the response
+      gherkin: |
+        When I make a GET request to "users"
+        Then the HTTP status code is equal to 200
+        And the response headers include:
+          | Content-Type | application/json |
 
 
 'rest.response.extracts.field':

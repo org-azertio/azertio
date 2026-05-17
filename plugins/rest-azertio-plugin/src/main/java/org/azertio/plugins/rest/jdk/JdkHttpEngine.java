@@ -10,12 +10,16 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 public class JdkHttpEngine implements RestEngine {
 
     private String baseUrl;
     private Integer httpCodeThreshold;
     private Duration timeout = Duration.ofSeconds(10);
     private String contentType;
+    private final Map<String, String> pendingRequestHeaders = new LinkedHashMap<>();
     private HttpRequest lastRequest;
     private String lastRequestBody;
     private HttpResponse<String> lastResponse;
@@ -68,6 +72,11 @@ public class JdkHttpEngine implements RestEngine {
     }
 
     @Override
+    public void setNextRequestHeaders(Map<String, String> headers) {
+        pendingRequestHeaders.putAll(headers);
+    }
+
+    @Override
     public int requestDELETE(String endpoint) {
         return send(builder(endpoint).DELETE().build(), null);
     }
@@ -90,15 +99,24 @@ public class JdkHttpEngine implements RestEngine {
             .orElse(null);
     }
 
+    @Override
+    public String responseHeader(String name) {
+        if (lastResponse == null) return null;
+        return lastResponse.headers().firstValue(name).orElse(null);
+    }
+
     private HttpRequest.Builder builder(String endpoint) {
         String url = (baseUrl == null || baseUrl.isBlank())
             ? endpoint
             : (baseUrl.endsWith("/") || endpoint.startsWith("/"))
                 ? baseUrl + endpoint
                 : baseUrl + "/" + endpoint;
-        return HttpRequest.newBuilder()
+        HttpRequest.Builder b = HttpRequest.newBuilder()
             .uri(URI.create(url))
             .timeout(timeout);
+        pendingRequestHeaders.forEach(b::header);
+        pendingRequestHeaders.clear();
+        return b;
     }
 
     private HttpRequest.Builder bodyBuilder(String endpoint) {
