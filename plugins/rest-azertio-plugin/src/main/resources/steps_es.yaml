@@ -19,11 +19,11 @@
 'rest.auth.bearer':
   expression: 'la autorización es Bearer {token:text}'
   example: |
-    Dado que la autorización es Bearer mitoken
+    Dado que la autorización es Bearer "mitoken"
   scenarios:
     - title: Autenticarse con un token Bearer estático
       gherkin: |
-        Dado que la autorización es Bearer mitoken
+        Dado que la autorización es Bearer "mitoken"
         Cuando hago una petición GET a "secure/resource"
         Entonces el código de estado HTTP es igual a 200
     - title: Autenticarse con un token almacenado en una variable

@@ -19,11 +19,11 @@
 'rest.auth.bearer':
   expression: 'the authorization is Bearer {token:text}'
   example: |
-    Given the authorization is Bearer mytoken
+    Given the authorization is Bearer "mytoken"
   scenarios:
     - title: Authenticate with a static Bearer token
       gherkin: |
-        Given the authorization is Bearer mytoken
+        Given the authorization is Bearer "mytoken"
         When I make a GET request to "secure/resource"
         Then the HTTP status code is equal to 200
     - title: Authenticate with a token stored in a variable
