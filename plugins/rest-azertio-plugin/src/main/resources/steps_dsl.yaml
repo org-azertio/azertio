@@ -69,7 +69,7 @@
     - title: Obtain an OAuth2 token and access a protected resource
       gherkin: |
         * OAuth2 client credentials "${auth.tokenUrl}" client "${auth.clientId}" secret "${auth.clientSecret}" into accessToken
-        * set HTTP auth Bearer ${accessToken}
+        * set HTTP auth Bearer "${accessToken}"
         * do HTTP GET "secure/resource"
         * assert HTTP status code = 200
 

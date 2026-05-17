@@ -28,7 +28,7 @@
         Entonces el código de estado HTTP es igual a 200
     - title: Autenticarse con un token almacenado en una variable
       gherkin: |
-        Dado que la autorización es Bearer ${accessToken}
+        Dado que la autorización es Bearer "${accessToken}"
         Cuando hago una petición GET a "secure/resource"
         Entonces el código de estado HTTP es igual a 200
 
@@ -77,7 +77,7 @@
     - title: Obtener un token OAuth2 y usarlo para acceder a un recurso protegido
       gherkin: |
         Dado que obtengo un token OAuth2 de cliente de "${auth.tokenUrl}" con cliente "${auth.clientId}" y secreto "${auth.clientSecret}" en la variable accessToken
-        Y la autorización es Bearer ${accessToken}
+        Y la autorización es Bearer "${accessToken}"
         Cuando hago una petición GET a "secure/resource"
         Entonces el código de estado HTTP es igual a 200
 
