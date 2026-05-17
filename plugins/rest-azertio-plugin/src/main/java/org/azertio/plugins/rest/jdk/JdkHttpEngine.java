@@ -5,10 +5,16 @@ import org.azertio.plugins.rest.RestEngine;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class JdkHttpEngine implements RestEngine {
 
@@ -16,6 +22,9 @@ public class JdkHttpEngine implements RestEngine {
     private Integer httpCodeThreshold;
     private Duration timeout = Duration.ofSeconds(10);
     private String contentType;
+    private final Map<String, String> persistentHeaders = new LinkedHashMap<>();
+    private final Map<String, String> persistentQueryParams = new LinkedHashMap<>();
+    private final Map<String, String> pendingRequestHeaders = new LinkedHashMap<>();
     private HttpRequest lastRequest;
     private String lastRequestBody;
     private HttpResponse<String> lastResponse;
@@ -68,6 +77,53 @@ public class JdkHttpEngine implements RestEngine {
     }
 
     @Override
+    public void setNextRequestHeaders(Map<String, String> headers) {
+        pendingRequestHeaders.putAll(headers);
+    }
+
+    @Override
+    public void setPersistentHeaders(Map<String, String> headers) {
+        persistentHeaders.putAll(headers);
+    }
+
+    @Override
+    public void addPersistentQueryParam(String name, String value) {
+        persistentQueryParams.put(name, value);
+    }
+
+    @Override
+    public String fetchOAuth2Token(String tokenUrl, String clientId, String clientSecret) {
+        String url = buildUrl(tokenUrl);
+        String body = "grant_type=client_credentials"
+            + "&client_id=" + URLEncoder.encode(clientId, StandardCharsets.UTF_8)
+            + "&client_secret=" + URLEncoder.encode(clientSecret, StandardCharsets.UTF_8);
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create(url))
+            .timeout(timeout)
+            .header("Content-Type", "application/x-www-form-urlencoded")
+            .POST(HttpRequest.BodyPublishers.ofString(body))
+            .build();
+        HttpResponse<String> response;
+        try {
+            response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new AzertioException("OAuth2 token request interrupted: {}", url);
+        } catch (IOException e) {
+            String reason = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
+            throw new AzertioException("OAuth2 token request failed [{}]: {}", url, reason);
+        }
+        if (response.statusCode() < 200 || response.statusCode() >= 300) {
+            throw new AzertioException("OAuth2 token endpoint returned status {}: {}", response.statusCode(), response.body());
+        }
+        var matcher = Pattern.compile("\"access_token\"\\s*:\\s*\"([^\"]+)\"").matcher(response.body());
+        if (!matcher.find()) {
+            throw new AzertioException("No 'access_token' field found in OAuth2 response: {}", response.body());
+        }
+        return matcher.group(1);
+    }
+
+    @Override
     public int requestDELETE(String endpoint) {
         return send(builder(endpoint).DELETE().build(), null);
     }
@@ -90,15 +146,36 @@ public class JdkHttpEngine implements RestEngine {
             .orElse(null);
     }
 
-    private HttpRequest.Builder builder(String endpoint) {
+    @Override
+    public String responseHeader(String name) {
+        if (lastResponse == null) return null;
+        return lastResponse.headers().firstValue(name).orElse(null);
+    }
+
+    private String buildUrl(String endpoint) {
         String url = (baseUrl == null || baseUrl.isBlank())
             ? endpoint
             : (baseUrl.endsWith("/") || endpoint.startsWith("/"))
                 ? baseUrl + endpoint
                 : baseUrl + "/" + endpoint;
-        return HttpRequest.newBuilder()
-            .uri(URI.create(url))
+        if (!persistentQueryParams.isEmpty()) {
+            String qs = persistentQueryParams.entrySet().stream()
+                .map(e -> URLEncoder.encode(e.getKey(), StandardCharsets.UTF_8)
+                        + "=" + URLEncoder.encode(e.getValue(), StandardCharsets.UTF_8))
+                .collect(Collectors.joining("&"));
+            url = url.contains("?") ? url + "&" + qs : url + "?" + qs;
+        }
+        return url;
+    }
+
+    private HttpRequest.Builder builder(String endpoint) {
+        HttpRequest.Builder b = HttpRequest.newBuilder()
+            .uri(URI.create(buildUrl(endpoint)))
             .timeout(timeout);
+        persistentHeaders.forEach(b::header);
+        pendingRequestHeaders.forEach(b::header);
+        pendingRequestHeaders.clear();
+        return b;
     }
 
     private HttpRequest.Builder bodyBuilder(String endpoint) {
