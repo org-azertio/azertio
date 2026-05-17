@@ -247,7 +247,7 @@ In **remote mode**, every CI run writes its full execution to the shared databas
 
 ## VS Code Extension
 
-![Azertio execution example](images/execution1.gif)
+![Azertio VS Code step documentation](images/screenshot2.png)
 
 The VS Code extension connects to the CLI via a JSON-RPC 2.0 server over stdio and provides a complete test management UI:
 
