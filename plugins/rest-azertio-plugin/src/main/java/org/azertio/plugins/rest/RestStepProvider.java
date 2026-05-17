@@ -15,7 +15,7 @@ import org.azertio.core.contributors.StepProvider;
 import org.azertio.core.testplan.DataTable;
 import org.azertio.core.testplan.Document;
 import org.azertio.plugins.rest.jdk.JdkHttpEngine;
-eimport java.nio.charset.StandardCharsets;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.LinkedHashMap;
