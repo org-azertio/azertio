@@ -32,7 +32,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: jacoco-reports
-          path: '**/target/site/jacoco/jacoco.xml'
+          path: |
+            **/target/site/jacoco/jacoco.xml
+            **/target/site/jacoco-aggregate/jacoco.xml
           retention-days: 1
 
   sonar:
