@@ -59,6 +59,43 @@ class TestRestSteps {
 				.withHeader("Content-Type", "application/json")
 				.withHeader("X-Custom-Header", "my-value")
 				.withBody("{}")));
+
+		wireMock.stubFor(get("/bearer-protected")
+			.withHeader("Authorization", equalTo("Bearer test-token"))
+			.willReturn(ok()));
+
+		// base64("user:pass") = dXNlcjpwYXNz
+		wireMock.stubFor(get("/basic-protected")
+			.withHeader("Authorization", equalTo("Basic dXNlcjpwYXNz"))
+			.willReturn(ok()));
+
+		wireMock.stubFor(get("/apikey-header-protected")
+			.withHeader("X-API-Key", equalTo("secret-key"))
+			.willReturn(ok()));
+
+		wireMock.stubFor(get(urlPathEqualTo("/apikey-query-protected"))
+			.withQueryParam("api_key", equalTo("secret-key"))
+			.willReturn(ok()));
+
+		wireMock.stubFor(post("/oauth/token")
+			.withRequestBody(containing("grant_type=client_credentials"))
+			.withRequestBody(containing("client_id=my-client"))
+			.withRequestBody(containing("client_secret=my-secret"))
+			.willReturn(ok()
+				.withHeader("Content-Type", "application/json")
+				.withBody("{\"access_token\":\"oauth-token\",\"token_type\":\"Bearer\",\"expires_in\":3600}")));
+
+		wireMock.stubFor(get("/oauth-protected")
+			.withHeader("Authorization", equalTo("Bearer oauth-token"))
+			.willReturn(ok()));
+
+		wireMock.stubFor(get("/persistent-headers-test")
+			.withHeader("X-Tenant-Id", equalTo("acme"))
+			.withHeader("X-Version", equalTo("2"))
+			.willReturn(ok()));
+
+		wireMock.stubFor(get("/echo-header")
+			.willReturn(ok()));
 	}
 
 	private String baseUrl() {
@@ -144,5 +181,47 @@ class TestRestSteps {
 	@FeatureDir("wrong-response-headers")
 	void wrongResponseHeaders_fails(JUnitAzertioPlan plan) {
 		plan.withConfig("rest.baseURL", baseUrl()).execute().assertAllFailed();
+	}
+
+	@Test
+	@FeatureDir("auth-bearer")
+	void authBearer_passes(JUnitAzertioPlan plan) {
+		plan.withConfig("rest.baseURL", baseUrl()).execute().assertAllPassed();
+	}
+
+	@Test
+	@FeatureDir("auth-basic")
+	void authBasic_passes(JUnitAzertioPlan plan) {
+		plan.withConfig("rest.baseURL", baseUrl()).execute().assertAllPassed();
+	}
+
+	@Test
+	@FeatureDir("auth-apikey-header")
+	void authApiKeyHeader_passes(JUnitAzertioPlan plan) {
+		plan.withConfig("rest.baseURL", baseUrl()).execute().assertAllPassed();
+	}
+
+	@Test
+	@FeatureDir("auth-apikey-query")
+	void authApiKeyQuery_passes(JUnitAzertioPlan plan) {
+		plan.withConfig("rest.baseURL", baseUrl()).execute().assertAllPassed();
+	}
+
+	@Test
+	@FeatureDir("auth-oauth2")
+	void authOAuth2ClientCredentials_passes(JUnitAzertioPlan plan) {
+		plan.withConfig("rest.baseURL", baseUrl()).execute().assertAllPassed();
+	}
+
+	@Test
+	@FeatureDir("auth-persistent-headers")
+	void authPersistentHeaders_passes(JUnitAzertioPlan plan) {
+		plan.withConfig("rest.baseURL", baseUrl()).execute().assertAllPassed();
+	}
+
+	@Test
+	@FeatureDir("extract-header")
+	void extractHeader_storesValueInVariable(JUnitAzertioPlan plan) {
+		plan.withConfig("rest.baseURL", baseUrl()).execute().assertAllPassed();
 	}
 }

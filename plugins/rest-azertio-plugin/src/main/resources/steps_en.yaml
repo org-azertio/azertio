@@ -1,3 +1,114 @@
+'rest.auth.headers':
+  expression: 'the following headers are set for all subsequent requests:'
+  example: |
+    Given the following headers are set for all subsequent requests:
+      | X-Tenant-Id | acme |
+      | X-Version   | 2    |
+  scenarios:
+    - title: Set custom headers for all requests in the scenario
+      gherkin: |
+        Given the following headers are set for all subsequent requests:
+          | X-Tenant-Id | acme |
+          | X-Version   | 2    |
+        When I make a GET request to "users"
+        Then the HTTP status code is equal to 200
+        When I make a GET request to "users/1"
+        Then the HTTP status code is equal to 200
+
+
+'rest.auth.bearer':
+  expression: 'the authorization is Bearer {token:text}'
+  example: |
+    Given the authorization is Bearer mytoken
+  scenarios:
+    - title: Authenticate with a static Bearer token
+      gherkin: |
+        Given the authorization is Bearer mytoken
+        When I make a GET request to "secure/resource"
+        Then the HTTP status code is equal to 200
+    - title: Authenticate with a token stored in a variable
+      gherkin: |
+        Given the authorization is Bearer ${accessToken}
+        When I make a GET request to "secure/resource"
+        Then the HTTP status code is equal to 200
+
+
+'rest.auth.basic':
+  expression: 'the authorization is Basic with username {username:text} and password {password:text}'
+  example: |
+    Given the authorization is Basic with username "admin" and password "secret"
+  scenarios:
+    - title: Authenticate with Basic credentials
+      gherkin: |
+        Given the authorization is Basic with username "admin" and password "secret"
+        When I make a GET request to "admin/settings"
+        Then the HTTP status code is equal to 200
+    - title: Authenticate using credentials from configuration variables
+      gherkin: |
+        Given the authorization is Basic with username "${api.user}" and password "${api.password}"
+        When I make a POST request to "data" with body:
+        """json
+        {"key": "value"}
+        """
+        Then the HTTP status code is equal to 201
+
+
+'rest.auth.apikey.header':
+  expression: 'the API key {key:text} is sent in header {name:text}'
+  example: |
+    Given the API key "abc123" is sent in header "X-API-Key"
+  scenarios:
+    - title: Authenticate with an API key in a custom header
+      gherkin: |
+        Given the API key "abc123" is sent in header "X-API-Key"
+        When I make a GET request to "data"
+        Then the HTTP status code is equal to 200
+    - title: Authenticate using an API key from a configuration variable
+      gherkin: |
+        Given the API key "${api.key}" is sent in header "X-API-Key"
+        When I make a GET request to "data"
+        Then the HTTP status code is equal to 200
+
+
+'rest.auth.apikey.query':
+  expression: 'the API key {key:text} is sent as query parameter {name:text}'
+  example: |
+    Given the API key "abc123" is sent as query parameter "api_key"
+  scenarios:
+    - title: Authenticate with an API key as a query parameter
+      gherkin: |
+        Given the API key "abc123" is sent as query parameter "api_key"
+        When I make a GET request to "data"
+        Then the HTTP status code is equal to 200
+    - title: Authenticate using an API key from a configuration variable
+      gherkin: |
+        Given the API key "${api.key}" is sent as query parameter "api_key"
+        When I make a GET request to "data"
+        Then the HTTP status code is equal to 200
+
+
+'rest.auth.oauth2.client_credentials':
+  expression: 'I obtain an OAuth2 client credentials token from {url:text} with client {clientId:text} and secret {clientSecret:text} into variable {variable:id}'
+  example: |
+    Given I obtain an OAuth2 client credentials token from "https://auth.example.com/token" with client "my-client" and secret "my-secret" into variable accessToken
+  scenarios:
+    - title: Obtain an OAuth2 token and use it to access a protected resource
+      gherkin: |
+        Given I obtain an OAuth2 client credentials token from "${auth.tokenUrl}" with client "${auth.clientId}" and secret "${auth.clientSecret}" into variable accessToken
+        And the authorization is Bearer ${accessToken}
+        When I make a GET request to "secure/resource"
+        Then the HTTP status code is equal to 200
+    - title: Obtain a token and verify the protected resource response body
+      gherkin: |
+        Given I obtain an OAuth2 client credentials token from "${auth.tokenUrl}" with client "${auth.clientId}" and secret "${auth.clientSecret}" into variable accessToken
+        And the authorization is Bearer ${accessToken}
+        When I make a POST request to "orders" with body:
+        """json
+        {"product": "widget", "qty": 5}
+        """
+        Then the HTTP status code is equal to 201
+
+
 'rest.request.headers':
   expression: 'the next request has the headers:'
   example: |
@@ -308,6 +419,27 @@
         Then the HTTP status code is equal to 200
         And the response headers include:
           | Content-Type | application/json |
+
+
+'rest.response.extracts.header':
+  expression: 'I store the value of response header {header:text} into variable {variable:id}'
+  example: |
+    Then I store the value of response header "X-Request-Id" into variable requestId
+  scenarios:
+    - title: Store a response header and use it in a subsequent request
+      gherkin: |
+        When I make a POST request to "orders" with body:
+        """json
+        {"product": "widget"}
+        """
+        Then I store the value of response header "X-Order-Id" into variable orderId
+        When I make a GET request to "orders/${orderId}"
+        Then the HTTP status code is equal to 200
+    - title: Store a correlation ID returned by the server
+      gherkin: |
+        When I make a GET request to "users"
+        Then I store the value of response header "X-Correlation-Id" into variable correlationId
+        And the HTTP status code is equal to 200
 
 
 'rest.response.extracts.field':

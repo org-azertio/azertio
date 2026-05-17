@@ -1,3 +1,87 @@
+'rest.auth.headers':
+  expression: 'los siguientes headers se aplican a todas las peticiones posteriores:'
+  example: |
+    Dado que los siguientes headers se aplican a todas las peticiones posteriores:
+      | X-Tenant-Id | acme |
+      | X-Version   | 2    |
+  scenarios:
+    - title: Establecer headers comunes para todas las peticiones del escenario
+      gherkin: |
+        Dado que los siguientes headers se aplican a todas las peticiones posteriores:
+          | X-Tenant-Id | acme |
+          | X-Version   | 2    |
+        Cuando hago una petición GET a "users"
+        Entonces el código de estado HTTP es igual a 200
+        Cuando hago una petición GET a "users/1"
+        Entonces el código de estado HTTP es igual a 200
+
+
+'rest.auth.bearer':
+  expression: 'la autorización es Bearer {token:text}'
+  example: |
+    Dado que la autorización es Bearer mitoken
+  scenarios:
+    - title: Autenticarse con un token Bearer estático
+      gherkin: |
+        Dado que la autorización es Bearer mitoken
+        Cuando hago una petición GET a "secure/resource"
+        Entonces el código de estado HTTP es igual a 200
+    - title: Autenticarse con un token almacenado en una variable
+      gherkin: |
+        Dado que la autorización es Bearer ${accessToken}
+        Cuando hago una petición GET a "secure/resource"
+        Entonces el código de estado HTTP es igual a 200
+
+
+'rest.auth.basic':
+  expression: 'la autorización es Basic con usuario {username:text} y contraseña {password:text}'
+  example: |
+    Dado que la autorización es Basic con usuario "admin" y contraseña "secret"
+  scenarios:
+    - title: Autenticarse con credenciales Basic
+      gherkin: |
+        Dado que la autorización es Basic con usuario "admin" y contraseña "secret"
+        Cuando hago una petición GET a "admin/settings"
+        Entonces el código de estado HTTP es igual a 200
+
+
+'rest.auth.apikey.header':
+  expression: 'la API key {key:text} se envía en el header {name:text}'
+  example: |
+    Dado que la API key "abc123" se envía en el header "X-API-Key"
+  scenarios:
+    - title: Autenticarse con una API key en un header personalizado
+      gherkin: |
+        Dado que la API key "abc123" se envía en el header "X-API-Key"
+        Cuando hago una petición GET a "data"
+        Entonces el código de estado HTTP es igual a 200
+
+
+'rest.auth.apikey.query':
+  expression: 'la API key {key:text} se envía como parámetro de query {name:text}'
+  example: |
+    Dado que la API key "abc123" se envía como parámetro de query "api_key"
+  scenarios:
+    - title: Autenticarse con una API key como parámetro de query
+      gherkin: |
+        Dado que la API key "abc123" se envía como parámetro de query "api_key"
+        Cuando hago una petición GET a "data"
+        Entonces el código de estado HTTP es igual a 200
+
+
+'rest.auth.oauth2.client_credentials':
+  expression: 'obtengo un token OAuth2 de cliente de {url:text} con cliente {clientId:text} y secreto {clientSecret:text} en la variable {variable:id}'
+  example: |
+    Dado que obtengo un token OAuth2 de cliente de "https://auth.example.com/token" con cliente "my-client" y secreto "my-secret" en la variable accessToken
+  scenarios:
+    - title: Obtener un token OAuth2 y usarlo para acceder a un recurso protegido
+      gherkin: |
+        Dado que obtengo un token OAuth2 de cliente de "${auth.tokenUrl}" con cliente "${auth.clientId}" y secreto "${auth.clientSecret}" en la variable accessToken
+        Y la autorización es Bearer ${accessToken}
+        Cuando hago una petición GET a "secure/resource"
+        Entonces el código de estado HTTP es igual a 200
+
+
 'rest.request.headers':
   expression: 'la próxima petición tiene los headers:'
   example: |
@@ -244,6 +328,22 @@
         Entonces el código de estado HTTP es igual a 200
         Y la respuesta incluye los headers:
           | Content-Type | application/json |
+
+
+'rest.response.extracts.header':
+  expression: 'almaceno el valor del header de respuesta {header:text} en la variable {variable:id}'
+  example: |
+    Entonces almaceno el valor del header de respuesta "X-Request-Id" en la variable requestId
+  scenarios:
+    - title: Almacenar un header de respuesta y usarlo en una petición posterior
+      gherkin: |
+        Cuando hago una petición POST a "orders" con el cuerpo:
+        """json
+        {"product": "widget"}
+        """
+        Entonces almaceno el valor del header de respuesta "X-Order-Id" en la variable orderId
+        Cuando hago una petición GET a "orders/${orderId}"
+        Entonces el código de estado HTTP es igual a 200
 
 
 'rest.response.extracts.field':

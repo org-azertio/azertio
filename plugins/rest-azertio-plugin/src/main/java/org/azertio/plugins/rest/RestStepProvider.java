@@ -15,8 +15,11 @@ import org.azertio.core.contributors.StepProvider;
 import org.azertio.core.testplan.DataTable;
 import org.azertio.core.testplan.Document;
 import org.azertio.plugins.rest.jdk.JdkHttpEngine;
+eimport java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.function.IntSupplier;
 
 @Extension(
@@ -51,6 +54,47 @@ public class RestStepProvider implements StepProvider  {
 		if (!ExecutionContext.current().isBenchmarkMode()) {
 			storeHttpExchange();
 		}
+	}
+
+
+	@StepExpression("rest.auth.headers")
+	public void setPersistentHeaders(DataTable table) {
+		var headers = new LinkedHashMap<String, String>();
+		for (var row : ExecutionContext.current().interpolateDataTable(table).values()) {
+			if (row.size() >= 2) {
+				headers.put(row.get(0), row.get(1));
+			}
+		}
+		restEngine.setPersistentHeaders(headers);
+	}
+
+	@StepExpression(value = "rest.auth.bearer", args = {"token:text"})
+	public void setAuthBearer(String token) {
+		restEngine.setPersistentHeaders(Map.of("Authorization", "Bearer " + interpolate(token)));
+	}
+
+	@StepExpression(value = "rest.auth.basic", args = {"username:text", "password:text"})
+	public void setAuthBasic(String username, String password) {
+		String credentials = Base64.getEncoder().encodeToString(
+			(interpolate(username) + ":" + interpolate(password)).getBytes(StandardCharsets.UTF_8)
+		);
+		restEngine.setPersistentHeaders(Map.of("Authorization", "Basic " + credentials));
+	}
+
+	@StepExpression(value = "rest.auth.apikey.header", args = {"key:text", "name:text"})
+	public void setAuthApiKeyHeader(String key, String name) {
+		restEngine.setPersistentHeaders(Map.of(interpolate(name), interpolate(key)));
+	}
+
+	@StepExpression(value = "rest.auth.apikey.query", args = {"key:text", "name:text"})
+	public void setAuthApiKeyQuery(String key, String name) {
+		restEngine.addPersistentQueryParam(interpolate(name), interpolate(key));
+	}
+
+	@StepExpression(value = "rest.auth.oauth2.client_credentials", args = {"url:text", "clientId:text", "clientSecret:text", "variable:id"})
+	public void fetchOAuth2ClientCredentials(String url, String clientId, String clientSecret, String variable) {
+		String token = restEngine.fetchOAuth2Token(interpolate(url), interpolate(clientId), interpolate(clientSecret));
+		ExecutionContext.current().setVariable(variable, token);
 	}
 
 
@@ -168,6 +212,15 @@ public class RestStepProvider implements StepProvider  {
 		String value = contentTypes.get(contentType).orElseThrow(
 			() -> new IllegalStateException("Unsupported response content type: " + contentType)
 		).extractValue(restEngine.responseBody(), field);
+		ExecutionContext.current().setVariable(variable, value);
+	}
+
+	@StepExpression(value = "rest.response.extracts.header", args = {"header:text", "variable:id"})
+	public void extractHeaderFromResponse(String header, String variable) {
+		String value = restEngine.responseHeader(interpolate(header));
+		if (value == null) {
+			throw new AssertionError("Response header '" + header + "' was not present");
+		}
 		ExecutionContext.current().setVariable(variable, value);
 	}
 
