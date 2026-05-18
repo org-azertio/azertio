@@ -9,8 +9,8 @@ import { ExecutionProvider } from './executionProvider';
 import { openExecutionDetail } from './executionDetailPanel';
 import { ISSUE_URI_SCHEME, TestPlanProvider } from './testPlanProvider';
 import { ContributorsProvider } from './contributorsProvider';
-import { HelpProvider as HelpTreeProvider, HelpDocumentProvider, HELP_URI_SCHEME } from './helpProvider';
-import { AiCompletionProvider } from './aiCompletionProvider';
+import { HelpProvider as HelpTreeProvider, HelpDocumentProvider, HELP_URI_SCHEME, UserGuideItem } from './helpProvider';
+import { AiCompletionProvider, AiFeatureCodeLensProvider, generateFeature, generateFeatureFromSwagger } from './aiCompletionProvider';
 import {
     CloseAction,
     ErrorAction,
@@ -254,7 +254,7 @@ export function activate(context: vscode.ExtensionContext): void {
     const contributorsProvider = new ContributorsProvider(logOutput);
     vscode.window.registerTreeDataProvider('azertio.contributors', contributorsProvider);
 
-    const helpTreeProvider = new HelpTreeProvider(logOutput);
+    const helpTreeProvider = new HelpTreeProvider(context.extensionUri, logOutput);
     vscode.window.registerTreeDataProvider('azertio.help', helpTreeProvider);
 
     const helpDocumentProvider = new HelpDocumentProvider();
@@ -574,6 +574,13 @@ export function activate(context: vscode.ExtensionContext): void {
     );
 
     context.subscriptions.push(
+        vscode.commands.registerCommand('azertio.help.openUserGuide', async (extensionUri: vscode.Uri) => {
+            const guideUri = vscode.Uri.joinPath(extensionUri, 'docs', 'user-guide.md');
+            await vscode.commands.executeCommand('markdown.showPreview', guideUri);
+        })
+    );
+
+    context.subscriptions.push(
         vscode.commands.registerCommand('azertio.help.open', async (id: string) => {
             await helpDocumentProvider.fetchAndCache(id);
             await vscode.commands.executeCommand(
@@ -680,9 +687,13 @@ export function activate(context: vscode.ExtensionContext): void {
     context.subscriptions.push(aiStatusBar);
 
     context.subscriptions.push(
+        vscode.languages.registerCodeLensProvider(
+            { scheme: 'file', language: 'feature' },
+            new AiFeatureCodeLensProvider()
+        ),
         vscode.languages.registerInlineCompletionItemProvider(
             { scheme: 'file', language: 'feature' },
-            new AiCompletionProvider(() => serveClient, aiStatusBar)
+            new AiCompletionProvider(() => serveClient, aiStatusBar, logOutput)
         ),
         vscode.commands.registerCommand('azertio.ai.toggle', () => {
             const cfg = vscode.workspace.getConfiguration('azertio.ai');
@@ -691,6 +702,22 @@ export function activate(context: vscode.ExtensionContext): void {
             vscode.window.showInformationMessage(
                 `Azertio AI completions ${!current ? 'enabled' : 'disabled'}.`
             );
+        }),
+        vscode.commands.registerCommand('azertio.ai.generateFeature', async () => {
+            const editor = vscode.window.activeTextEditor;
+            if (!editor || editor.document.languageId !== 'feature') {
+                vscode.window.showWarningMessage('Open a .feature file to use this command.');
+                return;
+            }
+            await generateFeature(editor.document, () => serveClient, aiStatusBar, logOutput);
+        }),
+        vscode.commands.registerCommand('azertio.ai.generateFeatureFromSwagger', async () => {
+            const editor = vscode.window.activeTextEditor;
+            if (!editor || editor.document.languageId !== 'feature') {
+                vscode.window.showWarningMessage('Open a .feature file to use this command.');
+                return;
+            }
+            await generateFeatureFromSwagger(editor.document, () => serveClient, aiStatusBar, logOutput);
         })
     );
 }

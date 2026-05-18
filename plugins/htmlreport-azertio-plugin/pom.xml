@@ -8,12 +8,12 @@
         <groupId>org.azertio</groupId>
         <artifactId>azertio-plugin-starter</artifactId>
         <relativePath>../../azertio-plugin-starter/pom.xml</relativePath>
-        <version>1.0.0</version>
+        <version>1.1.0-SNAPSHOT</version>
     </parent>
 
     <groupId>org.azertio.plugins</groupId>
     <artifactId>htmlreport-azertio-plugin</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0-SNAPSHOT</version>
 
     <name>HTML Report Azertio Plugin</name>
     <description>A plugin that generates self-contained HTML execution reports for Azertio test runs</description>
@@ -57,7 +57,7 @@
         <dependency>
             <groupId>org.azertio</groupId>
             <artifactId>azertio-persistence</artifactId>
-            <version>1.0.0</version>
+            <version>1.1.0-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <dependency>

@@ -1,7 +1,21 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
 import { AzertioClient, HelpEntry } from './azertioClient';
 
 export const HELP_URI_SCHEME = 'azertio-help';
+
+export class UserGuideItem extends vscode.TreeItem {
+    constructor(extensionUri: vscode.Uri) {
+        super('User Guide', vscode.TreeItemCollapsibleState.None);
+        this.iconPath = new vscode.ThemeIcon('book');
+        this.contextValue = 'userGuide';
+        this.command = {
+            command: 'azertio.help.openUserGuide',
+            title: 'Open User Guide',
+            arguments: [extensionUri],
+        };
+    }
+}
 
 export class HelpItem extends vscode.TreeItem {
     constructor(public readonly entry: HelpEntry) {
@@ -16,15 +30,18 @@ export class HelpItem extends vscode.TreeItem {
     }
 }
 
-export class HelpProvider implements vscode.TreeDataProvider<HelpItem> {
+export class HelpProvider implements vscode.TreeDataProvider<HelpItem | UserGuideItem> {
 
-    private readonly _onDidChangeTreeData = new vscode.EventEmitter<HelpItem | undefined | void>();
+    private readonly _onDidChangeTreeData = new vscode.EventEmitter<HelpItem | UserGuideItem | undefined | void>();
     readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
 
     private client: AzertioClient | undefined;
     private entries: HelpEntry[] = [];
 
-    constructor(private readonly log: (msg: string) => void = () => {}) {}
+    constructor(
+        private readonly extensionUri: vscode.Uri,
+        private readonly log: (msg: string) => void = () => {}
+    ) {}
 
     setClient(client: AzertioClient): void {
         this.client = client;
@@ -41,13 +58,16 @@ export class HelpProvider implements vscode.TreeDataProvider<HelpItem> {
         this._onDidChangeTreeData.fire();
     }
 
-    getTreeItem(element: HelpItem): vscode.TreeItem {
+    getTreeItem(element: HelpItem | UserGuideItem): vscode.TreeItem {
         return element;
     }
 
-    getChildren(element?: HelpItem): HelpItem[] {
+    getChildren(element?: HelpItem | UserGuideItem): (HelpItem | UserGuideItem)[] {
         if (element) { return []; }
-        return this.entries.map(e => new HelpItem(e));
+        return [
+            new UserGuideItem(this.extensionUri),
+            ...this.entries.map(e => new HelpItem(e)),
+        ];
     }
 }
 
