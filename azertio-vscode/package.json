@@ -14,6 +14,9 @@
   "categories": [
     "Testing"
   ],
+  "extensionDependencies": [
+    "github.copilot-chat"
+  ],
   "activationEvents": [
     "workspaceContains:azertio.yaml"
   ],
@@ -105,6 +108,14 @@
       {
         "command": "azertio.ai.toggle",
         "title": "Azertio: Toggle AI Completions"
+      },
+      {
+        "command": "azertio.ai.generateFeature",
+        "title": "Azertio: Generate Feature with AI"
+      },
+      {
+        "command": "azertio.ai.generateFeatureFromSwagger",
+        "title": "Azertio: Generate Feature from Swagger"
       },
       {
         "command": "azertio.help.open",
