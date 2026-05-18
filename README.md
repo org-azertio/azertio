@@ -1,6 +1,6 @@
 # Azertio — Open Black-Box Testing
 
-Test REST APIs and databases in plain Gherkin — no glue code, no boilerplate, no test framework to wire up. Plugins load at runtime; results live in VS Code.
+Test REST APIs and databases in plain Gherkin — no glue code, no boilerplate, no test framework to wire up. Plugins load at runtime; results live in VS Code. Write tests faster with AI-powered inline completions and full feature generation.
 
 [![CI](https://github.com/org-azertio/azertio/actions/workflows/ci.yml/badge.svg)](https://github.com/org-azertio/azertio/actions/workflows/ci.yml)
 [![Maven Central](https://img.shields.io/maven-central/v/org.azertio/azertio-core.svg)](https://central.sonatype.com/artifact/org.azertio/azertio-core)
@@ -28,6 +28,7 @@ Test REST APIs and databases in plain Gherkin — no glue code, no boilerplate, 
 - **Benchmark mode** — run any step N times across T virtual threads and assert on min/max/mean/P50/P95/P99/throughput/errorRate — in the same `.feature` file as functional tests.
 - **Configurable persistence** — three modes: transient (CI), local file (developer workstation), or remote PostgreSQL + MinIO (team-shared execution history).
 - **VS Code extension** — browse executions, inspect result trees, view attachments, and re-run past executions directly from the editor.
+- **AI-powered authoring** — inline step completions as you type, generate a full Gherkin feature from a plain-text description, or generate from an OpenAPI/Swagger spec. Works with GitHub Copilot, Claude, GPT-4o, and any VS Code language model.
 - **Profiles** — named environment configurations in `azertio.yaml`, switched with a single CLI flag.
 - **Tag-based suite filtering** — boolean tag expressions (`GET and not slow`) define named test suites in configuration.
 - **HTML & PDF reports** — add the `htmlreport` or `pdfreport` plugin to generate self-contained execution reports after each run.
@@ -256,6 +257,14 @@ The VS Code extension connects to the CLI via a JSON-RPC 2.0 server over stdio a
 - **Attachments** — response bodies, CSV query results, and other step outputs stored with the execution and openable inline.
 - **Benchmark statistics** — P50/P95/P99/throughput/errorRate visible per step.
 - **One-click re-run** — replay any past execution against its original test plan and profile.
+
+### AI Features
+
+- **Inline step completions** — as you type a step line in a `.feature` file, the extension suggests the next step drawn from the real index of available steps in your project.
+- **Generate feature from description** — run *Azertio: Generate Feature with AI*, describe what you want to test, and get a complete ready-to-run Gherkin feature file.
+- **Generate feature from OpenAPI spec** — run *Azertio: Generate Feature from Swagger*, point at a Swagger/OpenAPI URL, and get a full feature file covering the API surface.
+
+AI features work with GitHub Copilot, Claude, GPT-4o, and any language model registered in VS Code.
 
 ---
 
