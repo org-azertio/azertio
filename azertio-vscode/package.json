@@ -2,7 +2,7 @@
   "name": "azertio",
   "displayName": "Azertio",
   "description": "Language support for Azertio feature files",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "publisher": "azertio",
   "repository": {
     "type": "git",
