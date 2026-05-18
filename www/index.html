@@ -920,6 +920,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </a>
   <nav class="nav-links">
     <a href="#features">Features</a>
+    <a href="#ai">AI</a>
     <a href="#example">DSL</a>
     <a href="#plugins">Plugins</a>
     <a href="#quickstart">Quick Start</a>
@@ -964,6 +965,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <span class="proof-chip">6 official plugins</span>
     <span class="proof-sep">·</span>
     <span class="proof-chip">VS Code extension</span>
+    <span class="proof-sep">·</span>
+    <span class="proof-chip">✨ AI-powered</span>
   </div>
 
   <div class="hero-cta">
@@ -1121,6 +1124,49 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </div>
 
     </div>
+  </div>
+</section>
+
+<div class="glow-line"></div>
+
+<!-- ── AI Features ──────────────────────────────────────────────── -->
+<section id="ai">
+  <div class="container">
+    <div class="features-head reveal">
+      <span class="section-label">Powered by AI</span>
+      <h2>From idea to test in seconds</h2>
+      <p class="section-intro">
+        The VS Code extension integrates with GitHub Copilot, Claude, GPT-4o, and any
+        other language model available in VS Code to accelerate feature authoring — from
+        inline completions to full file generation.
+      </p>
+    </div>
+
+    <div class="features-grid">
+
+      <div class="feature-card reveal">
+        <div class="feature-icon">✨</div>
+        <h3>Inline step completions</h3>
+        <p>As you type a step line in a <code style="font-family:var(--mono);color:var(--cyan);font-size:0.85em">.feature</code> file, the extension suggests the next step drawn from the real index of available steps in your project — not generic templates.</p>
+      </div>
+
+      <div class="feature-card reveal">
+        <div class="feature-icon">🤖</div>
+        <h3>Generate feature from description</h3>
+        <p>Describe what you want to test in plain language. Azertio generates a complete, ready-to-run Gherkin feature file — including correct structural keywords for your chosen locale.</p>
+      </div>
+
+      <div class="feature-card reveal">
+        <div class="feature-icon">📋</div>
+        <h3>Generate feature from OpenAPI spec</h3>
+        <p>Point Azertio at a Swagger / OpenAPI URL and it reads the endpoints and generates a full feature file covering the API surface automatically.</p>
+      </div>
+
+    </div>
+    <p class="reveal" style="text-align:center;margin-top:2.5rem;color:var(--muted);font-size:0.9rem">
+      Works with any language model registered in VS Code. &nbsp;
+      <a href="#vscode" style="color:var(--cyan)">See the VS Code extension →</a>
+    </p>
   </div>
 </section>
 
@@ -1433,7 +1479,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div class="reveal" style="text-align:center">
         <div class="vscode-badge" style="justify-content:center">
           <svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="5" fill="#00ffe0"/></svg>
-          VS Code Extension
+          VS Code Extension &nbsp;·&nbsp; v1.1.0
         </div>
         <span class="section-label">IDE Integration</span>
         <h2>Run and inspect tests without leaving the editor</h2>
@@ -1483,6 +1529,22 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <div class="vscode-point-text">
             <h4>One-click re-run</h4>
             <p>Re-execute any past run against its original test plan and profile with a single button — no need to reconfigure anything.</p>
+          </div>
+        </div>
+
+        <div class="vscode-point">
+          <div class="vscode-point-icon">✨</div>
+          <div class="vscode-point-text">
+            <h4>AI step completions</h4>
+            <p>Inline suggestions as you type in <code>.feature</code> files, powered by GitHub Copilot or any VS Code language model. Suggestions are based on the steps actually available in your project.</p>
+          </div>
+        </div>
+
+        <div class="vscode-point">
+          <div class="vscode-point-icon">🤖</div>
+          <div class="vscode-point-text">
+            <h4>AI feature generation</h4>
+            <p>Generate a complete Gherkin feature file from a plain-text description, or from an OpenAPI/Swagger spec. Supports multiple languages with correct structural keywords.</p>
           </div>
         </div>
       </div>
