@@ -112,7 +112,7 @@
                     <classpathDependencyExcludes>
                         <classpathDependencyExclude>org.slf4j:slf4j-simple</classpathDependencyExclude>
                     </classpathDependencyExcludes>
-                    <argLine>--add-reads org.azertio.plugins.rest.test=ALL-UNNAMED</argLine>
+                    <argLine>@{argLine} --add-reads org.azertio.plugins.rest.test=ALL-UNNAMED</argLine>
                 </configuration>
             </plugin>
         </plugins>

@@ -56,6 +56,9 @@
         <azertio-core.version>1.1.0-SNAPSHOT</azertio-core.version>
         <azertio-docgen.version>1.1.0-SNAPSHOT</azertio-docgen.version>
         <jexten.version>1.0.0</jexten.version>
+        <sonar.coverage.jacoco.xmlReportPaths>
+            ${project.basedir}/target/site/jacoco/jacoco.xml
+        </sonar.coverage.jacoco.xmlReportPaths>
         <!-- Doc generation: override in child pom to customise paths and titles -->
         <azertio.docgen.stepDocFile>${project.basedir}/src/main/resources/steps.yaml</azertio.docgen.stepDocFile>
         <azertio.docgen.configFile>${project.basedir}/src/main/resources/config.yaml</azertio.docgen.configFile>
@@ -100,6 +103,26 @@
                             <inputFile>${azertio.docgen.stepDocFile}</inputFile>
                             <outputDirectory>${project.build.outputDirectory}</outputDirectory>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.12</version>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
