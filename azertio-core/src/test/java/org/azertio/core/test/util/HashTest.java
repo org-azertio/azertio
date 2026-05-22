@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.azertio.core.util.Hash;
 import java.nio.file.Path;
 import java.util.List;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class HashTest {
 
@@ -23,6 +24,14 @@ class HashTest {
 		var hash3 = Hash.of("src/test/resources/files/file_b.txt");
 		assert hash1.equals(hash2);
 		assert !hash1.equals(hash3);
+	}
+
+	@Test
+	void testHashSinglePath() {
+		var path = Path.of("src/test/resources/files/file_a.txt");
+		var hash = Hash.of(path);
+		assertThat(hash).isNotBlank();
+		assertThat(hash).isEqualTo(Hash.of(List.of(path)));
 	}
 
 	@Test

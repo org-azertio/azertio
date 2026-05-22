@@ -3,6 +3,7 @@ package org.azertio.core.execution;
 import org.myjtools.imconfig.Config;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public record Profile(String name, Map<String,String> properties) {
@@ -22,7 +23,8 @@ public record Profile(String name, Map<String,String> properties) {
 			var matcher = pattern.matcher(value);
 			resolved.put(key, matcher.replaceAll(match -> {
 				String placeholder = match.group(1);
-				return properties.getOrDefault(placeholder, match.group(0));
+				String replacement = properties.getOrDefault(placeholder, match.group(0));
+				return Matcher.quoteReplacement(replacement);
 			}));
 		});
 		return Config.ofMap(resolved);
