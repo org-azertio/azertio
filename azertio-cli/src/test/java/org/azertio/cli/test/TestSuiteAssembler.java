@@ -17,11 +17,9 @@ public class TestSuiteAssembler implements SuiteAssembler {
 
     @Override
     public Optional<UUID> assembleSuite(TestSuite testSuite) {
-        UUID suite    = node(NodeType.TEST_SUITE,   testSuite.name());
-        UUID feature  = node(NodeType.TEST_FEATURE, "feature");
-        UUID testCase = node(NodeType.TEST_CASE,    "test case");
+        UUID suite   = node(NodeType.TEST_SUITE,   testSuite.name());
+        UUID feature = node(NodeType.TEST_FEATURE, "feature");
         repository.attachChildNodeLast(suite, feature);
-        repository.attachChildNodeLast(feature, testCase);
         return Optional.of(suite);
     }
 
