@@ -7,6 +7,7 @@ import org.azertio.core.persistence.TestExecutionRepository;
 import org.azertio.core.testplan.DataTable;
 import org.azertio.core.testplan.Document;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -73,9 +74,11 @@ public class ExecutionContext {
 
 
 	public String interpolateString(String input) {
-		for (Map.Entry<String, String> entry : variables.entrySet()) {
-			String placeholder = "${" + entry.getKey() + "}";
-			input = input.replace(placeholder, entry.getValue());
+		Map<String, String> resolved = new LinkedHashMap<>(runtime.configuration().asMap());
+		resolved.entrySet().removeIf(e -> e.getValue() == null);
+		resolved.putAll(variables);
+		for (Map.Entry<String, String> entry : resolved.entrySet()) {
+			input = input.replace("${" + entry.getKey() + "}", entry.getValue());
 		}
 		return input;
 	}
