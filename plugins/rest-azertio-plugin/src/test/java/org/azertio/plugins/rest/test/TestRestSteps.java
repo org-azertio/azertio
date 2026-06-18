@@ -103,6 +103,18 @@ class TestRestSteps {
 			.withHeader("Authorization", equalTo("Bearer user-token"))
 			.willReturn(ok()));
 
+		wireMock.stubFor(post("/form-login")
+			.withHeader("Content-Type", containing("application/x-www-form-urlencoded"))
+			.withRequestBody(containing("username=alice"))
+			.withRequestBody(containing("password=s3cr3t"))
+			.willReturn(aResponse().withStatus(200)));
+
+		wireMock.stubFor(post("/form-upload")
+			.withHeader("Content-Type", containing("multipart/form-data"))
+			.withRequestBody(containing("name"))
+			.withRequestBody(containing("Alice"))
+			.willReturn(aResponse().withStatus(201)));
+
 		wireMock.stubFor(get("/persistent-headers-test")
 			.withHeader("X-Tenant-Id", equalTo("acme"))
 			.withHeader("X-Version", equalTo("2"))
@@ -230,6 +242,18 @@ class TestRestSteps {
 	@Test
 	@FeatureDir("auth-oauth2-password")
 	void authOAuth2PasswordGrant_passes(JUnitAzertioPlan plan) {
+		plan.withConfig("rest.baseURL", baseUrl()).execute().assertAllPassed();
+	}
+
+	@Test
+	@FeatureDir("post-urlencoded")
+	void postUrlEncoded_passes(JUnitAzertioPlan plan) {
+		plan.withConfig("rest.baseURL", baseUrl()).execute().assertAllPassed();
+	}
+
+	@Test
+	@FeatureDir("post-multipart")
+	void postMultipart_passes(JUnitAzertioPlan plan) {
 		plan.withConfig("rest.baseURL", baseUrl()).execute().assertAllPassed();
 	}
 

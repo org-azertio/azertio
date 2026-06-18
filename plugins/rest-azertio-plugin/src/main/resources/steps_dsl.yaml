@@ -170,6 +170,36 @@
         * assert HTTP status code = 201
 
 
+'rest.request.POST.urlencoded':
+  expression: 'do HTTP POST {endpoint:text} urlencoded:'
+  example: |
+    * do HTTP POST "login" urlencoded:
+      | username | alice  |
+      | password | s3cr3t |
+  scenarios:
+    - title: Submit a login form with URL-encoded body
+      gherkin: |
+        * do HTTP POST "login" urlencoded:
+          | username | alice  |
+          | password | s3cr3t |
+        * assert HTTP status code = 200
+
+
+'rest.request.POST.multipart':
+  expression: 'do HTTP POST {endpoint:text} multipart:'
+  example: |
+    * do HTTP POST "upload" multipart:
+      | name  | Alice             |
+      | email | alice@example.com |
+  scenarios:
+    - title: Submit a multipart form
+      gherkin: |
+        * do HTTP POST "upload" multipart:
+          | name  | Alice             |
+          | email | alice@example.com |
+        * assert HTTP status code = 200
+
+
 'rest.request.PUT.body':
   expression: 'do HTTP PUT {endpoint:text}:'
   example: |

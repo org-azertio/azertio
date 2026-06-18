@@ -156,6 +156,34 @@
     The body of the POST request, provided as a multi-line text input.
 
 
+'rest.request.POST.urlencoded':
+  since: '1.1.0'
+  role: when
+  description: |
+    Makes a POST request to the specified URL with an application/x-www-form-urlencoded body
+    built from the given key-value table. Values are URL-encoded automatically.
+  parameters:
+    - name: endpoint
+      type: text
+      description: The URL to which the POST request is made
+  additional-data: |
+    A two-column table where each row is a form field name and its value.
+
+
+'rest.request.POST.multipart':
+  since: '1.1.0'
+  role: when
+  description: |
+    Makes a POST request to the specified URL with a multipart/form-data body
+    built from the given key-value table. Each row becomes a separate form part.
+  parameters:
+    - name: endpoint
+      type: text
+      description: The URL to which the POST request is made
+  additional-data: |
+    A two-column table where each row is a form field name and its value.
+
+
 'rest.request.POST.file':
   since: '1.0.0'
   role: when

@@ -10,6 +10,8 @@ public interface RestEngine {
 	int requestGET(String endpoint);
 	int requestPOST(String endpoint);
 	int requestPOST(String endpoint, String content);
+	int requestPOSTUrlEncoded(String endpoint, Map<String, String> fields);
+	int requestPOSTMultipart(String endpoint, Map<String, String> fields);
 	int requestPUT(String endpoint, String content);
 	int requestPATCH(String endpoint, String content);
 	void setContentType(String contentType);

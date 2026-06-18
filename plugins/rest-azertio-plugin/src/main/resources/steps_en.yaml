@@ -213,6 +213,36 @@
         Then the HTTP status code is equal to 201
 
 
+'rest.request.POST.urlencoded':
+  expression: 'I make a POST request to {endpoint:text} with URL-encoded form:'
+  example: |
+    When I make a POST request to "login" with URL-encoded form:
+      | username | alice |
+      | password | s3cr3t |
+  scenarios:
+    - title: Submit a login form
+      gherkin: |
+        When I make a POST request to "login" with URL-encoded form:
+          | username | alice  |
+          | password | s3cr3t |
+        Then the HTTP status code is equal to 200
+
+
+'rest.request.POST.multipart':
+  expression: 'I make a POST request to {endpoint:text} with multipart form:'
+  example: |
+    When I make a POST request to "upload" with multipart form:
+      | name  | Alice |
+      | email | alice@example.com |
+  scenarios:
+    - title: Submit a multipart form
+      gherkin: |
+        When I make a POST request to "upload" with multipart form:
+          | name  | Alice             |
+          | email | alice@example.com |
+        Then the HTTP status code is equal to 200
+
+
 'rest.request.PUT.body':
   expression: 'I make a PUT request to {endpoint:text} with body:'
   example: |

@@ -144,6 +144,26 @@ public class RestStepProvider implements StepProvider  {
 	}
 
 	@StatisticsProvider
+	@StepExpression(value = "rest.request.POST.urlencoded", args = {"endpoint:text"})
+	public void postWithUrlEncodedForm(String endpoint, DataTable table) {
+		var fields = new LinkedHashMap<String, String>();
+		for (var row : ExecutionContext.current().interpolateDataTable(table).values()) {
+			if (row.size() >= 2) fields.put(row.get(0), row.get(1));
+		}
+		request(() -> restEngine.requestPOSTUrlEncoded(interpolate(endpoint), fields));
+	}
+
+	@StatisticsProvider
+	@StepExpression(value = "rest.request.POST.multipart", args = {"endpoint:text"})
+	public void postWithMultipartForm(String endpoint, DataTable table) {
+		var fields = new LinkedHashMap<String, String>();
+		for (var row : ExecutionContext.current().interpolateDataTable(table).values()) {
+			if (row.size() >= 2) fields.put(row.get(0), row.get(1));
+		}
+		request(() -> restEngine.requestPOSTMultipart(interpolate(endpoint), fields));
+	}
+
+	@StatisticsProvider
 	@StepExpression(value = "rest.request.PUT.body", args = {"endpoint:text"})
 	public void putWithBody(String endpoint, Document body) {
 		request(() -> restEngine.requestPUT(interpolate(endpoint), interpolate(body.content())));

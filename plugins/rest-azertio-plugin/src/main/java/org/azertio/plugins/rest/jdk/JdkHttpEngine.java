@@ -67,6 +67,39 @@ public class JdkHttpEngine implements RestEngine {
     }
 
     @Override
+    public int requestPOSTUrlEncoded(String endpoint, Map<String, String> fields) {
+        String body = fields.entrySet().stream()
+            .map(e -> URLEncoder.encode(e.getKey(), StandardCharsets.UTF_8)
+                    + "=" + URLEncoder.encode(e.getValue(), StandardCharsets.UTF_8))
+            .collect(Collectors.joining("&"));
+        HttpRequest request = builder(endpoint)
+            .header("Content-Type", "application/x-www-form-urlencoded")
+            .POST(HttpRequest.BodyPublishers.ofString(body))
+            .build();
+        return send(request, body);
+    }
+
+    @Override
+    public int requestPOSTMultipart(String endpoint, Map<String, String> fields) {
+        String boundary = java.util.UUID.randomUUID().toString().replace("-", "");
+        String CRLF = "\r\n";
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<String, String> entry : fields.entrySet()) {
+            sb.append("--").append(boundary).append(CRLF);
+            sb.append("Content-Disposition: form-data; name=\"").append(entry.getKey()).append("\"").append(CRLF);
+            sb.append(CRLF);
+            sb.append(entry.getValue()).append(CRLF);
+        }
+        sb.append("--").append(boundary).append("--").append(CRLF);
+        String body = sb.toString();
+        HttpRequest request = builder(endpoint)
+            .header("Content-Type", "multipart/form-data; boundary=" + boundary)
+            .POST(HttpRequest.BodyPublishers.ofString(body))
+            .build();
+        return send(request, body);
+    }
+
+    @Override
     public int requestPUT(String endpoint, String content) {
         return send(bodyBuilder(endpoint).PUT(HttpRequest.BodyPublishers.ofString(content)).build(), content);
     }

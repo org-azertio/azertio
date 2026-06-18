@@ -178,6 +178,36 @@
         Entonces el código de estado HTTP es igual a 201
 
 
+'rest.request.POST.urlencoded':
+  expression: 'hago una petición POST a {endpoint:text} con formulario URL-encoded:'
+  example: |
+    Cuando hago una petición POST a "login" con formulario URL-encoded:
+      | username | alice |
+      | password | s3cr3t |
+  scenarios:
+    - title: Enviar un formulario de login
+      gherkin: |
+        Cuando hago una petición POST a "login" con formulario URL-encoded:
+          | username | alice  |
+          | password | s3cr3t |
+        Entonces el código de estado HTTP es igual a 200
+
+
+'rest.request.POST.multipart':
+  expression: 'hago una petición POST a {endpoint:text} con formulario multipart:'
+  example: |
+    Cuando hago una petición POST a "upload" con formulario multipart:
+      | name  | Alice |
+      | email | alice@example.com |
+  scenarios:
+    - title: Enviar un formulario multipart
+      gherkin: |
+        Cuando hago una petición POST a "upload" con formulario multipart:
+          | name  | Alice             |
+          | email | alice@example.com |
+        Entonces el código de estado HTTP es igual a 200
+
+
 'rest.request.PUT.body':
   expression: 'hago una petición PUT a {endpoint:text} con el cuerpo:'
   example: |
