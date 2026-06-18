@@ -107,4 +107,22 @@ class StepDocLoaderTest {
         java.nio.file.Files.delete(tempFile);
     }
 
+    @Test
+    void load_parsesSince() throws IOException, URISyntaxException {
+        var tempFile = java.nio.file.Files.createTempFile("step-doc-since", ".yaml");
+        java.nio.file.Files.writeString(tempFile, "'my.step':\n  since: '1.0.0'\n  description: A step.\n");
+        var steps = StepDocLoader.load(tempFile);
+        assertThat(steps.get("my.step").since()).isEqualTo("1.0.0");
+        java.nio.file.Files.delete(tempFile);
+    }
+
+    @Test
+    void load_sinceIsNullWhenAbsent() throws IOException, URISyntaxException {
+        var tempFile = java.nio.file.Files.createTempFile("step-doc-no-since", ".yaml");
+        java.nio.file.Files.writeString(tempFile, "'my.step':\n  description: A step.\n");
+        var steps = StepDocLoader.load(tempFile);
+        assertThat(steps.get("my.step").since()).isNull();
+        java.nio.file.Files.delete(tempFile);
+    }
+
 }

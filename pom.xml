@@ -90,7 +90,7 @@
 				<artifactId>bcprov-jdk18on</artifactId>
 				<version>1.84</version>
 			</dependency>
-<dependency>
+			<dependency>
 				<groupId>net.minidev</groupId>
 				<artifactId>json-smart</artifactId>
 				<version>2.6.0</version>

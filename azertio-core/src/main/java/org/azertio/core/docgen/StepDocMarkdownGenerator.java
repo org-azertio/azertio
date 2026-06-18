@@ -21,6 +21,10 @@ public class StepDocMarkdownGenerator {
             sb.append("**Role:** `").append(entry.role()).append("`\n\n");
         }
 
+        if (entry.since() != null) {
+            sb.append("**Since:** `").append(entry.since()).append("`\n\n");
+        }
+
         sb.append(entry.description()).append("\n\n");
 
         if (entry.parameters() != null && !entry.parameters().isEmpty()) {

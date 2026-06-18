@@ -73,6 +73,7 @@ public class StepDocLoader {
 
     @SuppressWarnings("unchecked")
     private static StepDocEntry parseEntry(Map<String, Object> map) {
+        String since = (String) map.get("since");
         String role = (String) map.get("role");
         String description = trimTrailingWhitespace((String) map.get("description"));
         String additionalData = trimTrailingWhitespace((String) map.get("additional-data"));
@@ -97,7 +98,7 @@ public class StepDocLoader {
             }
         }
 
-        return new StepDocEntry(role, description, parameters, additionalData, language);
+        return new StepDocEntry(since, role, description, parameters, additionalData, language);
     }
 
     @SuppressWarnings("unchecked")
