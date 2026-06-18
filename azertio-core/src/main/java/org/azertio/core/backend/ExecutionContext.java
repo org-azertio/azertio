@@ -72,6 +72,10 @@ public class ExecutionContext {
 		return variables.get(name);
 	}
 
+	public void addOutput(String key, String value) {
+		runtime.outputRegistry().set(key, value);
+	}
+
 
 	public String interpolateString(String input) {
 		Map<String, String> resolved = new LinkedHashMap<>(runtime.configuration().asMap());

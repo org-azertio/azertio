@@ -34,6 +34,9 @@ public class AzertioFile {
 		@SuppressWarnings("unchecked")
 		Map<String, Map<String,String>> profiles = (Map<String, Map<String,String>>) raw.get("profiles");
 		file.profiles = profiles;
+		@SuppressWarnings("unchecked")
+		List<String> outputs = (List<String>) raw.get("outputs");
+		file.outputs = outputs;
 
 		return file;
 	}
@@ -54,6 +57,7 @@ public class AzertioFile {
 	private List<String> plugins;
 	private Map<String, Object> configuration;
 	private Map<String, Map<String,String>> profiles;
+	private List<String> outputs;
 
 
 	public TestProject project() {
@@ -70,6 +74,10 @@ public class AzertioFile {
 
 	public Map<String, Map<String,String>> profiles() {
 		return profiles != null ? Map.copyOf(profiles) : Map.of();
+	}
+
+	public List<String> outputs() {
+		return outputs != null ? List.copyOf(outputs) : List.of();
 	}
 
 
@@ -119,7 +127,8 @@ public class AzertioFile {
 			contextProject,
 			Config.ofMap(flattenMap(contextConfiguration, "")).append(inputParameters),
 			contextTestSuites,
-			contextPlugins
+			contextPlugins,
+			outputs()
 		);
 	}
 
