@@ -109,6 +109,19 @@
         Then the HTTP status code is equal to 201
 
 
+'rest.auth.oauth2.password':
+  expression: 'I obtain an OAuth2 password grant token from {url:text} with client {clientId:text} and secret {clientSecret:text} as user {username:text} with password {password:text} into variable {variable:id}'
+  example: |
+    Given I obtain an OAuth2 password grant token from "https://auth.example.com/token" with client "my-client" and secret "my-secret" as user "admin" with password "admin123" into variable accessToken
+  scenarios:
+    - title: Obtain a user token and use it to access a role-protected resource
+      gherkin: |
+        Given I obtain an OAuth2 password grant token from "${auth.tokenUrl}" with client "${auth.clientId}" and secret "${auth.clientSecret}" as user "${test.username}" with password "${test.password}" into variable accessToken
+        And the authorization is Bearer "${accessToken}"
+        When I make a GET request to "admin/settings"
+        Then the HTTP status code is equal to 200
+
+
 'rest.request.headers':
   expression: 'the next request has the headers:'
   example: |

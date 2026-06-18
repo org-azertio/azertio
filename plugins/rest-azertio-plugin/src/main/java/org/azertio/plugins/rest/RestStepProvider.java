@@ -97,6 +97,15 @@ public class RestStepProvider implements StepProvider  {
 		ExecutionContext.current().setVariable(variable, token);
 	}
 
+	@StepExpression(value = "rest.auth.oauth2.password", args = {"url:text", "clientId:text", "clientSecret:text", "username:text", "password:text", "variable:id"})
+	public void fetchOAuth2PasswordGrant(String url, String clientId, String clientSecret, String username, String password, String variable) {
+		String token = restEngine.fetchOAuth2PasswordToken(
+			interpolate(url), interpolate(clientId), interpolate(clientSecret),
+			interpolate(username), interpolate(password)
+		);
+		ExecutionContext.current().setVariable(variable, token);
+	}
+
 
 	@StepExpression("rest.request.headers")
 	public void setNextRequestHeaders(DataTable table) {

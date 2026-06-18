@@ -77,16 +77,30 @@ class TestRestSteps {
 			.withQueryParam("api_key", equalTo("secret-key"))
 			.willReturn(ok()));
 
+		// bXktY2xpZW50Om15LXNlY3JldA== = base64("my-client:my-secret")
 		wireMock.stubFor(post("/oauth/token")
+			.withHeader("Authorization", equalTo("Basic bXktY2xpZW50Om15LXNlY3JldA=="))
 			.withRequestBody(containing("grant_type=client_credentials"))
-			.withRequestBody(containing("client_id=my-client"))
-			.withRequestBody(containing("client_secret=my-secret"))
 			.willReturn(ok()
 				.withHeader("Content-Type", "application/json")
 				.withBody("{\"access_token\":\"oauth-token\",\"token_type\":\"Bearer\",\"expires_in\":3600}")));
 
 		wireMock.stubFor(get("/oauth-protected")
 			.withHeader("Authorization", equalTo("Bearer oauth-token"))
+			.willReturn(ok()));
+
+		// bXktY2xpZW50Om15LXNlY3JldA== = base64("my-client:my-secret")
+		wireMock.stubFor(post("/oauth/token")
+			.withHeader("Authorization", equalTo("Basic bXktY2xpZW50Om15LXNlY3JldA=="))
+			.withRequestBody(containing("grant_type=password"))
+			.withRequestBody(containing("username=admin"))
+			.withRequestBody(containing("password=admin123"))
+			.willReturn(ok()
+				.withHeader("Content-Type", "application/json")
+				.withBody("{\"access_token\":\"user-token\",\"token_type\":\"Bearer\",\"expires_in\":3600}")));
+
+		wireMock.stubFor(get("/user-protected")
+			.withHeader("Authorization", equalTo("Bearer user-token"))
 			.willReturn(ok()));
 
 		wireMock.stubFor(get("/persistent-headers-test")
@@ -210,6 +224,12 @@ class TestRestSteps {
 	@Test
 	@FeatureDir("auth-oauth2")
 	void authOAuth2ClientCredentials_passes(JUnitAzertioPlan plan) {
+		plan.withConfig("rest.baseURL", baseUrl()).execute().assertAllPassed();
+	}
+
+	@Test
+	@FeatureDir("auth-oauth2-password")
+	void authOAuth2PasswordGrant_passes(JUnitAzertioPlan plan) {
 		plan.withConfig("rest.baseURL", baseUrl()).execute().assertAllPassed();
 	}
 

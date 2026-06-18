@@ -22,6 +22,8 @@ public interface RestEngine {
 	void addPersistentQueryParam(String name, String value);
 	/** Calls an OAuth2 token endpoint (client_credentials grant) and returns the access token. */
 	String fetchOAuth2Token(String tokenUrl, String clientId, String clientSecret);
+	/** Calls an OAuth2 token endpoint (password grant / ROPC) and returns the access token. */
+	String fetchOAuth2PasswordToken(String tokenUrl, String clientId, String clientSecret, String username, String password);
 	Integer responseHttpCode();
 	String responseBody();
 	String responseContentType();

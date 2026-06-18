@@ -82,6 +82,19 @@
         Entonces el código de estado HTTP es igual a 200
 
 
+'rest.auth.oauth2.password':
+  expression: 'obtengo un token OAuth2 de contraseña de {url:text} con cliente {clientId:text} y secreto {clientSecret:text} como usuario {username:text} con contraseña {password:text} en la variable {variable:id}'
+  example: |
+    Dado que obtengo un token OAuth2 de contraseña de "https://auth.example.com/token" con cliente "my-client" y secreto "my-secret" como usuario "admin" con contraseña "admin123" en la variable accessToken
+  scenarios:
+    - title: Obtener un token de usuario y usarlo para acceder a un recurso protegido por rol
+      gherkin: |
+        Dado que obtengo un token OAuth2 de contraseña de "${auth.tokenUrl}" con cliente "${auth.clientId}" y secreto "${auth.clientSecret}" como usuario "${test.username}" con contraseña "${test.password}" en la variable accessToken
+        Y la autorización es Bearer "${accessToken}"
+        Cuando hago una petición GET a "admin/settings"
+        Entonces el código de estado HTTP es igual a 200
+
+
 'rest.request.headers':
   expression: 'la próxima petición tiene los headers:'
   example: |

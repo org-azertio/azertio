@@ -1,6 +1,7 @@
 package org.azertio.plugins.rest.jdk;
 
 import org.azertio.core.AzertioException;
+import org.azertio.core.util.Log;
 import org.azertio.plugins.rest.RestEngine;
 
 import java.io.IOException;
@@ -11,12 +12,16 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class JdkHttpEngine implements RestEngine {
+
+    private static final Log log = Log.of("rest");
+    private static final int MAX_LOG_BODY_LENGTH = 1000;
 
     private String baseUrl;
     private Integer httpCodeThreshold;
@@ -93,26 +98,31 @@ public class JdkHttpEngine implements RestEngine {
 
     @Override
     public String fetchOAuth2Token(String tokenUrl, String clientId, String clientSecret) {
-        String url = buildUrl(tokenUrl);
-        String body = "grant_type=client_credentials"
-            + "&client_id=" + URLEncoder.encode(clientId, StandardCharsets.UTF_8)
-            + "&client_secret=" + URLEncoder.encode(clientSecret, StandardCharsets.UTF_8);
+        return doFetchOAuth2Token(tokenUrl, "grant_type=client_credentials", clientId, clientSecret);
+    }
+
+    @Override
+    public String fetchOAuth2PasswordToken(String tokenUrl, String clientId, String clientSecret, String username, String password) {
+        String grantParams = "grant_type=password"
+            + "&username=" + URLEncoder.encode(username, StandardCharsets.UTF_8)
+            + "&password=" + URLEncoder.encode(password, StandardCharsets.UTF_8);
+        return doFetchOAuth2Token(tokenUrl, grantParams, clientId, clientSecret);
+    }
+
+    // #131: uses CLIENT_SECRET_BASIC (RFC 6749 §2.3.1 recommended method)
+    // #132: uses tokenUrl directly — it is always an absolute URL, must not go through buildUrl
+    private String doFetchOAuth2Token(String tokenUrl, String grantParams, String clientId, String clientSecret) {
+        String credentials = Base64.getEncoder().encodeToString(
+            (clientId + ":" + clientSecret).getBytes(StandardCharsets.UTF_8)
+        );
         HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(url))
+            .uri(URI.create(tokenUrl))
             .timeout(timeout)
             .header("Content-Type", "application/x-www-form-urlencoded")
-            .POST(HttpRequest.BodyPublishers.ofString(body))
+            .header("Authorization", "Basic " + credentials)
+            .POST(HttpRequest.BodyPublishers.ofString(grantParams))
             .build();
-        HttpResponse<String> response;
-        try {
-            response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new AzertioException("OAuth2 token request interrupted: {}", url);
-        } catch (IOException e) {
-            String reason = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
-            throw new AzertioException("OAuth2 token request failed [{}]: {}", url, reason);
-        }
+        HttpResponse<String> response = executeRequest(request, grantParams);
         if (response.statusCode() < 200 || response.statusCode() >= 300) {
             throw new AzertioException("OAuth2 token endpoint returned status {}: {}", response.statusCode(), response.body());
         }
@@ -218,21 +228,59 @@ public class JdkHttpEngine implements RestEngine {
     private int send(HttpRequest request, String body) {
         lastRequest = request;
         lastRequestBody = body;
+        lastResponse = executeRequest(request, body);
+        checkThreshold(lastResponse.statusCode());
+        return lastResponse.statusCode();
+    }
+
+    private HttpResponse<String> executeRequest(HttpRequest request, String body) {
+        logRequest(request, body);
         HttpResponse<String> response;
         try {
             response = client.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new AzertioException("HTTP request interrupted: {}",request.uri());
+            throw new AzertioException("HTTP request interrupted: {}", request.uri());
         } catch (IOException e) {
             String reason = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
             throw new AzertioException("HTTP request failed [{}]: {}", request.uri(), reason);
         }
-        lastResponse = response;
-        checkThreshold(response.statusCode());
-        return response.statusCode();
+        logResponse(response);
+        return response;
     }
 
+    private void logRequest(HttpRequest request, String body) {
+        log.debug("[REST] --> {} {}", request.method(), request.uri());
+        request.headers().map().forEach((name, values) ->
+            values.forEach(value -> log.debug("[REST]     {}: {}", name, maskSensitiveHeader(name, value)))
+        );
+        if (body != null && !body.isBlank()) {
+            log.debug("[REST]     Body: {}", truncate(body));
+        }
+    }
+
+    private void logResponse(HttpResponse<String> response) {
+        log.debug("[REST] <-- {}", response.statusCode());
+        response.headers().map().forEach((name, values) ->
+            values.forEach(value -> log.debug("[REST]     {}: {}", name, value))
+        );
+        String body = response.body();
+        if (body != null && !body.isBlank()) {
+            log.debug("[REST]     Body: {}", truncate(body));
+        }
+    }
+
+    private String maskSensitiveHeader(String name, String value) {
+        if ("Authorization".equalsIgnoreCase(name)) {
+            int spaceIdx = value.indexOf(' ');
+            return spaceIdx >= 0 ? value.substring(0, spaceIdx + 1) + "***" : "***";
+        }
+        return value;
+    }
+
+    private String truncate(String s) {
+        return s.length() <= MAX_LOG_BODY_LENGTH ? s : s.substring(0, MAX_LOG_BODY_LENGTH) + "... [truncated]";
+    }
 
     private void checkThreshold(int statusCode) {
         if (httpCodeThreshold != null && statusCode >= httpCodeThreshold) {

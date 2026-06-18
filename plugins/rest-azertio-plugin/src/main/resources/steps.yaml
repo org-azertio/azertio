@@ -66,17 +66,47 @@
   role: given
   description: |
     Obtains an OAuth2 access token using the client credentials grant and stores it in a scenario variable.
+    Credentials are sent via HTTP Basic Authentication (CLIENT_SECRET_BASIC, RFC 6749 §2.3.1).
     The token can then be used with the rest.auth.bearer step.
   parameters:
     - name: url
       type: text
-      description: The token endpoint URL
+      description: The token endpoint URL (always used as-is, regardless of rest.baseURL)
     - name: clientId
       type: text
       description: The OAuth2 client ID
     - name: clientSecret
       type: text
       description: The OAuth2 client secret
+    - name: variable
+      type: id
+      description: The variable name where the access token will be stored
+
+
+'rest.auth.oauth2.password':
+  since: '1.1.0'
+  role: given
+  description: |
+    Obtains an OAuth2 access token using the Resource Owner Password Credentials grant (ROPC)
+    and stores it in a scenario variable. Useful for testing endpoints secured by user roles.
+    Credentials are sent via HTTP Basic Authentication (CLIENT_SECRET_BASIC, RFC 6749 §2.3.1).
+    The token can then be used with the rest.auth.bearer step.
+  parameters:
+    - name: url
+      type: text
+      description: The token endpoint URL (always used as-is, regardless of rest.baseURL)
+    - name: clientId
+      type: text
+      description: The OAuth2 client ID
+    - name: clientSecret
+      type: text
+      description: The OAuth2 client secret
+    - name: username
+      type: text
+      description: The resource owner username
+    - name: password
+      type: text
+      description: The resource owner password
     - name: variable
       type: id
       description: The variable name where the access token will be stored
