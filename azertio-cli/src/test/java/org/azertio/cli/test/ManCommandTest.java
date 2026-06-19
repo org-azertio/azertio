@@ -52,6 +52,22 @@ class ManCommandTest {
         assertEquals(1, exitCode);
     }
 
+    @Test
+    void showTopicText() {
+        int exitCode = new CommandLine(new MainCommand()).execute(
+            args("man", "test-topic")
+        );
+        assertEquals(0, exitCode);
+    }
+
+    @Test
+    void showTopicJson() {
+        int exitCode = new CommandLine(new MainCommand()).execute(
+            args("man", "test-topic", "--json")
+        );
+        assertEquals(0, exitCode);
+    }
+
     static String[] args(String... extra) {
         List<String> all = new ArrayList<>(Arrays.asList(extra));
         all.addAll(Arrays.asList(BASE_ARGS));
