@@ -1,0 +1,3 @@
+# Step definitions for the Web UI plugin.
+# Each entry documents one step key used by @StepExpression in WebUiStepProvider.
+# See the REST plugin for a complete example of the expected format.

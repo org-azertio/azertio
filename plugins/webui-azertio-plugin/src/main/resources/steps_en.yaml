@@ -1,0 +1,6 @@
+# English natural-language expressions for each step key.
+# Format:
+#   'webui.step.key':
+#     expression: 'the step expression with {param:type}'
+#     example: |
+#       Given the step example
