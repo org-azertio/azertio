@@ -82,6 +82,19 @@
         Entonces el código de estado HTTP es igual a 200
 
 
+'rest.auth.oauth2.password':
+  expression: 'obtengo un token OAuth2 de contraseña de {url:text} con cliente {clientId:text} y secreto {clientSecret:text} como usuario {username:text} con contraseña {password:text} en la variable {variable:id}'
+  example: |
+    Dado que obtengo un token OAuth2 de contraseña de "https://auth.example.com/token" con cliente "my-client" y secreto "my-secret" como usuario "admin" con contraseña "admin123" en la variable accessToken
+  scenarios:
+    - title: Obtener un token de usuario y usarlo para acceder a un recurso protegido por rol
+      gherkin: |
+        Dado que obtengo un token OAuth2 de contraseña de "${auth.tokenUrl}" con cliente "${auth.clientId}" y secreto "${auth.clientSecret}" como usuario "${test.username}" con contraseña "${test.password}" en la variable accessToken
+        Y la autorización es Bearer "${accessToken}"
+        Cuando hago una petición GET a "admin/settings"
+        Entonces el código de estado HTTP es igual a 200
+
+
 'rest.request.headers':
   expression: 'la próxima petición tiene los headers:'
   example: |
@@ -163,6 +176,36 @@
       gherkin: |
         Cuando hago una petición POST a "users" con el cuerpo del archivo "fixtures/new_user.json"
         Entonces el código de estado HTTP es igual a 201
+
+
+'rest.request.POST.urlencoded':
+  expression: 'hago una petición POST a {endpoint:text} con formulario URL-encoded:'
+  example: |
+    Cuando hago una petición POST a "login" con formulario URL-encoded:
+      | username | alice |
+      | password | s3cr3t |
+  scenarios:
+    - title: Enviar un formulario de login
+      gherkin: |
+        Cuando hago una petición POST a "login" con formulario URL-encoded:
+          | username | alice  |
+          | password | s3cr3t |
+        Entonces el código de estado HTTP es igual a 200
+
+
+'rest.request.POST.multipart':
+  expression: 'hago una petición POST a {endpoint:text} con formulario multipart:'
+  example: |
+    Cuando hago una petición POST a "upload" con formulario multipart:
+      | name  | Alice |
+      | email | alice@example.com |
+  scenarios:
+    - title: Enviar un formulario multipart
+      gherkin: |
+        Cuando hago una petición POST a "upload" con formulario multipart:
+          | name  | Alice             |
+          | email | alice@example.com |
+        Entonces el código de estado HTTP es igual a 200
 
 
 'rest.request.PUT.body':
@@ -328,6 +371,23 @@
         Entonces el código de estado HTTP es igual a 200
         Y la respuesta incluye los headers:
           | Content-Type | application/json |
+
+
+'rest.response.cookies':
+  expression: 'la respuesta establece las cookies:'
+  example: |
+    Entonces la respuesta establece las cookies:
+      | session_id | abc123 |
+      | theme      | dark   |
+  scenarios:
+    - title: Verificar cookies establecidas tras un login exitoso
+      gherkin: |
+        Cuando hago una petición POST a "login" con formulario URL-encoded:
+          | username | alice  |
+          | password | s3cr3t |
+        Entonces el código de estado HTTP es igual a 200
+        Y la respuesta establece las cookies:
+          | session_id | abc123 |
 
 
 'rest.response.extracts.header':

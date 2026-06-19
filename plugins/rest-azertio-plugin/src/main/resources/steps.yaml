@@ -66,17 +66,47 @@
   role: given
   description: |
     Obtains an OAuth2 access token using the client credentials grant and stores it in a scenario variable.
+    Credentials are sent via HTTP Basic Authentication (CLIENT_SECRET_BASIC, RFC 6749 §2.3.1).
     The token can then be used with the rest.auth.bearer step.
   parameters:
     - name: url
       type: text
-      description: The token endpoint URL
+      description: The token endpoint URL (always used as-is, regardless of rest.baseURL)
     - name: clientId
       type: text
       description: The OAuth2 client ID
     - name: clientSecret
       type: text
       description: The OAuth2 client secret
+    - name: variable
+      type: id
+      description: The variable name where the access token will be stored
+
+
+'rest.auth.oauth2.password':
+  since: '1.1.0'
+  role: given
+  description: |
+    Obtains an OAuth2 access token using the Resource Owner Password Credentials grant (ROPC)
+    and stores it in a scenario variable. Useful for testing endpoints secured by user roles.
+    Credentials are sent via HTTP Basic Authentication (CLIENT_SECRET_BASIC, RFC 6749 §2.3.1).
+    The token can then be used with the rest.auth.bearer step.
+  parameters:
+    - name: url
+      type: text
+      description: The token endpoint URL (always used as-is, regardless of rest.baseURL)
+    - name: clientId
+      type: text
+      description: The OAuth2 client ID
+    - name: clientSecret
+      type: text
+      description: The OAuth2 client secret
+    - name: username
+      type: text
+      description: The resource owner username
+    - name: password
+      type: text
+      description: The resource owner password
     - name: variable
       type: id
       description: The variable name where the access token will be stored
@@ -124,6 +154,34 @@
       description: The URL to which the POST request is made
   additional-data: |
     The body of the POST request, provided as a multi-line text input.
+
+
+'rest.request.POST.urlencoded':
+  since: '1.1.0'
+  role: when
+  description: |
+    Makes a POST request to the specified URL with an application/x-www-form-urlencoded body
+    built from the given key-value table. Values are URL-encoded automatically.
+  parameters:
+    - name: endpoint
+      type: text
+      description: The URL to which the POST request is made
+  additional-data: |
+    A two-column table where each row is a form field name and its value.
+
+
+'rest.request.POST.multipart':
+  since: '1.1.0'
+  role: when
+  description: |
+    Makes a POST request to the specified URL with a multipart/form-data body
+    built from the given key-value table. Each row becomes a separate form part.
+  parameters:
+    - name: endpoint
+      type: text
+      description: The URL to which the POST request is made
+  additional-data: |
+    A two-column table where each row is a form field name and its value.
 
 
 'rest.request.POST.file':
@@ -249,6 +307,18 @@
     Additional response headers not listed in the table are accepted.
   additional-data: |
     A two-column table where each row specifies an expected header name and its expected value.
+
+
+'rest.response.cookies':
+  since: '1.1.0'
+  role: then
+  description: |
+    Asserts that the last REST response sets the specified cookies with the given values.
+    Each row names a cookie and its expected value. Only the cookie value is checked;
+    attributes such as Path, Domain, HttpOnly or Secure are ignored.
+    Additional cookies not listed in the table are accepted.
+  additional-data: |
+    A two-column table where each row specifies an expected cookie name and its expected value.
 
 
 'rest.response.extracts.field':
