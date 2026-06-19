@@ -400,6 +400,22 @@
           | Content-Type | application/json |
 
 
+'rest.response.cookies':
+  expression: 'assert HTTP cookies include:'
+  example: |
+    * assert HTTP cookies include:
+      | session_id | abc123 |
+  scenarios:
+    - title: Verify cookies after login
+      gherkin: |
+        * do HTTP POST "login" urlencoded:
+          | username | alice  |
+          | password | s3cr3t |
+        * assert HTTP status code = 200
+        * assert HTTP cookies include:
+          | session_id | abc123 |
+
+
 'rest.response.extracts.header':
   expression: 'var {variable:id} = header {header:text} from HTTP response'
   example: |

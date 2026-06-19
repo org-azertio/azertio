@@ -30,6 +30,7 @@ public interface RestEngine {
 	String responseBody();
 	String responseContentType();
 	String responseHeader(String name);
+	String responseCookie(String name);
 	String requestRaw();
 	String responseRaw();
 

@@ -373,6 +373,23 @@
           | Content-Type | application/json |
 
 
+'rest.response.cookies':
+  expression: 'la respuesta establece las cookies:'
+  example: |
+    Entonces la respuesta establece las cookies:
+      | session_id | abc123 |
+      | theme      | dark   |
+  scenarios:
+    - title: Verificar cookies establecidas tras un login exitoso
+      gherkin: |
+        Cuando hago una petición POST a "login" con formulario URL-encoded:
+          | username | alice  |
+          | password | s3cr3t |
+        Entonces el código de estado HTTP es igual a 200
+        Y la respuesta establece las cookies:
+          | session_id | abc123 |
+
+
 'rest.response.extracts.header':
   expression: 'almaceno el valor del header de respuesta {header:text} en la variable {variable:id}'
   example: |

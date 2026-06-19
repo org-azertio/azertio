@@ -235,6 +235,25 @@ public class RestStepProvider implements StepProvider  {
 	}
 
 
+	@StepExpression("rest.response.cookies")
+	public void checkResponseCookies(DataTable table) {
+		var errors = new ArrayList<String>();
+		for (var row : ExecutionContext.current().interpolateDataTable(table).values()) {
+			if (row.size() < 2) continue;
+			String name = row.get(0);
+			String expected = row.get(1);
+			String actual = restEngine.responseCookie(name);
+			if (actual == null) {
+				errors.add("Cookie '" + name + "' was not set in the response");
+			} else if (!expected.equals(actual)) {
+				errors.add("Cookie '" + name + "': expected '" + expected + "' but was '" + actual + "'");
+			}
+		}
+		if (!errors.isEmpty()) {
+			throw new AssertionError("Response cookies mismatch:\n" + String.join("\n", errors));
+		}
+	}
+
 	@StepExpression(value = "rest.response.extracts.field", args = {"field:text", "variable:id"})
 	public void extractFieldFromResponse(String field, String variable) {
 		String contentType = restEngine.responseContentType();

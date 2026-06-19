@@ -122,6 +122,11 @@ class TestRestSteps {
 
 		wireMock.stubFor(get("/echo-header")
 			.willReturn(ok()));
+
+		wireMock.stubFor(post("/cookie-login")
+			.willReturn(ok()
+				.withHeader("Set-Cookie", "session_id=abc123; Path=/; HttpOnly")
+				.withHeader("Set-Cookie", "theme=dark; Path=/")));
 	}
 
 	private String baseUrl() {
@@ -254,6 +259,12 @@ class TestRestSteps {
 	@Test
 	@FeatureDir("post-multipart")
 	void postMultipart_passes(JUnitAzertioPlan plan) {
+		plan.withConfig("rest.baseURL", baseUrl()).execute().assertAllPassed();
+	}
+
+	@Test
+	@FeatureDir("response-cookies")
+	void responseCookies_passes(JUnitAzertioPlan plan) {
 		plan.withConfig("rest.baseURL", baseUrl()).execute().assertAllPassed();
 	}
 

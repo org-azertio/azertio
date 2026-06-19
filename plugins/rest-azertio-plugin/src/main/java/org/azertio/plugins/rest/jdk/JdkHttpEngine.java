@@ -195,6 +195,23 @@ public class JdkHttpEngine implements RestEngine {
         return lastResponse.headers().firstValue(name).orElse(null);
     }
 
+    @Override
+    public String responseCookie(String name) {
+        if (lastResponse == null) return null;
+        return lastResponse.headers().allValues("Set-Cookie").stream()
+            .map(h -> h.split(";")[0].trim())
+            .filter(pair -> {
+                int eq = pair.indexOf('=');
+                return eq > 0 && pair.substring(0, eq).equals(name);
+            })
+            .map(pair -> {
+                int eq = pair.indexOf('=');
+                return pair.substring(eq + 1);
+            })
+            .findFirst()
+            .orElse(null);
+    }
+
     private String buildUrl(String endpoint) {
         String url = (baseUrl == null || baseUrl.isBlank())
             ? endpoint

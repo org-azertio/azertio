@@ -309,6 +309,18 @@
     A two-column table where each row specifies an expected header name and its expected value.
 
 
+'rest.response.cookies':
+  since: '1.1.0'
+  role: then
+  description: |
+    Asserts that the last REST response sets the specified cookies with the given values.
+    Each row names a cookie and its expected value. Only the cookie value is checked;
+    attributes such as Path, Domain, HttpOnly or Secure are ignored.
+    Additional cookies not listed in the table are accepted.
+  additional-data: |
+    A two-column table where each row specifies an expected cookie name and its expected value.
+
+
 'rest.response.extracts.field':
   since: '1.0.0'
   role: then
