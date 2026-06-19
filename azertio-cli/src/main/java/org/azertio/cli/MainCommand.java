@@ -24,7 +24,8 @@ import java.util.Map;
 		ReportCommand.class,
 		ServeCommand.class,
 		ShowConfigCommand.class,
-		LspCommand.class
+		LspCommand.class,
+		ManCommand.class
 	}
 )
 public class MainCommand implements Runnable {

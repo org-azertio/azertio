@@ -1,3 +1,4 @@
+import org.azertio.core.contributors.HelpProvider;
 import org.azertio.core.contributors.SuiteAssembler;
 
 module org.azertio.cli.test {
@@ -12,4 +13,5 @@ module org.azertio.cli.test {
 	opens org.azertio.cli.test to org.junit.platform.commons, info.picocli, org.myjtools.jexten, org.azertio.core;
 
 	provides SuiteAssembler with org.azertio.cli.test.TestSuiteAssembler;
+	provides HelpProvider with org.azertio.cli.test.TestHelpProvider;
 }

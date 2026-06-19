@@ -320,3 +320,9 @@ All feedback and participation are welcome.
 ## License
 
 Released under the [MIT License](LICENSE).
+
+---
+
+## Authors
+
+**Luis Iñesta Gelabert** — luiinge@gmail.com

@@ -4,7 +4,6 @@ import org.azertio.cli.MainCommand;
 import org.azertio.core.AzertioConfig;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 import picocli.CommandLine;
 
 import java.io.ByteArrayOutputStream;
@@ -39,12 +38,14 @@ class ExecCommandTest {
 
     @BeforeAll
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    static void setUp(@TempDir Path tempDir) throws Exception {
-        yaml = tempDir.resolve("azertio.yaml");
+    static void setUp() throws Exception {
+        Path baseDir = Path.of("target/.azertio-exec");
+        Files.createDirectories(baseDir);
+        yaml = baseDir.resolve("azertio.yaml");
         Files.writeString(yaml, YAML_CONTENT);
-        featuresDir = tempDir.resolve("features");
+        featuresDir = baseDir.resolve("features");
         Files.createDirectories(featuresDir);
-        envPath = tempDir.resolve(".azertio");
+        envPath = baseDir.resolve(".azertio");
         Files.createDirectories(envPath);
     }
 
