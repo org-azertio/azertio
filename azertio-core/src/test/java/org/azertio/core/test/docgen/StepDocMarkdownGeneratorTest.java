@@ -26,7 +26,7 @@ class StepDocMarkdownGeneratorTest {
 
     @Test
     void generate_stepWithDescription_includesSeparatorAndId() {
-        var step = new StepDocEntry(null, "A description", List.of(), null, Map.of());
+        var step = new StepDocEntry(null, null,"A description", List.of(), null, Map.of());
         String result = generator.generate("Steps", Map.of("my.step", step));
         assertThat(result).contains("---\n\n## `my.step`\n\n");
         assertThat(result).contains("A description\n\n");
@@ -34,16 +34,30 @@ class StepDocMarkdownGeneratorTest {
 
     @Test
     void generate_stepWithRole_includesRoleLine() {
-        var step = new StepDocEntry("action", "desc", List.of(), null, Map.of());
+        var step = new StepDocEntry(null, "action", "desc", List.of(), null, Map.of());
         String result = generator.generate("Steps", Map.of("s", step));
         assertThat(result).contains("**Role:** `action`\n\n");
     }
 
     @Test
     void generate_stepWithoutRole_omitsRoleLine() {
-        var step = new StepDocEntry(null, "desc", List.of(), null, Map.of());
+        var step = new StepDocEntry(null, null, "desc", List.of(), null, Map.of());
         String result = generator.generate("Steps", Map.of("s", step));
         assertThat(result).doesNotContain("**Role:**");
+    }
+
+    @Test
+    void generate_stepWithSince_includesSinceLine() {
+        var step = new StepDocEntry("1.0.0", "action", "desc", List.of(), null, Map.of());
+        String result = generator.generate("Steps", Map.of("s", step));
+        assertThat(result).contains("**Since:** `1.0.0`\n\n");
+    }
+
+    @Test
+    void generate_stepWithoutSince_omitsSinceLine() {
+        var step = new StepDocEntry(null, null, "desc", List.of(), null, Map.of());
+        String result = generator.generate("Steps", Map.of("s", step));
+        assertThat(result).doesNotContain("**Since:**");
     }
 
     @Test
@@ -52,7 +66,7 @@ class StepDocMarkdownGeneratorTest {
             new ParameterDoc("url", "text", "The target URL"),
             new ParameterDoc("timeout", "integer", "Max wait time")
         );
-        var step = new StepDocEntry(null, "desc", params, null, Map.of());
+        var step = new StepDocEntry(null, null,"desc", params, null, Map.of());
         String result = generator.generate("Steps", Map.of("s", step));
         assertThat(result).contains("### Parameters\n\n");
         assertThat(result).contains("| Name | Type | Description |");
@@ -62,14 +76,14 @@ class StepDocMarkdownGeneratorTest {
 
     @Test
     void generate_stepWithEmptyParameters_omitsParameterSection() {
-        var step = new StepDocEntry(null, "desc", List.of(), null, Map.of());
+        var step = new StepDocEntry(null, null,"desc", List.of(), null, Map.of());
         String result = generator.generate("Steps", Map.of("s", step));
         assertThat(result).doesNotContain("### Parameters");
     }
 
     @Test
     void generate_stepWithAdditionalData_includesSection() {
-        var step = new StepDocEntry(null, "desc", List.of(), "Extra info here", Map.of());
+        var step = new StepDocEntry(null, null,"desc", List.of(), "Extra info here", Map.of());
         String result = generator.generate("Steps", Map.of("s", step));
         assertThat(result).contains("### Additional data\n\n");
         assertThat(result).contains("Extra info here\n\n");
@@ -77,7 +91,7 @@ class StepDocMarkdownGeneratorTest {
 
     @Test
     void generate_stepWithNullAdditionalData_omitsSection() {
-        var step = new StepDocEntry(null, "desc", List.of(), null, Map.of());
+        var step = new StepDocEntry(null, null,"desc", List.of(), null, Map.of());
         String result = generator.generate("Steps", Map.of("s", step));
         assertThat(result).doesNotContain("### Additional data");
     }
@@ -85,7 +99,7 @@ class StepDocMarkdownGeneratorTest {
     @Test
     void generate_languageEntryWithExpression_includesExpression() {
         var lang = new StepLanguageEntry("I do {x:text}", null, List.of(), List.of());
-        var step = new StepDocEntry(null, "desc", List.of(), null, Map.of("en", lang));
+        var step = new StepDocEntry(null, null,"desc", List.of(), null, Map.of("en", lang));
         String result = generator.generate("Steps", Map.of("s", step));
         assertThat(result).contains("### `en`\n\n");
         assertThat(result).contains("**Expression:** `I do {x:text}`\n\n");
@@ -94,7 +108,7 @@ class StepDocMarkdownGeneratorTest {
     @Test
     void generate_languageEntryWithoutExpression_omitsExpressionLine() {
         var lang = new StepLanguageEntry(null, null, List.of(), List.of());
-        var step = new StepDocEntry(null, "desc", List.of(), null, Map.of("en", lang));
+        var step = new StepDocEntry(null, null,"desc", List.of(), null, Map.of("en", lang));
         String result = generator.generate("Steps", Map.of("s", step));
         assertThat(result).doesNotContain("**Expression:**");
     }
@@ -102,7 +116,7 @@ class StepDocMarkdownGeneratorTest {
     @Test
     void generate_languageEntryWithAssertionHints_includesBullets() {
         var lang = new StepLanguageEntry(null, null, List.of(), List.of("hint A", "hint B"));
-        var step = new StepDocEntry(null, "desc", List.of(), null, Map.of("en", lang));
+        var step = new StepDocEntry(null, null,"desc", List.of(), null, Map.of("en", lang));
         String result = generator.generate("Steps", Map.of("s", step));
         assertThat(result).contains("**Assertion expressions:**\n\n");
         assertThat(result).contains("- `hint A`\n");
@@ -112,7 +126,7 @@ class StepDocMarkdownGeneratorTest {
     @Test
     void generate_languageEntryWithExample_includesGherkinBlock() {
         var lang = new StepLanguageEntry(null, "Given I do something", List.of(), List.of());
-        var step = new StepDocEntry(null, "desc", List.of(), null, Map.of("en", lang));
+        var step = new StepDocEntry(null, null,"desc", List.of(), null, Map.of("en", lang));
         String result = generator.generate("Steps", Map.of("s", step));
         assertThat(result).contains("**Example:**\n\n```gherkin\nGiven I do something\n```\n\n");
     }
@@ -124,7 +138,7 @@ class StepDocMarkdownGeneratorTest {
             new ScenarioExample(null, "Given X\nThen Y")
         );
         var lang = new StepLanguageEntry(null, null, scenarios, List.of());
-        var step = new StepDocEntry(null, "desc", List.of(), null, Map.of("en", lang));
+        var step = new StepDocEntry(null, null,"desc", List.of(), null, Map.of("en", lang));
         String result = generator.generate("Steps", Map.of("s", step));
         assertThat(result).contains("**Scenarios:**\n\n");
         assertThat(result).contains("*Happy path*\n\n");
@@ -135,8 +149,8 @@ class StepDocMarkdownGeneratorTest {
     @Test
     void generate_multipleSteps_allStepsPresent() {
         var steps = new LinkedHashMap<String, StepDocEntry>();
-        steps.put("step.one", new StepDocEntry(null, "First", List.of(), null, Map.of()));
-        steps.put("step.two", new StepDocEntry(null, "Second", List.of(), null, Map.of()));
+        steps.put("step.one", new StepDocEntry(null, null,"First", List.of(), null, Map.of()));
+        steps.put("step.two", new StepDocEntry(null, null,"Second", List.of(), null, Map.of()));
         String result = generator.generate("Steps", steps);
         assertThat(result).contains("## `step.one`");
         assertThat(result).contains("## `step.two`");

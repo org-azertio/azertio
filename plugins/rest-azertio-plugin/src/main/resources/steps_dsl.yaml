@@ -74,6 +74,19 @@
         * assert HTTP status code = 200
 
 
+'rest.auth.oauth2.password':
+  expression: 'OAuth2 password grant {url:text} client {clientId:text} secret {clientSecret:text} user {username:text} password {password:text} into {variable:id}'
+  example: |
+    * OAuth2 password grant "${auth.tokenUrl}" client "${auth.clientId}" secret "${auth.clientSecret}" user "admin" password "admin123" into accessToken
+  scenarios:
+    - title: Obtain a user token and access a role-protected resource
+      gherkin: |
+        * OAuth2 password grant "${auth.tokenUrl}" client "${auth.clientId}" secret "${auth.clientSecret}" user "${test.username}" password "${test.password}" into accessToken
+        * set HTTP auth Bearer "${accessToken}"
+        * do HTTP GET "admin/settings"
+        * assert HTTP status code = 200
+
+
 'rest.request.headers':
   expression: 'set HTTP request headers:'
   example: |
@@ -155,6 +168,36 @@
       gherkin: |
         * do HTTP POST "users" using "fixtures/new_user.json"
         * assert HTTP status code = 201
+
+
+'rest.request.POST.urlencoded':
+  expression: 'do HTTP POST {endpoint:text} urlencoded:'
+  example: |
+    * do HTTP POST "login" urlencoded:
+      | username | alice  |
+      | password | s3cr3t |
+  scenarios:
+    - title: Submit a login form with URL-encoded body
+      gherkin: |
+        * do HTTP POST "login" urlencoded:
+          | username | alice  |
+          | password | s3cr3t |
+        * assert HTTP status code = 200
+
+
+'rest.request.POST.multipart':
+  expression: 'do HTTP POST {endpoint:text} multipart:'
+  example: |
+    * do HTTP POST "upload" multipart:
+      | name  | Alice             |
+      | email | alice@example.com |
+  scenarios:
+    - title: Submit a multipart form
+      gherkin: |
+        * do HTTP POST "upload" multipart:
+          | name  | Alice             |
+          | email | alice@example.com |
+        * assert HTTP status code = 200
 
 
 'rest.request.PUT.body':
@@ -355,6 +398,22 @@
         * assert HTTP status code = 200
         * assert HTTP response headers include:
           | Content-Type | application/json |
+
+
+'rest.response.cookies':
+  expression: 'assert HTTP cookies include:'
+  example: |
+    * assert HTTP cookies include:
+      | session_id | abc123 |
+  scenarios:
+    - title: Verify cookies after login
+      gherkin: |
+        * do HTTP POST "login" urlencoded:
+          | username | alice  |
+          | password | s3cr3t |
+        * assert HTTP status code = 200
+        * assert HTTP cookies include:
+          | session_id | abc123 |
 
 
 'rest.response.extracts.header':

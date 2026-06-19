@@ -11,5 +11,6 @@ target/
 *.db.tmp
 .openbbt/
 .azertio/
-www/docs/
+www/docs/**
+!www/docs/index.html
 /.claude/scheduled_tasks.lock

@@ -97,6 +97,15 @@ public class RestStepProvider implements StepProvider  {
 		ExecutionContext.current().setVariable(variable, token);
 	}
 
+	@StepExpression(value = "rest.auth.oauth2.password", args = {"url:text", "clientId:text", "clientSecret:text", "username:text", "password:text", "variable:id"})
+	public void fetchOAuth2PasswordGrant(String url, String clientId, String clientSecret, String username, String password, String variable) {
+		String token = restEngine.fetchOAuth2PasswordToken(
+			interpolate(url), interpolate(clientId), interpolate(clientSecret),
+			interpolate(username), interpolate(password)
+		);
+		ExecutionContext.current().setVariable(variable, token);
+	}
+
 
 	@StepExpression("rest.request.headers")
 	public void setNextRequestHeaders(DataTable table) {
@@ -132,6 +141,26 @@ public class RestStepProvider implements StepProvider  {
 	@StepExpression(value = "rest.request.POST.file", args = {"endpoint:text", "file:text"})
 	public void postWithFile(String endpoint, String file) {
 		request(() -> restEngine.requestPOST(interpolate(endpoint), resourceFinder.readAsString(file)));
+	}
+
+	@StatisticsProvider
+	@StepExpression(value = "rest.request.POST.urlencoded", args = {"endpoint:text"})
+	public void postWithUrlEncodedForm(String endpoint, DataTable table) {
+		var fields = new LinkedHashMap<String, String>();
+		for (var row : ExecutionContext.current().interpolateDataTable(table).values()) {
+			if (row.size() >= 2) fields.put(row.get(0), row.get(1));
+		}
+		request(() -> restEngine.requestPOSTUrlEncoded(interpolate(endpoint), fields));
+	}
+
+	@StatisticsProvider
+	@StepExpression(value = "rest.request.POST.multipart", args = {"endpoint:text"})
+	public void postWithMultipartForm(String endpoint, DataTable table) {
+		var fields = new LinkedHashMap<String, String>();
+		for (var row : ExecutionContext.current().interpolateDataTable(table).values()) {
+			if (row.size() >= 2) fields.put(row.get(0), row.get(1));
+		}
+		request(() -> restEngine.requestPOSTMultipart(interpolate(endpoint), fields));
 	}
 
 	@StatisticsProvider
@@ -205,6 +234,25 @@ public class RestStepProvider implements StepProvider  {
 		}
 	}
 
+
+	@StepExpression("rest.response.cookies")
+	public void checkResponseCookies(DataTable table) {
+		var errors = new ArrayList<String>();
+		for (var row : ExecutionContext.current().interpolateDataTable(table).values()) {
+			if (row.size() < 2) continue;
+			String name = row.get(0);
+			String expected = row.get(1);
+			String actual = restEngine.responseCookie(name);
+			if (actual == null) {
+				errors.add("Cookie '" + name + "' was not set in the response");
+			} else if (!expected.equals(actual)) {
+				errors.add("Cookie '" + name + "': expected '" + expected + "' but was '" + actual + "'");
+			}
+		}
+		if (!errors.isEmpty()) {
+			throw new AssertionError("Response cookies mismatch:\n" + String.join("\n", errors));
+		}
+	}
 
 	@StepExpression(value = "rest.response.extracts.field", args = {"field:text", "variable:id"})
 	public void extractFieldFromResponse(String field, String variable) {

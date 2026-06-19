@@ -1,4 +1,5 @@
 'db.define.alias':
+  since: '1.0.0'
   role: given
   description: |
     Selects a configured datasource alias for subsequent database operations.
@@ -9,6 +10,7 @@
 
 
 'db.teardown.execute':
+  since: '1.0.0'
   role: given
   description: |
     Registers a SQL statement to be executed at teardown, after the scenario finishes.
@@ -24,6 +26,7 @@
 
 
 'db.execute.query':
+  since: '1.0.0'
   role: given
   description: |
     Executes an arbitrary SQL statement and stores the result for subsequent steps.
@@ -36,6 +39,7 @@
 
 
 'db.store.query.result':
+  since: '1.0.0'
   role: then
   description: |
     Stores the result of the last executed SQL statement in a named variable.
@@ -48,6 +52,7 @@
 
 
 'db.assert.query.count':
+  since: '1.0.0'
   role: then
   description: |
     Asserts the count resulting from the last executed SQL statement.
@@ -60,6 +65,7 @@
 
 
 'db.assert.count':
+  since: '1.0.0'
   role: then
   description: |
     Asserts that the number of rows in the specified table satisfies the given condition.
@@ -73,6 +79,7 @@
 
 
 'db.assert.table.contains':
+  since: '1.0.0'
   role: then
   description: |
     Asserts that the contents of a database table contains the expected data provided in a tabular format.
@@ -89,6 +96,7 @@
 
 
 'db.assert.table.is':
+  since: '1.0.0'
   role: then
   description: |
     Asserts that the contents of a database table match exactly the expected data provided in a tabular format.
@@ -106,6 +114,7 @@
 
 
 'db.assert.table.contains.csv':
+  since: '1.0.0'
   role: then
   description: |
     Asserts that the contents of a database table contains all rows from a CSV file.
@@ -120,6 +129,7 @@
 
 
 'db.assert.table.is.csv':
+  since: '1.0.0'
   role: then
   description: |
     Asserts that the contents of a database table match exactly the rows from a CSV file.
@@ -135,6 +145,7 @@
 
 
 'db.assert.contains.xls':
+  since: '1.0.0'
   role: then
   description: |
     Asserts that the database contains the rows from an Excel file.

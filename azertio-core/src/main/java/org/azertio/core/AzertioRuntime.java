@@ -6,6 +6,7 @@ import org.myjtools.jexten.InjectionProvider;
 import org.myjtools.jexten.ModuleLayerProvider;
 import org.azertio.core.contributors.*;
 import org.azertio.core.events.EventBus;
+import org.azertio.core.execution.OutputRegistry;
 import org.azertio.core.execution.Profile;
 import org.azertio.core.messages.MessageProvider;
 import org.azertio.core.messages.Messages;
@@ -43,6 +44,7 @@ public class AzertioRuntime implements InjectionProvider {
 	private final ContentTypes contentTypes;
 	private final RepositoryFactory repositoryFactory;
 	private final boolean readOnly;
+	private final OutputRegistry outputRegistry = new OutputRegistry();
 	private final Lazy<TestPlanRepository> planNodeRepository = Lazy.of(this::openRepository);
 	private final Lazy<TestExecutionRepository> executionRepository = Lazy.of(this::openExecutionRepository);
 	private final Lazy<AttachmentRepository> attachmentRepository = Lazy.of(this::openAttachmentRepository);
@@ -376,6 +378,10 @@ public class AzertioRuntime implements InjectionProvider {
 
 	public EventBus eventBus() {
 		return eventBus;
+	}
+
+	public OutputRegistry outputRegistry() {
+		return outputRegistry;
 	}
 
 }

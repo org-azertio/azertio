@@ -64,7 +64,7 @@ public class JUnitAzertioPlan {
         String suiteName = featureDirPath.getFileName().toString();
         TestSuite suite = new TestSuite(suiteName, "", TagExpression.EMPTY);
         TestProject project = new TestProject("Azertio Test", "", "", List.of(suite));
-        AzertioContext context = new AzertioContext(project, config, List.of(suiteName), List.of());
+        AzertioContext context = new AzertioContext(project, config, List.of(suiteName), List.of(), List.of());
 
         TestPlan plan = runtime.buildTestPlan(context);
         TestExecution execution = new TestPlanExecutor(runtime).execute(plan.planID());

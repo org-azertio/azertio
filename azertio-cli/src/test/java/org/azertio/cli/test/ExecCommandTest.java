@@ -91,6 +91,71 @@ class ExecCommandTest {
         assertThat(out.stdout()).contains("executionId");
     }
 
+    // ─── outputs ─────────────────────────────────────────────────────────────
+
+    @Test
+    void exec_withDeclaredOutputs_printsOutputsBlock() throws Exception {
+        var yamlWithOutputs = yaml.getParent().resolve("azertio-outputs.yaml");
+        Files.writeString(yamlWithOutputs, YAML_CONTENT + """
+            outputs:
+              - executionResult
+              - executionTimeMilliseconds
+            """);
+        var out = capture(
+            "exec",
+            "-f", yamlWithOutputs.toString(),
+            "-D" + AzertioConfig.ENV_PATH + "=" + envPath,
+            "-D" + AzertioConfig.PERSISTENCE_MODE + "=" + AzertioConfig.PERSISTENCE_MODE_FILE,
+            "-D" + AzertioConfig.PERSISTENCE_FILE + "=db/azertio.db",
+            "-D" + AzertioConfig.RESOURCE_PATH + "=" + featuresDir,
+            "--exit-zero"
+        );
+        assertThat(out.stderr()).as("stderr").isEmpty();
+        assertThat(out.exitCode()).isZero();
+        assertThat(out.stdout()).contains("Outputs:");
+        assertThat(out.stdout()).contains("executionResult");
+        assertThat(out.stdout()).contains("executionTimeMilliseconds");
+    }
+
+    @Test
+    void exec_withDeclaredOutputs_json_includesOutputsObject() throws Exception {
+        var yamlWithOutputs = yaml.getParent().resolve("azertio-outputs-json.yaml");
+        Files.writeString(yamlWithOutputs, YAML_CONTENT + """
+            outputs:
+              - executionResult
+              - executionID
+            """);
+        var out = capture(
+            "exec",
+            "-f", yamlWithOutputs.toString(),
+            "-D" + AzertioConfig.ENV_PATH + "=" + envPath,
+            "-D" + AzertioConfig.PERSISTENCE_MODE + "=" + AzertioConfig.PERSISTENCE_MODE_FILE,
+            "-D" + AzertioConfig.PERSISTENCE_FILE + "=db/azertio.db",
+            "-D" + AzertioConfig.RESOURCE_PATH + "=" + featuresDir,
+            "--json",
+            "--exit-zero"
+        );
+        assertThat(out.stderr()).as("stderr").isEmpty();
+        assertThat(out.exitCode()).isZero();
+        assertThat(out.stdout()).contains("\"outputs\"");
+        assertThat(out.stdout()).contains("executionResult");
+        assertThat(out.stdout()).contains("executionID");
+    }
+
+    @Test
+    void exec_withoutDeclaredOutputs_doesNotPrintOutputsBlock() {
+        var out = capture(
+            "exec",
+            "-f", yaml.toString(),
+            "-D" + AzertioConfig.ENV_PATH + "=" + envPath,
+            "-D" + AzertioConfig.PERSISTENCE_MODE + "=" + AzertioConfig.PERSISTENCE_MODE_FILE,
+            "-D" + AzertioConfig.PERSISTENCE_FILE + "=db/azertio.db",
+            "-D" + AzertioConfig.RESOURCE_PATH + "=" + featuresDir,
+            "--exit-zero"
+        );
+        assertThat(out.stdout()).doesNotContain("Outputs:");
+    }
+
     // ─── detached execution ───────────────────────────────────────────────────
 
     @Test

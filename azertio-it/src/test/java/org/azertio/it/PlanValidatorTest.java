@@ -105,7 +105,7 @@ class PlanValidatorTest {
 	private AzertioContext createContext(String suiteName, Config config) {
 		TestSuite suite = new TestSuite(suiteName, "", null);
 		TestProject project = new TestProject("Test Project", "", "Test Org", List.of(suite));
-		return new AzertioContext(project, config, List.of(suiteName), List.of());
+		return new AzertioContext(project, config, List.of(suiteName), List.of(), List.of());
 	}
 
 	private TestPlanNode findNodeOfType(TestPlanRepository repo, TestPlan plan, NodeType type) {

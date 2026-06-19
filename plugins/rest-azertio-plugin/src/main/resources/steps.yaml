@@ -1,4 +1,5 @@
 'rest.auth.headers':
+  since: '1.0.0'
   role: given
   description: |
     Sets headers that will be sent with every subsequent HTTP request in the scenario.
@@ -7,6 +8,7 @@
 
 
 'rest.auth.bearer':
+  since: '1.0.0'
   role: given
   description: |
     Sets a Bearer token as the authorization for every subsequent HTTP request in the scenario.
@@ -17,6 +19,7 @@
 
 
 'rest.auth.basic':
+  since: '1.0.0'
   role: given
   description: |
     Sets HTTP Basic authentication credentials for every subsequent HTTP request in the scenario.
@@ -31,6 +34,7 @@
 
 
 'rest.auth.apikey.header':
+  since: '1.0.0'
   role: given
   description: |
     Sets an API key that will be sent as a request header with every subsequent HTTP request in the scenario.
@@ -44,6 +48,7 @@
 
 
 'rest.auth.apikey.query':
+  since: '1.0.0'
   role: given
   description: |
     Sets an API key that will be appended as a query parameter to every subsequent HTTP request URL in the scenario.
@@ -57,14 +62,16 @@
 
 
 'rest.auth.oauth2.client_credentials':
+  since: '1.0.0'
   role: given
   description: |
     Obtains an OAuth2 access token using the client credentials grant and stores it in a scenario variable.
+    Credentials are sent via HTTP Basic Authentication (CLIENT_SECRET_BASIC, RFC 6749 §2.3.1).
     The token can then be used with the rest.auth.bearer step.
   parameters:
     - name: url
       type: text
-      description: The token endpoint URL
+      description: The token endpoint URL (always used as-is, regardless of rest.baseURL)
     - name: clientId
       type: text
       description: The OAuth2 client ID
@@ -76,7 +83,37 @@
       description: The variable name where the access token will be stored
 
 
+'rest.auth.oauth2.password':
+  since: '1.1.0'
+  role: given
+  description: |
+    Obtains an OAuth2 access token using the Resource Owner Password Credentials grant (ROPC)
+    and stores it in a scenario variable. Useful for testing endpoints secured by user roles.
+    Credentials are sent via HTTP Basic Authentication (CLIENT_SECRET_BASIC, RFC 6749 §2.3.1).
+    The token can then be used with the rest.auth.bearer step.
+  parameters:
+    - name: url
+      type: text
+      description: The token endpoint URL (always used as-is, regardless of rest.baseURL)
+    - name: clientId
+      type: text
+      description: The OAuth2 client ID
+    - name: clientSecret
+      type: text
+      description: The OAuth2 client secret
+    - name: username
+      type: text
+      description: The resource owner username
+    - name: password
+      type: text
+      description: The resource owner password
+    - name: variable
+      type: id
+      description: The variable name where the access token will be stored
+
+
 'rest.request.headers':
+  since: '1.0.0'
   role: given
   description: |
     Sets headers to be sent with the next HTTP request only.
@@ -85,6 +122,7 @@
 
 
 'rest.request.GET':
+  since: '1.0.0'
   role: when
   description: |
     Makes a GET request to the specified URL.
@@ -95,6 +133,7 @@
 
 
 'rest.request.POST.empty':
+  since: '1.0.0'
   role: when
   description: |
     Makes a POST request to the specified URL with an empty body.
@@ -105,6 +144,7 @@
 
 
 'rest.request.POST.body':
+  since: '1.0.0'
   role: when
   description: |
     Makes a POST request to the specified URL with the given body.
@@ -116,7 +156,36 @@
     The body of the POST request, provided as a multi-line text input.
 
 
+'rest.request.POST.urlencoded':
+  since: '1.1.0'
+  role: when
+  description: |
+    Makes a POST request to the specified URL with an application/x-www-form-urlencoded body
+    built from the given key-value table. Values are URL-encoded automatically.
+  parameters:
+    - name: endpoint
+      type: text
+      description: The URL to which the POST request is made
+  additional-data: |
+    A two-column table where each row is a form field name and its value.
+
+
+'rest.request.POST.multipart':
+  since: '1.1.0'
+  role: when
+  description: |
+    Makes a POST request to the specified URL with a multipart/form-data body
+    built from the given key-value table. Each row becomes a separate form part.
+  parameters:
+    - name: endpoint
+      type: text
+      description: The URL to which the POST request is made
+  additional-data: |
+    A two-column table where each row is a form field name and its value.
+
+
 'rest.request.POST.file':
+  since: '1.0.0'
   role: when
   description: |
     Makes a POST request to the specified URL with the given body read from a file.
@@ -130,6 +199,7 @@
 
 
 'rest.request.PUT.body':
+  since: '1.0.0'
   role: when
   description: |
     Makes a PUT request to the specified URL with the given body.
@@ -142,6 +212,7 @@
 
 
 'rest.request.PUT.file':
+  since: '1.0.0'
   role: when
   description: |
     Makes a PUT request to the specified URL with the given body read from a file.
@@ -155,6 +226,7 @@
 
 
 'rest.request.PATCH.body':
+  since: '1.0.0'
   role: when
   description: |
     Makes a PATCH request to the specified URL with the given body.
@@ -167,6 +239,7 @@
 
 
 'rest.request.PATCH.file':
+  since: '1.0.0'
   role: when
   description: |
     Makes a PATCH request to the specified URL with the given body read from a file.
@@ -180,6 +253,7 @@
 
 
 'rest.request.DELETE':
+  since: '1.0.0'
   role: when
   description: |
     Makes a DELETE request to the specified URL.
@@ -190,12 +264,14 @@
 
 
 'rest.response.statusCode':
+  since: '1.0.0'
   role: then
   description: |
     Asserts that the status code of the last REST response matches the expected value.
 
 
 'rest.response.body':
+  since: '1.0.0'
   role: then
   description: |
     Asserts that the body of the last REST response matches exactly the expected value.
@@ -204,6 +280,7 @@
 
 
 'rest.response.body.file':
+  since: '1.0.0'
   role: then
   description: |
     Asserts that the body of the last REST response matches exactly the expected value read from a file.
@@ -214,6 +291,7 @@
 
 
 'rest.response.body.contains':
+  since: '1.0.0'
   role: then
   description: |
     Asserts that the body of the last REST response contains the expected value.
@@ -222,6 +300,7 @@
 
 
 'rest.response.headers':
+  since: '1.0.0'
   role: then
   description: |
     Asserts that the last REST response includes the specified headers with the given values.
@@ -230,7 +309,20 @@
     A two-column table where each row specifies an expected header name and its expected value.
 
 
+'rest.response.cookies':
+  since: '1.1.0'
+  role: then
+  description: |
+    Asserts that the last REST response sets the specified cookies with the given values.
+    Each row names a cookie and its expected value. Only the cookie value is checked;
+    attributes such as Path, Domain, HttpOnly or Secure are ignored.
+    Additional cookies not listed in the table are accepted.
+  additional-data: |
+    A two-column table where each row specifies an expected cookie name and its expected value.
+
+
 'rest.response.extracts.field':
+  since: '1.0.0'
   role: then
   description: |
     Stores the value of a field from the response body into a variable for later use in the test scenario.
@@ -244,6 +336,7 @@
 
 
 'rest.response.extracts.header':
+  since: '1.0.0'
   role: then
   description: |
     Stores the value of a response header into a variable for later use in the test scenario.

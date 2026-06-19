@@ -10,7 +10,8 @@ public record AzertioContext(
 	TestProject testProject,
 	Config configuration,
 	List<String> testSuites,
-	List<String> plugins
+	List<String> plugins,
+	List<String> outputs
 ){
 
 	public Optional<TestSuite> testSuite(String name) {

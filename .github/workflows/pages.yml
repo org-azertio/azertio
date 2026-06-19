@@ -49,6 +49,24 @@ jobs:
               --metadata slug="$slug" \
               --output "www/docs/$slug/index.html"
           done
+          for f in www/docs/plugins/*/*.md; do
+            [ -f "$f" ] || continue
+            plugin_dir=$(dirname "$f")
+            plugin_name=$(basename "$plugin_dir")
+            short_name="${plugin_name%-azertio-plugin}"
+            doc_slug=$(basename "$f" .md)
+            title=$(grep "^# " "$f" | head -1 | sed 's/^# //')
+            out_dir="www/docs/plugins/$short_name/$doc_slug"
+            mkdir -p "$out_dir"
+            pandoc "$f" \
+              --from gfm \
+              --to html5 \
+              --template .github/pandoc/doc-template.html \
+              --highlight-style zenburn \
+              --metadata title="$title" \
+              --metadata slug="plugins/$short_name/$doc_slug" \
+              --output "$out_dir/index.html"
+          done
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

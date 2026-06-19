@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Documentation — Azertio</title>
+  <meta name="description" content="Azertio documentation: plugin step references, configuration, getting started guides, and more." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://azertio.org/docs/" />
+  <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-NDFJJ357');</script>
+  <!-- End Google Tag Manager -->
+
+  <!-- Google Analytics (GA4) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z3JDMGL1G4"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-Z3JDMGL1G4');
+  </script>
+  <!-- End Google Analytics -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Baumans&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #07070f;
+      --surface: #0e0e1a;
+      --border:  #1e1e35;
+      --cyan:    #00ffe0;
+      --text:    #d1d5db;
+      --muted:   #6b7280;
+      --white:   #f9fafb;
+      --font:    'Inter', sans-serif;
+      --mono:    'JetBrains Mono', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font); line-height: 1.6; min-height: 100vh; }
+    a { color: var(--cyan); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.9rem 2rem;
+      background: rgba(7,7,15,0.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo img { width: 100px; height: auto; display: block; }
+    .nav-back {
+      display: flex; align-items: center; gap: 0.4rem;
+      font-size: 0.85rem; color: var(--muted); transition: color 0.2s;
+    }
+    .nav-back:hover { color: var(--white); text-decoration: none; }
+
+    .page { max-width: 860px; margin: 0 auto; padding: 3.5rem 2rem 6rem; }
+
+    h1 {
+      font-size: clamp(1.8rem, 3vw, 2.4rem); font-weight: 800;
+      color: var(--white); letter-spacing: -0.02em; line-height: 1.2;
+      margin-bottom: 0.6rem;
+    }
+    .subtitle { color: var(--muted); font-size: 1.05rem; margin-bottom: 3rem; }
+
+    h2 {
+      font-size: 1.1rem; font-weight: 700; color: var(--white);
+      letter-spacing: 0.05em; text-transform: uppercase;
+      margin: 2.8rem 0 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1rem;
+    }
+
+    .card {
+      display: block;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.2rem 1.4rem;
+      transition: border-color 0.2s, background 0.2s;
+      text-decoration: none;
+    }
+    .card:hover { border-color: var(--cyan); background: rgba(0,255,224,0.04); text-decoration: none; }
+
+    .card-title { color: var(--white); font-weight: 600; font-size: 0.95rem; margin-bottom: 0.3rem; }
+    .card-desc { color: var(--muted); font-size: 0.82rem; line-height: 1.5; }
+
+    .plugin-section { margin-bottom: 0.5rem; }
+    .plugin-name {
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--cyan); margin-bottom: 0.6rem;
+    }
+    .link-row { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+    .link-pill {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 6px; padding: 0.45rem 0.9rem;
+      font-size: 0.83rem; color: var(--text);
+      transition: border-color 0.2s, color 0.2s;
+      text-decoration: none;
+    }
+    .link-pill:hover { border-color: var(--cyan); color: var(--white); text-decoration: none; }
+    .link-pill svg { opacity: 0.6; }
+
+    @media (max-width: 600px) {
+      .card-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NDFJJ357"
+height="0" width="0" style="display:none;visibility:hidden" title="Google Tag Manager"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<nav>
+  <a href="/" class="nav-logo" aria-label="Azertio home">
+    <img src="/logo.svg" alt="Azertio" />
+  </a>
+  <a href="/" class="nav-back">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Back to home
+  </a>
+</nav>
+
+<div class="page">
+
+  <h1>Documentation</h1>
+  <p class="subtitle">Reference guides, step catalogues, and configuration for Azertio and its plugins.</p>
+
+  <h2>Getting started</h2>
+  <div class="card-grid">
+    <a href="/docs/getting-started/" class="card">
+      <div class="card-title">Getting Started</div>
+      <div class="card-desc">Install Azertio, write your first feature file, and run your first test.</div>
+    </a>
+    <a href="/docs/config/" class="card">
+      <div class="card-title">Configuration reference</div>
+      <div class="card-desc">All azertio.yaml top-level keys, profiles, and environment variable overrides.</div>
+    </a>
+    <a href="/docs/steps/" class="card">
+      <div class="card-title">Core steps</div>
+      <div class="card-desc">Built-in steps for variables, assertions, benchmarking, and flow control.</div>
+    </a>
+    <a href="/docs/creating-step-plugins/" class="card">
+      <div class="card-title">Creating plugins</div>
+      <div class="card-desc">Build your own step plugin — from project setup to publishing on Maven Central.</div>
+    </a>
+  </div>
+
+  <h2>Plugin reference</h2>
+
+  <div class="plugin-section">
+    <div class="plugin-name">REST plugin</div>
+    <div class="link-row">
+      <a href="/docs/plugins/rest/steps/" class="link-pill">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Step reference
+      </a>
+      <a href="/docs/plugins/rest/config/" class="link-pill">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+        Configuration
+      </a>
+    </div>
+  </div>
+
+  <div class="plugin-section">
+    <div class="plugin-name">DB plugin</div>
+    <div class="link-row">
+      <a href="/docs/plugins/db/steps/" class="link-pill">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Step reference
+      </a>
+      <a href="/docs/plugins/db/config/" class="link-pill">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+        Configuration
+      </a>
+    </div>
+  </div>
+
+  <div class="plugin-section">
+    <div class="plugin-name">PDF Report plugin</div>
+    <div class="link-row">
+      <a href="/docs/plugins/pdfreport/config/" class="link-pill">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+        Configuration
+      </a>
+    </div>
+  </div>
+
+  <h2>Comparisons</h2>
+  <div class="card-grid">
+    <a href="/docs/comparison-karate/" class="card">
+      <div class="card-title">Azertio vs Karate</div>
+      <div class="card-desc">How Azertio compares to Karate DSL for API testing.</div>
+    </a>
+    <a href="/docs/comparison-cucumber-restassured/" class="card">
+      <div class="card-title">Azertio vs Cucumber + REST-assured</div>
+      <div class="card-desc">Azertio vs. the classic BDD + REST-assured combo.</div>
+    </a>
+    <a href="/docs/comparison-postman-newman/" class="card">
+      <div class="card-title">Azertio vs Postman/Newman</div>
+      <div class="card-desc">Azertio vs. Postman collections run via Newman.</div>
+    </a>
+  </div>
+
+</div>
+
+</body>
+</html>

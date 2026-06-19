@@ -77,10 +77,10 @@ class TestRestSteps {
 			.withQueryParam("api_key", equalTo("secret-key"))
 			.willReturn(ok()));
 
+		// bXktY2xpZW50Om15LXNlY3JldA== = base64("my-client:my-secret")
 		wireMock.stubFor(post("/oauth/token")
+			.withHeader("Authorization", equalTo("Basic bXktY2xpZW50Om15LXNlY3JldA=="))
 			.withRequestBody(containing("grant_type=client_credentials"))
-			.withRequestBody(containing("client_id=my-client"))
-			.withRequestBody(containing("client_secret=my-secret"))
 			.willReturn(ok()
 				.withHeader("Content-Type", "application/json")
 				.withBody("{\"access_token\":\"oauth-token\",\"token_type\":\"Bearer\",\"expires_in\":3600}")));
@@ -89,6 +89,32 @@ class TestRestSteps {
 			.withHeader("Authorization", equalTo("Bearer oauth-token"))
 			.willReturn(ok()));
 
+		// bXktY2xpZW50Om15LXNlY3JldA== = base64("my-client:my-secret")
+		wireMock.stubFor(post("/oauth/token")
+			.withHeader("Authorization", equalTo("Basic bXktY2xpZW50Om15LXNlY3JldA=="))
+			.withRequestBody(containing("grant_type=password"))
+			.withRequestBody(containing("username=admin"))
+			.withRequestBody(containing("password=admin123"))
+			.willReturn(ok()
+				.withHeader("Content-Type", "application/json")
+				.withBody("{\"access_token\":\"user-token\",\"token_type\":\"Bearer\",\"expires_in\":3600}")));
+
+		wireMock.stubFor(get("/user-protected")
+			.withHeader("Authorization", equalTo("Bearer user-token"))
+			.willReturn(ok()));
+
+		wireMock.stubFor(post("/form-login")
+			.withHeader("Content-Type", containing("application/x-www-form-urlencoded"))
+			.withRequestBody(containing("username=alice"))
+			.withRequestBody(containing("password=s3cr3t"))
+			.willReturn(aResponse().withStatus(200)));
+
+		wireMock.stubFor(post("/form-upload")
+			.withHeader("Content-Type", containing("multipart/form-data"))
+			.withRequestBody(containing("name"))
+			.withRequestBody(containing("Alice"))
+			.willReturn(aResponse().withStatus(201)));
+
 		wireMock.stubFor(get("/persistent-headers-test")
 			.withHeader("X-Tenant-Id", equalTo("acme"))
 			.withHeader("X-Version", equalTo("2"))
@@ -96,6 +122,11 @@ class TestRestSteps {
 
 		wireMock.stubFor(get("/echo-header")
 			.willReturn(ok()));
+
+		wireMock.stubFor(post("/cookie-login")
+			.willReturn(ok()
+				.withHeader("Set-Cookie", "session_id=abc123; Path=/; HttpOnly")
+				.withHeader("Set-Cookie", "theme=dark; Path=/")));
 	}
 
 	private String baseUrl() {
@@ -210,6 +241,30 @@ class TestRestSteps {
 	@Test
 	@FeatureDir("auth-oauth2")
 	void authOAuth2ClientCredentials_passes(JUnitAzertioPlan plan) {
+		plan.withConfig("rest.baseURL", baseUrl()).execute().assertAllPassed();
+	}
+
+	@Test
+	@FeatureDir("auth-oauth2-password")
+	void authOAuth2PasswordGrant_passes(JUnitAzertioPlan plan) {
+		plan.withConfig("rest.baseURL", baseUrl()).execute().assertAllPassed();
+	}
+
+	@Test
+	@FeatureDir("post-urlencoded")
+	void postUrlEncoded_passes(JUnitAzertioPlan plan) {
+		plan.withConfig("rest.baseURL", baseUrl()).execute().assertAllPassed();
+	}
+
+	@Test
+	@FeatureDir("post-multipart")
+	void postMultipart_passes(JUnitAzertioPlan plan) {
+		plan.withConfig("rest.baseURL", baseUrl()).execute().assertAllPassed();
+	}
+
+	@Test
+	@FeatureDir("response-cookies")
+	void responseCookies_passes(JUnitAzertioPlan plan) {
 		plan.withConfig("rest.baseURL", baseUrl()).execute().assertAllPassed();
 	}
 

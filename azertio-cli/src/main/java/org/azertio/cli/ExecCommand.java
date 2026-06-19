@@ -6,6 +6,7 @@ import org.azertio.core.AzertioException;
 import org.azertio.core.AzertioPluginManager;
 import org.azertio.core.AzertioRuntime;
 import org.azertio.core.execution.ExecutionResult;
+import org.azertio.core.execution.OutputRegistry;
 import org.azertio.core.execution.TestExecution;
 import org.azertio.core.execution.TestPlanExecutor;
 import org.azertio.core.persistence.TestExecutionRepository;
@@ -16,6 +17,7 @@ import picocli.CommandLine;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
@@ -83,6 +85,8 @@ public final class ExecCommand extends AbstractCommand {
         }
         String resultName = result.map(ExecutionResult::name).orElse("-");
 
+        registerBuiltinOutputs(runtime.outputRegistry(), execution, resultName, elapsed);
+
         if (json) {
             JsonObject obj = new JsonObject();
             obj.addProperty("result", resultName);
@@ -91,14 +95,50 @@ public final class ExecCommand extends AbstractCommand {
             obj.addProperty("failed", execution.testFailedCount());
             obj.addProperty("error", execution.testErrorCount());
             obj.addProperty("durationMs", elapsed.toMillis());
+            printOutputsJson(obj, context.outputs(), runtime.outputRegistry());
             out().println(obj);
         } else {
             printSummary(execution, resultName, elapsed);
+            printOutputs(context.outputs(), runtime.outputRegistry());
         }
 
         boolean passed = ExecutionResult.PASSED.name().equals(resultName);
         if (!passed && !exitZero) {
             exitCode = 1;
+        }
+    }
+
+    private void registerBuiltinOutputs(OutputRegistry registry, TestExecution execution, String resultName, Duration elapsed) {
+        registry.set("executionID", execution.executionID().toString());
+        registry.set("planID", execution.planID().toString());
+        registry.set("executionResult", resultName);
+        registry.set("executionTimeMilliseconds", String.valueOf(elapsed.toMillis()));
+        registry.set("testsPassed", String.valueOf(execution.testPassedCount() != null ? execution.testPassedCount() : 0));
+        registry.set("testsFailed", String.valueOf(execution.testFailedCount() != null ? execution.testFailedCount() : 0));
+        registry.set("testsError",  String.valueOf(execution.testErrorCount()  != null ? execution.testErrorCount()  : 0));
+    }
+
+    private void printOutputs(List<String> declared, OutputRegistry registry) {
+        if (declared.isEmpty()) return;
+        List<String> resolved = registry.resolveOutputs(declared);
+        if (resolved.isEmpty()) return;
+        out().println();
+        out().println(AnsiColors.color("Outputs:", AnsiColors.BOLD));
+        out().println();
+        int maxLen = resolved.stream().mapToInt(String::length).max().orElse(0);
+        for (String key : resolved) {
+            out().printf("%-" + maxLen + "s = %s%n", key, registry.get(key));
+        }
+    }
+
+    private void printOutputsJson(JsonObject obj, List<String> declared, OutputRegistry registry) {
+        if (declared.isEmpty()) return;
+        JsonObject outputs = new JsonObject();
+        for (String key : registry.resolveOutputs(declared)) {
+            outputs.addProperty(key, registry.get(key));
+        }
+        if (outputs.size() > 0) {
+            obj.add("outputs", outputs);
         }
     }
 
