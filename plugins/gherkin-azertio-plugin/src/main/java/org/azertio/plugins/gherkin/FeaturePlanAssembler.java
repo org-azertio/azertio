@@ -343,7 +343,7 @@ public class FeaturePlanAssembler {
 			.map(Comment::text)
 			.map(propertyRegex::matcher)
 			.filter(Matcher::find)
-			.collect(Collectors.toMap(it -> it.group(1),it -> it.group(2)));
+			.collect(Collectors.toMap(it -> it.group(1), it -> it.group(2), (a, b) -> b));
 	}
 
 
