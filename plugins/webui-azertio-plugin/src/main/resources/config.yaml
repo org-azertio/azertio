@@ -21,3 +21,11 @@ webui.timeout:
     The default timeout in milliseconds for waiting on elements or page loads.
   type: integer
   defaultValue: 10000
+
+webui.screenshots:
+  description: |
+    Whether to capture a screenshot after each interaction step (navigate, click, fill, select,
+    check, uncheck, wait) and attach it to the test execution result.
+    Useful for debugging failures. Has no effect in benchmark mode.
+  type: boolean
+  defaultValue: false

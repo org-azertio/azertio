@@ -10,6 +10,7 @@ module org.azertio.plugins.webui {
     requires org.myjtools.jexten;
     requires org.azertio.core;
     requires org.myjtools.imconfig;
+    requires playwright;
 
     provides org.azertio.core.contributors.StepProvider with WebUiStepProvider;
     provides org.azertio.core.contributors.ConfigProvider with WebUiConfigProvider;

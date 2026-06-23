@@ -1,1 +1,194 @@
-# Compact DSL expressions for each step key.
+'webui.go':
+  expression: 'navigate to web page {url:text}'
+  example: |
+    * navigate to web page "https://example.com"
+  scenarios:
+    - title: Navigate to a page by absolute URL
+      gherkin: |
+        * navigate to web page "https://example.com/login"
+        * assert web page title = "Login"
+    - title: Navigate to a relative URL using baseURL
+      gherkin: |
+        * navigate to web page "/dashboard"
+        * assert web page URL contains "/dashboard"
+
+
+'webui.click':
+  expression: 'click UI {locator:text}'
+  example: |
+    * click UI "button[type=submit]"
+  scenarios:
+    - title: Submit a form by clicking the submit button
+      gherkin: |
+        * fill UI "#username" with "admin"
+        * fill UI "#password" with "secret"
+        * click UI "button[type=submit]"
+        * assert web page URL contains "/dashboard"
+
+
+'webui.fill':
+  expression: 'fill UI {locator:text} with {value:text}'
+  example: |
+    * fill UI "#search" with "playwright"
+  scenarios:
+    - title: Fill a login form and submit
+      gherkin: |
+        * navigate to web page "/login"
+        * fill UI "#username" with "alice"
+        * fill UI "#password" with "p@ssw0rd"
+        * click UI "button[type=submit]"
+        * assert web page URL contains "/home"
+
+
+'webui.select':
+  expression: 'select {value:text} in UI {locator:text}'
+  example: |
+    * select "France" in UI "#country"
+  scenarios:
+    - title: Choose a country from a dropdown
+      gherkin: |
+        * navigate to web page "/profile"
+        * select "Spain" in UI "#country"
+        * click UI "#save"
+        * assert UI ".country-value" text = "Spain"
+
+
+'webui.check':
+  expression: 'check UI {locator:text}'
+  example: |
+    * check UI "#accept-terms"
+  scenarios:
+    - title: Accept terms and submit
+      gherkin: |
+        * navigate to web page "/register"
+        * check UI "#accept-terms"
+        * click UI "#submit"
+        * assert web page URL contains "/welcome"
+
+
+'webui.uncheck':
+  expression: 'uncheck UI {locator:text}'
+  example: |
+    * uncheck UI "#subscribe-newsletter"
+  scenarios:
+    - title: Opt out of newsletter and save
+      gherkin: |
+        * navigate to web page "/preferences"
+        * uncheck UI "#subscribe-newsletter"
+        * click UI "#save"
+        * assert UI ".status-message" text = "Preferences saved"
+
+
+'webui.wait.visible':
+  expression: 'wait for UI {locator:text} to be visible'
+  example: |
+    * wait for UI ".results-table" to be visible
+  scenarios:
+    - title: Wait for a dynamically loaded element before asserting
+      gherkin: |
+        * navigate to web page "/dashboard"
+        * click UI "#load-data"
+        * wait for UI ".results-table" to be visible
+        * assert UI ".results-table" text contains "Alice"
+
+
+'webui.wait.hidden':
+  expression: 'wait for UI {locator:text} to be hidden'
+  example: |
+    * wait for UI "#loading-spinner" to be hidden
+  scenarios:
+    - title: Wait for a loading spinner to disappear
+      gherkin: |
+        * navigate to web page "/dashboard"
+        * click UI "#refresh"
+        * wait for UI "#loading-spinner" to be hidden
+        * assert UI ".content" is visible
+
+
+'webui.assert.visible':
+  expression: 'assert UI {locator:text} is visible'
+  example: |
+    * assert UI ".success-banner" is visible
+  scenarios:
+    - title: Verify a success message appears after login
+      gherkin: |
+        * navigate to web page "/login"
+        * fill UI "#username" with "alice"
+        * fill UI "#password" with "secret"
+        * click UI "button[type=submit]"
+        * assert UI ".welcome-message" is visible
+
+
+'webui.assert.hidden':
+  expression: 'assert UI {locator:text} is hidden'
+  example: |
+    * assert UI ".error-message" is hidden
+  scenarios:
+    - title: Verify an error message is not shown on a clean page
+      gherkin: |
+        * navigate to web page "/login"
+        * assert UI ".error-message" is hidden
+
+
+'webui.assert.text':
+  expression: 'assert UI {locator:text} text {{text-assertion}}'
+  assertion-hints:
+    - '= "Welcome"'
+    - 'contains "Error"'
+    - '!= ""'
+  example: |
+    * assert UI "h1" text = "Dashboard"
+  scenarios:
+    - title: Verify the page heading after navigation
+      gherkin: |
+        * navigate to web page "/dashboard"
+        * assert UI "h1" text = "Dashboard"
+    - title: Verify an error message text
+      gherkin: |
+        * click UI "#submit"
+        * assert UI ".error" text contains "required"
+
+
+'webui.assert.url':
+  expression: 'assert web page URL {{text-assertion}}'
+  assertion-hints:
+    - 'contains "/dashboard"'
+    - '= "https://example.com/home"'
+    - 'contains "?tab=profile"'
+  example: |
+    * assert web page URL contains "/dashboard"
+  scenarios:
+    - title: Verify navigation to dashboard after login
+      gherkin: |
+        * navigate to web page "/login"
+        * fill UI "#username" with "alice"
+        * fill UI "#password" with "secret"
+        * click UI "button[type=submit]"
+        * assert web page URL contains "/dashboard"
+
+
+'webui.assert.title':
+  expression: 'assert web page title {{text-assertion}}'
+  assertion-hints:
+    - '= "Home"'
+    - 'contains "Dashboard"'
+  example: |
+    * assert web page title = "My App — Dashboard"
+  scenarios:
+    - title: Verify the page title after navigation
+      gherkin: |
+        * navigate to web page "/dashboard"
+        * assert web page title contains "Dashboard"
+
+
+'webui.extract.text':
+  expression: 'var {variable:id} = text of UI {locator:text}'
+  example: |
+    * var confirmationCode = text of UI "#confirmation-code"
+  scenarios:
+    - title: Extract a value from the page and use it later
+      gherkin: |
+        * navigate to web page "/orders/latest"
+        * var orderId = text of UI ".order-id"
+        * navigate to web page "/orders/${orderId}/details"
+        * assert UI "h1" text contains "${orderId}"

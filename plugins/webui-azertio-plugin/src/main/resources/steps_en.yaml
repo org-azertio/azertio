@@ -1,6 +1,69 @@
-# English natural-language expressions for each step key.
-# Format:
-#   'webui.step.key':
-#     expression: 'the step expression with {param:type}'
-#     example: |
-#       Given the step example
+'webui.go':
+  expression: 'I navigate to the web page {url:text}'
+  example: |
+    * I navigate to the web page "https://example.com"
+
+'webui.click':
+  expression: 'I click the UI element {locator:text}'
+  example: |
+    * I click the UI element "button[type=submit]"
+
+'webui.fill':
+  expression: 'I fill the UI element {locator:text} with {value:text}'
+  example: |
+    * I fill the UI element "#search" with "playwright"
+
+'webui.select':
+  expression: 'I select {value:text} in the UI element {locator:text}'
+  example: |
+    * I select "France" in the UI element "#country"
+
+'webui.check':
+  expression: 'I check the UI element {locator:text}'
+  example: |
+    * I check the UI element "#accept-terms"
+
+'webui.uncheck':
+  expression: 'I uncheck the UI element {locator:text}'
+  example: |
+    * I uncheck the UI element "#subscribe-newsletter"
+
+'webui.wait.visible':
+  expression: 'I wait for the UI element {locator:text} to be visible'
+  example: |
+    * I wait for the UI element ".results-table" to be visible
+
+'webui.wait.hidden':
+  expression: 'I wait for the UI element {locator:text} to be hidden'
+  example: |
+    * I wait for the UI element "#loading-spinner" to be hidden
+
+'webui.assert.visible':
+  expression: 'the UI element {locator:text} is visible'
+  example: |
+    * the UI element ".success-banner" is visible
+
+'webui.assert.hidden':
+  expression: 'the UI element {locator:text} is hidden'
+  example: |
+    * the UI element ".error-message" is hidden
+
+'webui.assert.text':
+  expression: 'the text of the UI element {locator:text} {{text-assertion}}'
+  example: |
+    * the text of the UI element "h1" is "Dashboard"
+
+'webui.assert.url':
+  expression: 'the web page URL {{text-assertion}}'
+  example: |
+    * the web page URL contains "/dashboard"
+
+'webui.assert.title':
+  expression: 'the web page title {{text-assertion}}'
+  example: |
+    * the web page title is "My App — Dashboard"
+
+'webui.extract.text':
+  expression: 'the text of the UI element {locator:text} is stored in the variable {variable:id}'
+  example: |
+    * the text of the UI element "#code" is stored in the variable confirmationCode
