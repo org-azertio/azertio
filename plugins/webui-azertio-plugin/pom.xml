@@ -36,6 +36,22 @@
 
     <url>https://azertio.org/plugins/webui</url>
 
+    <developers>
+        <developer>
+            <id>luiinge</id>
+            <name>Luis Iñesta Gelabert</name>
+            <email>luiinge@gmail.com</email>
+            <url>https://github.com/luiinge</url>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/org-azertio/azertio.git</connection>
+        <developerConnection>scm:git:ssh://github.com/org-azertio/azertio.git</developerConnection>
+        <url>https://github.com/org-azertio/azertio</url>
+        <tag>webui-1.0.0</tag>
+    </scm>
+
     <dependencies>
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
