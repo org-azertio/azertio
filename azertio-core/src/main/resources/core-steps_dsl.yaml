@@ -251,6 +251,16 @@
         * assert benchmark:throughput > 10.0
 
 
+'wait.seconds':
+  expression: 'wait {seconds:integer}s'
+  example: |
+    * wait 3s
+  scenarios:
+    - title: Pause for a fixed delay
+      gherkin: |
+        * wait 5s
+
+
 'assert.benchmark.statistics.errorRate':
   expression: 'assert benchmark:errorRate {{decimal-assertion}}'
   assertion-hints:

@@ -252,6 +252,16 @@
         Then the benchmark throughput (req/s) is greater than 10.0
 
 
+'wait.seconds':
+  expression: 'I wait {seconds:integer} second(s)'
+  example: |
+    When I wait 3 second(s)
+  scenarios:
+    - title: Pause for a fixed delay
+      gherkin: |
+        When I wait 5 second(s)
+
+
 'assert.benchmark.statistics.errorRate':
   expression: 'the benchmark error rate {{decimal-assertion}}'
   assertion-hints:

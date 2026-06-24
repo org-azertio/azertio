@@ -12,7 +12,7 @@
 
 	<groupId>org.azertio</groupId>
 	<artifactId>azertio</artifactId>
-	<version>1.1.0</version>
+	<version>1.2.0</version>
 	<packaging>pom</packaging>
 
 	<name>Azertio</name>
@@ -189,6 +189,7 @@
 				<module>plugins/db-azertio-plugin</module>
 				<module>plugins/pdfreport-azertio-plugin</module>
 				<module>plugins/htmlreport-azertio-plugin</module>
+				<module>plugins/webui-azertio-plugin</module>
 				<module>azertio-it</module>
 			</modules>
 		</profile>

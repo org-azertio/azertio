@@ -1,0 +1,23 @@
+project:
+    name: Web UI Examples
+    description: |
+      Browser automation examples using the webui-azertio-plugin against the-internet.herokuapp.com,
+      a stable public site maintained for UI testing practice.
+      Requires a Chromium-compatible browser installed (default: Chrome).
+
+plugins:
+    - org.azertio.plugins:gherkin-azertio-plugin:1.2.0-SNAPSHOT
+    - org.azertio.plugins:webui-azertio-plugin:1.1.0-SNAPSHOT with org.seleniumhq.selenium:selenium-chrome-driver,org.seleniumhq.selenium:selenium-firefox-driver
+
+configuration:
+    webui:
+        headless: true
+        timeout: 15000
+
+profiles:
+    chrome:
+        webui:
+            browser: chrome
+    firefox:
+        webui:
+            browser: firefox

@@ -1,0 +1,31 @@
+webui.browser:
+  description: |
+    The browser to use for web UI testing.
+    Supported values: chrome, firefox, edge
+  type: text
+  defaultValue: chrome
+
+webui.headless:
+  description: |
+    Whether to run the browser in headless mode (without a visible window).
+  type: boolean
+  defaultValue: true
+
+webui.baseURL:
+  description: |
+    The base URL prepended to relative navigation paths.
+  type: text
+
+webui.timeout:
+  description: |
+    The default timeout in milliseconds for waiting on elements or page loads.
+  type: integer
+  defaultValue: 10000
+
+webui.screenshots:
+  description: |
+    Whether to capture a screenshot after each interaction step (navigate, click, fill, select,
+    check, uncheck, wait) and attach it to the test execution result.
+    Useful for debugging failures. Has no effect in benchmark mode.
+  type: boolean
+  defaultValue: false

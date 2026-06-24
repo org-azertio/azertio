@@ -1,0 +1,69 @@
+'webui.go':
+  expression: 'navego a la página web {url:text}'
+  example: |
+    * navego a la página web "https://example.com"
+
+'webui.click':
+  expression: 'hago click en el elemento UI {locator:text}'
+  example: |
+    * hago click en el elemento UI "button[type=submit]"
+
+'webui.fill':
+  expression: 'relleno el elemento UI {locator:text} con el valor {value:text}'
+  example: |
+    * relleno el elemento UI "#busqueda" con el valor "playwright"
+
+'webui.select':
+  expression: 'selecciono la opción {value:text} en el elemento UI {locator:text}'
+  example: |
+    * selecciono la opción "Francia" en el elemento UI "#pais"
+
+'webui.check':
+  expression: 'marco el elemento UI {locator:text}'
+  example: |
+    * marco el elemento UI "#acepto-terminos"
+
+'webui.uncheck':
+  expression: 'desmarco el elemento UI {locator:text}'
+  example: |
+    * desmarco el elemento UI "#suscribir-newsletter"
+
+'webui.wait.visible':
+  expression: 'espero a que el elemento UI {locator:text} sea visible'
+  example: |
+    * espero a que el elemento UI ".tabla-resultados" sea visible
+
+'webui.wait.hidden':
+  expression: 'espero a que el elemento UI {locator:text} no sea visible'
+  example: |
+    * espero a que el elemento UI "#spinner" no sea visible
+
+'webui.assert.visible':
+  expression: 'el elemento UI {locator:text} es visible'
+  example: |
+    * el elemento UI ".mensaje-exito" es visible
+
+'webui.assert.hidden':
+  expression: 'el elemento UI {locator:text} no es visible'
+  example: |
+    * el elemento UI ".mensaje-error" no es visible
+
+'webui.assert.text':
+  expression: 'el texto del elemento UI {locator:text} {{text-assertion}}'
+  example: |
+    * el texto del elemento UI "h1" es igual a "Panel"
+
+'webui.assert.url':
+  expression: 'la URL de la página web {{text-assertion}}'
+  example: |
+    * la URL de la página web contiene "/panel"
+
+'webui.assert.title':
+  expression: 'el título de la página web {{text-assertion}}'
+  example: |
+    * el título de la página web es "Mi App — Panel"
+
+'webui.extract.text':
+  expression: 'guardo el texto del elemento UI {locator:text} en la variable {variable:id}'
+  example: |
+    * guardo el texto del elemento UI "#codigo" en la variable codigoConfirmacion
