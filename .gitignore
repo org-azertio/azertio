@@ -15,3 +15,6 @@ www/docs/**
 !www/docs/index.html
 /.claude/scheduled_tasks.lock
 /.claude/commands/
+
+# Stray build artifacts
+plugins/webui-azertio-plugin/org/
