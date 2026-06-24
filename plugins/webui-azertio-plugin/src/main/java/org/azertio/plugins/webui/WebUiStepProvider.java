@@ -26,7 +26,7 @@ public class WebUiStepProvider implements StepProvider {
         long timeout = config.getLong("webui.timeout").orElse(10000L);
         String baseUrl = config.getString("webui.baseURL").orElse("");
         this.screenshots = config.get("webui.screenshots", Boolean::parseBoolean).orElse(false);
-        this.engine = new PlaywrightEngine(browser, headless, timeout, baseUrl);
+        this.engine = new WebDriverEngine(browser, headless, timeout, baseUrl);
     }
 
     @TearDown
