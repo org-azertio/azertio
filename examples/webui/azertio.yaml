@@ -7,7 +7,7 @@ project:
 
 plugins:
     - org.azertio.plugins:gherkin-azertio-plugin:1.2.0-SNAPSHOT
-    - org.azertio.plugins:webui-azertio-plugin:1.0.0 with org.seleniumhq.selenium:selenium-chrome-driver,org.seleniumhq.selenium:selenium-firefox-driver
+    - org.azertio.plugins:webui-azertio-plugin:1.1.0-SNAPSHOT with org.seleniumhq.selenium:selenium-chrome-driver,org.seleniumhq.selenium:selenium-firefox-driver
 
 configuration:
     webui:
