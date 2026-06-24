@@ -88,3 +88,11 @@
 'assert.benchmark.statistics.errorRate':
   description: Assert that the error rate (0.0–1.0) of the last benchmark satisfies a decimal assertion
   role: then
+
+'wait.seconds':
+  description: Pause execution for a given number of seconds
+  parameters:
+    - name: seconds
+      type: integer
+      description: Number of seconds to wait
+  role: when

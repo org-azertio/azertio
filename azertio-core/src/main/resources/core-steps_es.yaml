@@ -252,6 +252,16 @@
         Entonces el throughput del benchmark (req/s) es mayor que 10.0
 
 
+'wait.seconds':
+  expression: 'espero {seconds:integer} segundo(s)'
+  example: |
+    Cuando espero 3 segundo(s)
+  scenarios:
+    - title: Pausar la ejecución un tiempo fijo
+      gherkin: |
+        Cuando espero 5 segundo(s)
+
+
 'assert.benchmark.statistics.errorRate':
   expression: 'la tasa de error del benchmark {{decimal-assertion}}'
   assertion-hints:

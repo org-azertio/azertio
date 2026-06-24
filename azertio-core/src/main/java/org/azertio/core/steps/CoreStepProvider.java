@@ -75,6 +75,15 @@ public class CoreStepProvider implements StepProvider {
 		Assertion.assertThat(value, assertion);
 	}
 
+	@StepExpression(value = "wait.seconds", args = {"seconds:integer"})
+	public void waitSeconds(Integer seconds) {
+		try {
+			Thread.sleep(seconds * 1000L);
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+		}
+	}
+
 	@StepExpression(value = "enable.benchmark.mode", args = {"executions:integer","threads:integer"})
 	public void enableBenchmarkMode(Integer executions, Integer threads) {
 		ExecutionContext.current().enableBenchmarkMode(executions, threads);
