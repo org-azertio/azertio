@@ -117,13 +117,18 @@ public class StepProviderService {
 
 
     public void setUp(Config config) {
-        stepProvider.init(config);
-        try  {
+        ClassLoader pluginLoader = stepProvider.getClass().getClassLoader();
+        ClassLoader previous = Thread.currentThread().getContextClassLoader();
+        Thread.currentThread().setContextClassLoader(pluginLoader);
+        try {
+            stepProvider.init(config);
             for (Method setupMethod : setupMethods) {
                 setupMethod.invoke(stepProvider);
             }
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new AzertioException(e);
+        } finally {
+            Thread.currentThread().setContextClassLoader(previous);
         }
     }
 
