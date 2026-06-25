@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Azertio — Open Source Black-Box API, Database &amp; Web UI Testing Framework</title>
+  <title>Azertio — Open Source Black-Box API &amp; Database Testing Framework</title>
 
   <!-- SEO -->
-  <meta name="description" content="Azertio is an open source black-box testing framework. Write expressive Gherkin tests against REST APIs, databases, web UIs, and any backend — without boilerplate or glue code. Plugin-based, CI-ready." />
-  <meta name="keywords" content="black-box testing, API testing, REST testing, database testing, web UI testing, browser testing, Selenium, BDD, Gherkin, DSL, test automation, open source, plugin-based, CI testing, backend testing" />
+  <meta name="description" content="Azertio is an open source black-box testing framework. Write expressive Gherkin tests against REST APIs, databases, and any backend — without boilerplate or glue code. Plugin-based, CI-ready." />
+  <meta name="keywords" content="black-box testing, API testing, REST testing, database testing, BDD, Gherkin, DSL, test automation, open source, plugin-based, CI testing, backend testing" />
   <meta name="author" content="azertio" />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://azertio.org/" />
@@ -593,7 +593,6 @@
     .badge-gherkin   { background: rgba(74,222,128,0.12);  color: #4ade80; border: 1px solid rgba(74,222,128,0.25); }
     .badge-rest      { background: rgba(251,191,36,0.12);  color: #fbbf24; border: 1px solid rgba(251,191,36,0.25); }
     .badge-db        { background: rgba(96,165,250,0.12);  color: #60a5fa; border: 1px solid rgba(96,165,250,0.25); }
-    .badge-webui     { background: rgba(56,189,248,0.12);  color: #38bdf8; border: 1px solid rgba(56,189,248,0.25); }
     .badge-custom    { background: rgba(167,139,250,0.12); color: #a78bfa; border: 1px solid rgba(167,139,250,0.25); }
     .badge-htmlrpt   { background: rgba(20,184,166,0.12);  color: #2dd4bf; border: 1px solid rgba(20,184,166,0.25); }
     .badge-pdfrpt    { background: rgba(249,115,22,0.12);  color: #fb923c; border: 1px solid rgba(249,115,22,0.25); }
@@ -984,7 +983,7 @@
 
   <div class="hero-badge">
     <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="#00ffe0"/></svg>
-    Open Source &nbsp;<span>· MIT License · v1.2.0</span>
+    Open Source &nbsp;<span>· MIT License · v1.2.1</span>
   </div>
 
   <h1>
@@ -993,8 +992,8 @@
   </h1>
 
   <p class="hero-sub">
-    Write expressive Gherkin tests against REST APIs, databases, web UIs, and
-    any backend — no glue code, no framework lock-in, no matter what your
+    Write expressive Gherkin tests against REST APIs, databases, and any
+    backend — no glue code, no framework lock-in, no matter what your
     application is built with.
   </p>
 
@@ -1002,8 +1001,6 @@
     <span class="proof-chip">REST APIs</span>
     <span class="proof-sep">·</span>
     <span class="proof-chip">SQL Databases</span>
-    <span class="proof-sep">·</span>
-    <span class="proof-chip">Web UI / Browser</span>
     <span class="proof-sep">·</span>
     <span class="proof-chip">Gherkin DSL</span>
     <span class="proof-sep">·</span>
@@ -1066,9 +1063,9 @@
           <div>
             <h3>Download &amp; install</h3>
             <p>Download the distribution ZIP, unzip it anywhere and add the <code>bin/</code> directory to your PATH.</p>
-            <a href="https://github.com/org-azertio/azertio/releases/download/v1.0.0/azertio-cli-1.0.0-dist.zip"
+            <a href="https://github.com/org-azertio/azertio/releases/download/v1.2.1/azertio-cli-1.2.1-dist.zip"
                class="btn-primary" style="display:inline-flex;margin-top:0.5rem;font-size:0.875rem;padding:0.6rem 1.4rem">
-              Download v1.0.0
+              Download v1.2.1
             </a>
           </div>
         </div>
@@ -1077,10 +1074,10 @@
             <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
             <span class="code-filename">shell</span>
           </div>
-          <pre><span class="t-prompt">$</span> unzip azertio-cli-1.0.0-dist.zip
-<span class="t-prompt">$</span> export PATH=<span class="str">"$PATH:$(pwd)/azertio-cli-1.0.0/bin"</span>
+          <pre><span class="t-prompt">$</span> unzip azertio-cli-1.2.1-dist.zip
+<span class="t-prompt">$</span> export PATH=<span class="str">"$PATH:$(pwd)/azertio-cli-1.2.1/bin"</span>
 <span class="t-prompt">$</span> azertio version
-<span class="t-pass">azertio 1.0.0</span></pre>
+<span class="t-pass">azertio 1.2.1</span></pre>
         </div>
       </div>
 
@@ -1262,12 +1259,6 @@
       </div>
 
       <div class="feature-card reveal">
-        <div class="feature-icon">🌐</div>
-        <h3>Web UI &amp; browser testing</h3>
-        <p>Drive Chrome with the same Gherkin DSL you use for APIs. Navigate pages, interact with elements, assert UI state — no separate framework needed.</p>
-      </div>
-
-      <div class="feature-card reveal">
         <div class="feature-icon">🖥</div>
         <h3>VS Code integration</h3>
         <p>Browse plans, inspect execution trees, view attachments and re-run past executions — all from the editor, via a JSON-RPC language server.</p>
@@ -1438,29 +1429,6 @@
         <div class="plugin-snippet">
 <span class="sk">plugins</span>:
   - <span class="sv">"db with com.mysql:mysql-connector-j"</span></div>
-      </div>
-
-      <div class="plugin-card reveal">
-        <div class="plugin-header">
-          <span class="plugin-badge badge-webui">webui</span>
-          <span class="plugin-name">Web UI</span>
-        </div>
-        <p class="plugin-desc">
-          Browser automation steps powered by Selenium. Navigate pages, click elements,
-          fill forms, and assert UI state — using the same Gherkin DSL as your API and database tests.
-        </p>
-        <div class="plugin-tags">
-          <span class="tag-chip">Selenium</span>
-          <span class="tag-chip">Chrome</span>
-          <span class="tag-chip">Navigation</span>
-          <span class="tag-chip">Assertions</span>
-        </div>
-        <div class="plugin-snippet">
-<span class="sk">plugins</span>:
-  - <span class="sv">webui</span>
-<span class="sk">configuration</span>:
-  <span class="sc">webui</span>:
-    <span class="sc">baseURL</span>: <span class="sv">'https://app.example.com'</span></div>
       </div>
 
       <div class="plugin-card reveal">
