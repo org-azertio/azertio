@@ -20,6 +20,7 @@
 
     <properties>
         <azertio-core.version>1.2.1</azertio-core.version>
+        <gherkin.version>1.0.1</gherkin.version>
         <azertio.docgen.stepDocFile>${project.basedir}/src/main/resources/steps.yaml</azertio.docgen.stepDocFile>
         <azertio.docgen.configFile>${project.basedir}/src/main/resources/config.yaml</azertio.docgen.configFile>
         <azertio.docgen.stepTitle>Web UI Plugin — Step Reference</azertio.docgen.stepTitle>
@@ -98,7 +99,7 @@
         <dependency>
             <groupId>org.azertio.plugins</groupId>
             <artifactId>gherkin-azertio-plugin</artifactId>
-            <version>${azertio-core.version}</version>
+            <version>${gherkin.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
