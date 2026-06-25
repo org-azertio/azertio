@@ -2,97 +2,107 @@
 
 Azertio's plugin architecture follows a consistent pattern: a `StepProvider` + `ConfigProvider` pair backed by an engine interface with one or more implementations. The REST plugin is the closest analogue — it has a `RestEngine` interface, a `JdkHttpEngine` implementation, and a `RestStepProvider` that delegates all I/O to the engine.
 
-Message brokers introduce a fundamental difference from HTTP: **consumption is asynchronous and stateful**. A consumer must be subscribed *before* the action that produces the message, then poll for the message to appear. This ordering constraint shapes the step design and the engine lifecycle.
+The DB plugin is the architectural model for generic broker support: it uses the JDBC API (standard JDK interface), with the actual driver JAR provided by the user as a `with` dependency. The `messaging-azertio-plugin` follows the same pattern using **Jakarta Messaging (JMS)** — the standard Java API for messaging brokers.
 
 ## Goals / Non-Goals
 
 **Goals:**
-- Provide Gherkin steps to publish messages to Kafka topics
-- Provide steps to assert that a message was received on a topic, with content assertions (JSON field, full body, plain text)
+- Provide Gherkin steps to publish messages to JMS destinations (topics and queues)
+- Provide steps to assert that a message was received on a destination, with content assertions (JSON field, full body, plain text)
 - Support a subscribe-before-act-then-assert pattern to handle asynchronous delivery
 - Support a configurable timeout when waiting for messages
-- Kafka-first implementation for v1.0
+- Work with any JMS-compliant broker: ActiveMQ Classic, ActiveMQ Artemis, RabbitMQ (via rabbitmq-jms-client), IBM MQ, HornetQ, etc.
 - Follow the existing plugin conventions exactly (same pom structure, SPI, YAML definitions)
 
 **Non-Goals:**
-- RabbitMQ support in v1.0 (the engine interface will be broker-agnostic to allow it later)
-- Avro / Schema Registry support (v1.0 handles JSON and plain text only)
+- Kafka support (Kafka does not implement JMS; a future `kafka-azertio-plugin` will handle this separately)
+- Avro / Schema Registry support (v1.0 handles text and JSON only)
 - Message ordering assertions
 - Dead-letter queue assertions
-- Kafka Streams or consumer group offset management beyond test isolation
+- Selector-based filtering (deferred)
 
 ## Decisions
 
-### 1. Engine interface instead of direct Kafka calls in StepProvider
+### 1. Jakarta Messaging (JMS) as the broker abstraction
 
-Same pattern as `RestEngine`. `MessagingEngine` is a broker-agnostic interface. `KafkaMessagingEngine` is the v1.0 implementation.
+Same pattern as the DB plugin and JDBC. `messaging-azertio-plugin` depends only on `jakarta.jms-api` (the API JAR, no implementation). Users add their broker's JMS provider JAR as a `with` dependency in `azertio.yaml`.
 
-**Rationale:** Allows a future `RabbitMqMessagingEngine` without touching `MessagingStepProvider`. Also makes unit testing easier.
+**Examples:**
+- ActiveMQ Classic: `with org.apache.activemq:activemq-all`
+- ActiveMQ Artemis: `with org.apache.activemq:artemis-jms-client-all`
+- RabbitMQ: `with com.rabbitmq.jms:rabbitmq-jms`
 
-**Alternative considered:** Directly embed Kafka calls in `MessagingStepProvider`. Rejected — locks the plugin to Kafka and makes testing harder.
+**Rationale:** Zero broker coupling in the plugin itself. Any JMS-compliant broker works out-of-the-box without any Azertio-side code.
+
+**Alternative considered:** Kafka-native implementation (`kafka-clients`). Rejected — Kafka does not implement JMS; it would lock the plugin to a single broker.
 
 ---
 
-### 2. Subscribe-before-assert step design
+### 2. ConnectionFactory loaded by class name (reflection)
+
+The config property `messaging.connectionFactoryClass` holds the fully qualified class name of the JMS `ConnectionFactory` implementation. The engine loads it at `init()` time using reflection, mirroring how older JDBC drivers are registered via `Class.forName()`.
+
+The engine tries a `(String url)` constructor first (supported by ActiveMQ, Artemis), then falls back to a no-arg constructor.
+
+```
+messaging.connectionFactoryClass = org.apache.activemq.ActiveMQConnectionFactory
+messaging.brokerUrl              = tcp://localhost:61616
+```
+
+**Alternative considered:** JNDI lookup. Rejected — adds operational complexity not justified in a testing tool.
+
+---
+
+### 3. Subscribe-before-assert step design
 
 The step sequence is:
 ```
-Given I subscribe to topic "order.created"   ← pre-subscribe (captures offset)
-When  I make a POST request to "orders" ...  ← REST action (produces event)
-Then  topic "order.created" should contain   ← polls until message or timeout
+Given I subscribe to destination "order.created"    ← creates JMS consumer before the action
+When  I make a POST request to "orders" ...         ← REST action (produces event)
+Then  destination "order.created" should contain    ← consumer.receive(timeout)
       """json
       { "orderId": "${id}" }
       """
 ```
 
-The `messaging.subscribe` step records the current end offset of the topic partition(s) at subscribe time. The assert step polls only for messages **after** that offset, preventing stale messages from causing false positives.
+For **JMS Topics** (non-durable subscriptions), a subscriber only receives messages published after it was created. This naturally isolates each test scenario — no stale messages from previous runs.
 
-**Alternative considered:** Always seek to LATEST on consumer start. Rejected — race condition between seek and the producing action.
+For **JMS Queues**, messages accumulate until consumed. Test authors must ensure queues are clean before subscribing, or use dedicated test queues.
 
-**Alternative considered:** Seek to EARLIEST (read everything). Rejected — test runs contaminate each other.
-
----
-
-### 3. Isolated consumer group per execution
-
-Each test plan execution gets a consumer group ID of the form `azertio-<UUID>`. The group is used only for offset tracking internally; actual polling uses `assign()` + explicit offset seek (not `subscribe()`) to avoid group coordination delays.
-
-**Rationale:** Consumer group rebalancing (triggered by `subscribe()`) can take seconds. Using `assign()` + seek is instant and avoids flakiness.
+**Alternative considered:** No subscribe step, always seek to latest. Rejected — requires broker-specific concepts not available in JMS.
 
 ---
 
-### 4. Background polling thread
+### 4. No background polling thread needed
 
-`KafkaMessagingEngine` starts a background thread on `init()` that polls for new messages across all subscribed topics and buffers them in memory. The assert steps check the buffer, blocking up to the configured timeout.
+JMS `MessageConsumer.receive(long timeout)` is a blocking call that returns the next available message or `null` after the timeout. No background thread is needed — the assert step blocks directly.
 
-**Rationale:** Kafka's `Consumer.poll()` is synchronous; without a background thread, there is a window between the REST call and the assert step where messages are not being consumed. The background thread eliminates this gap.
-
-**Risk:** Thread lifecycle must be tied to the test execution. The engine's `close()` method (called by the framework at plan teardown) shuts it down.
+This is simpler and more reliable than the Kafka approach.
 
 ---
 
-### 5. Message format: JSON + plain text for v1.0
+### 5. Message format: text and JSON for v1.0
 
-Keys and values are treated as UTF-8 strings. JSON assertion uses the same path/contains logic already present in the REST plugin (via `Assertion`). Avro / Protobuf deferred.
+Values are sent as JMS `TextMessage`. JSON assertion uses the same path/contains logic already present in core (via `ContentTypes`). Binary message support deferred.
 
 ---
 
-### 6. Producer is synchronous (fire-and-wait)
+### 6. Engine interface for future extensibility
 
-`messaging.publish` blocks until the broker acknowledges (acks=all). This gives a predictable "message is in Kafka" guarantee before the next step runs.
+`MessagingEngine` is an internal interface wrapping JMS semantics. `JmsMessagingEngine` is the sole v1.0 implementation. This allows adding a non-JMS engine (e.g., a future Kafka engine) without changing `MessagingStepProvider`.
 
 ## Risks / Trade-offs
 
-- **Flaky tests on slow brokers** → Mitigated by a configurable `messaging.timeout` (default 10 s). Users can increase it for slow CI environments.
-- **Background thread resource leak if `close()` is not called** → The engine registers a JVM shutdown hook as a safety net; but proper teardown via the plugin lifecycle is the primary path.
-- **Multiple topics, multiple partitions** → v1.0 subscribes to a single partition (partition 0) by default; full partition support deferred.
-- **No broker = test skipped or failed?** → Connection failure at `init()` throws, failing the test plan. A `messaging.enabled` config flag can be used to skip when no broker is available.
+- **RabbitMQ routing key model differs from JMS** → RabbitMQ's JMS client maps JMS Topics to AMQP exchanges. Users may need to configure exchanges explicitly. Documented in config.
+- **Queue stale messages** → Test authors must design test queues or drain them in teardown. Not specific to this plugin.
+- **Class not found if provider JAR missing** → `init()` throws with a descriptive message including the required `with` declaration.
+- **JMS provider JPMS compatibility** → Some older JMS provider JARs may not be modular. Loaded as automatic modules via `with`, which works for unnamed-module JARs.
 
 ## Migration Plan
 
-No migration needed — this is a new artifact. Plugin is opt-in: users add it to `azertio.yaml` only when they need it.
+No migration needed — this is a new artifact. Plugin is opt-in.
 
 ## Open Questions
 
-- Should `messaging.assert.received` consume the message (mark it "seen") so it cannot match a second assertion, or should each assert re-scan the buffer? **Lean toward: consume-once to avoid double-match bugs.**
-- Should the plugin auto-detect broker type from the bootstrap address (Kafka port 9092 vs RabbitMQ port 5672) or always require explicit config? **For v1.0 with only Kafka, this is moot.**
+- Should `messaging.destination` support both `topic://name` and `queue://name` URI syntax, or use separate config properties? **Lean toward URI prefix syntax for clarity.**
+- Should assertion steps fail immediately if the consumer was never subscribed, or wait and time out? **Lean toward: fail immediately with a clear error if no subscriber exists for the destination.**

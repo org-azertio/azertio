@@ -596,6 +596,7 @@
     .badge-custom    { background: rgba(167,139,250,0.12); color: #a78bfa; border: 1px solid rgba(167,139,250,0.25); }
     .badge-htmlrpt   { background: rgba(20,184,166,0.12);  color: #2dd4bf; border: 1px solid rgba(20,184,166,0.25); }
     .badge-pdfrpt    { background: rgba(249,115,22,0.12);  color: #fb923c; border: 1px solid rgba(249,115,22,0.25); }
+    .badge-messaging { background: rgba(232,121,249,0.12); color: #e879f9; border: 1px solid rgba(232,121,249,0.25); }
 
     .plugin-name {
       font-size: 1rem;
@@ -983,7 +984,7 @@
 
   <div class="hero-badge">
     <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="#00ffe0"/></svg>
-    Open Source &nbsp;<span>· MIT License · v1.0.0</span>
+    Open Source &nbsp;<span>· MIT License · v1.2.0</span>
   </div>
 
   <h1>
@@ -1063,9 +1064,9 @@
           <div>
             <h3>Download &amp; install</h3>
             <p>Download the distribution ZIP, unzip it anywhere and add the <code>bin/</code> directory to your PATH.</p>
-            <a href="https://github.com/org-azertio/azertio/releases/download/v1.0.0/azertio-cli-1.0.0-dist.zip"
+            <a href="https://github.com/org-azertio/azertio/releases/download/v1.2.0/azertio-cli-1.2.0-dist.zip"
                class="btn-primary" style="display:inline-flex;margin-top:0.5rem;font-size:0.875rem;padding:0.6rem 1.4rem">
-              Download v1.0.0
+              Download v1.2.0
             </a>
           </div>
         </div>
@@ -1074,10 +1075,10 @@
             <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
             <span class="code-filename">shell</span>
           </div>
-          <pre><span class="t-prompt">$</span> unzip azertio-cli-1.0.0-dist.zip
-<span class="t-prompt">$</span> export PATH=<span class="str">"$PATH:$(pwd)/azertio-cli-1.0.0/bin"</span>
+          <pre><span class="t-prompt">$</span> unzip azertio-cli-1.2.0-dist.zip
+<span class="t-prompt">$</span> export PATH=<span class="str">"$PATH:$(pwd)/azertio-cli-1.2.0/bin"</span>
 <span class="t-prompt">$</span> azertio version
-<span class="t-pass">azertio 1.0.0</span></pre>
+<span class="t-pass">azertio 1.2.0</span></pre>
         </div>
       </div>
 
@@ -1471,6 +1472,31 @@
 <span class="sk">configuration</span>:
   <span class="sc">pdfreport</span>:
     <span class="sc">outputDir</span>: <span class="sv">reports/</span></div>
+      </div>
+
+      <div class="plugin-card reveal">
+        <div class="plugin-header">
+          <span class="plugin-badge badge-messaging">messaging</span>
+          <span class="plugin-name">Messaging (JMS)</span>
+        </div>
+        <p class="plugin-desc">
+          Publish and consume JMS messages in Gherkin. Subscribe before an action, then assert the resulting message. Works with ActiveMQ, Artemis, RabbitMQ, IBM MQ and any JMS-compliant broker — just add the provider JAR.
+        </p>
+        <div class="plugin-tags">
+          <span class="tag-chip">JMS</span>
+          <span class="tag-chip">ActiveMQ</span>
+          <span class="tag-chip">RabbitMQ</span>
+          <span class="tag-chip">Event-driven</span>
+        </div>
+        <div class="plugin-snippet">
+<span class="sk">plugins</span>:
+  - <span class="sv">messaging</span>
+<span class="sk">configuration</span>:
+  <span class="sc">messaging</span>:
+    <span class="sc">systems</span>:
+      <span class="sc">main</span>:
+        <span class="sc">connectionFactoryClass</span>: <span class="sv">org.apache.activemq.ActiveMQConnectionFactory</span>
+        <span class="sc">brokerUrl</span>: <span class="sv">tcp://localhost:61616</span></div>
       </div>
 
       <div class="plugin-card reveal">

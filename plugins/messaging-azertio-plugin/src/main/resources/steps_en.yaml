@@ -1,0 +1,59 @@
+'messaging.use':
+  expression: 'I use the messaging system {alias:text}'
+  example: |
+    Given I use the messaging system "rabbitmq"
+
+'messaging.subscribe':
+  expression: 'I subscribe to destination {destination:text}'
+  example: |
+    Given I subscribe to destination "topic://orders"
+
+'messaging.publish':
+  expression: 'I publish to destination {destination:text} the message:'
+  example: |
+    When I publish to destination "topic://orders" the message:
+      """json
+      {"orderId": 42, "status": "placed"}
+      """
+
+'messaging.publish.keyed':
+  expression: 'I publish to destination {destination:text} with key {key:text} the message:'
+  example: |
+    When I publish to destination "topic://orders" with key "order-42" the message:
+      """json
+      {"orderId": 42}
+      """
+
+'messaging.assert.received':
+  expression: 'destination {destination:text} should have received a message containing:'
+  example: |
+    Then destination "topic://orders" should have received a message containing:
+      """json
+      {"orderId": 42}
+      """
+  scenarios:
+    - title: Assert a REST call produces a downstream JMS event
+      gherkin: |
+        Given I subscribe to destination "topic://order-events"
+        When I make a POST request to "orders" with body:
+          """json
+          {"customerId": 99, "item": "laptop"}
+          """
+        Then the HTTP status code is equal to 201
+        And destination "topic://order-events" should have received a message containing:
+          """json
+          {"customerId": 99, "item": "laptop"}
+          """
+
+'messaging.assert.received.exact':
+  expression: 'destination {destination:text} should have received exactly:'
+  example: |
+    Then destination "topic://notifications" should have received exactly:
+      """json
+      {"event": "order.placed", "orderId": 42}
+      """
+
+'messaging.extract.field':
+  expression: 'I extract field {field:text} from destination {destination:text} into {variable:id}'
+  example: |
+    Then I extract field "orderId" from destination "topic://orders" into orderId

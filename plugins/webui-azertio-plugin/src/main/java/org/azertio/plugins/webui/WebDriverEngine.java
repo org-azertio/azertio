@@ -10,6 +10,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import org.azertio.core.util.ClassFinder;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.time.Duration;
@@ -90,20 +92,7 @@ public class WebDriverEngine implements WebUiEngine {
 
     // Scans the current module layer — finds driver classes loaded via 'with' at runtime
     private Class<?> findDriverClass(String className) {
-        try {
-            return Class.forName(className);
-        } catch (ClassNotFoundException ignored) {}
-
-        ModuleLayer layer = WebDriverEngine.class.getModule().getLayer();
-        if (layer == null) return null;
-        for (Module module : layer.modules()) {
-            ClassLoader loader = module.getClassLoader();
-            if (loader == null) continue;
-            try {
-                return loader.loadClass(className);
-            } catch (ClassNotFoundException ignored) {}
-        }
-        return null;
+        return ClassFinder.find(className, WebDriverEngine.class);
     }
 
     private WebDriver instantiateDriver(Class<?> driverClass, String optionsClassName, String headlessArg) {

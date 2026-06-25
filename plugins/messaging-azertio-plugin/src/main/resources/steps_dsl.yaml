@@ -1,0 +1,46 @@
+'messaging.use':
+  expression: 'use messaging {alias:text}'
+  example: |
+    * use messaging "rabbitmq"
+
+'messaging.subscribe':
+  expression: 'subscribe {destination:text}'
+  example: |
+    * subscribe "topic://orders"
+
+'messaging.publish':
+  expression: 'publish {destination:text}:'
+  example: |
+    * publish "topic://orders":
+      """json
+      {"orderId": 42}
+      """
+
+'messaging.publish.keyed':
+  expression: 'publish {destination:text} key {key:text}:'
+  example: |
+    * publish "topic://orders" key "order-42":
+      """json
+      {"orderId": 42}
+      """
+
+'messaging.assert.received':
+  expression: 'received {destination:text}:'
+  example: |
+    * received "topic://orders":
+      """json
+      {"orderId": 42}
+      """
+
+'messaging.assert.received.exact':
+  expression: 'received exact {destination:text}:'
+  example: |
+    * received exact "topic://notifications":
+      """json
+      {"event": "order.placed", "orderId": 42}
+      """
+
+'messaging.extract.field':
+  expression: 'extract {field:text} from {destination:text} into {variable:id}'
+  example: |
+    * extract "orderId" from "topic://orders" into orderId
