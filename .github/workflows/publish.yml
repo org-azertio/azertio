@@ -8,10 +8,9 @@ on:
 
 permissions:
   contents: write
-  packages: write
 
 jobs:
-  publish:
+  release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -22,23 +21,36 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
-          server-id: github
-          server-username: GITHUB_ACTOR
-          server-password: GITHUB_TOKEN
 
-      - name: Deploy to GitHub Packages
-        run: ./mvnw -B deploy -Pplugins -DskipTests
+      - name: Build CLI distribution
+        run: ./mvnw -B package -pl azertio-cli -am -DskipTests
+
+      - name: Verify ZIP exists
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          ZIP="azertio-cli/target/azertio-cli-${VERSION}-dist.zip"
+          if [ ! -f "$ZIP" ]; then
+            echo "ERROR: $ZIP not found after build"
+            exit 1
+          fi
+          echo "ZIP_PATH=$ZIP" >> "$GITHUB_ENV"
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+
+      - name: Delete existing release if present
         env:
-          GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # A prior immutable release (e.g. created by central-publishing-maven-plugin
+          # or manually) must be removed before we can publish one with the ZIP.
+          if gh release view "$GITHUB_REF_NAME" 2>/dev/null; then
+            gh release delete "$GITHUB_REF_NAME" --yes
+          fi
 
       - name: Create GitHub Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          VERSION=${GITHUB_REF_NAME#v}
-          ZIP="azertio-cli/target/azertio-cli-${VERSION}-dist.zip"
           gh release create "$GITHUB_REF_NAME" \
             --title "Azertio ${GITHUB_REF_NAME}" \
             --generate-notes \
-            "${ZIP}#azertio-cli-${VERSION}-dist.zip"
+            "${ZIP_PATH}#azertio-cli-${VERSION}-dist.zip"

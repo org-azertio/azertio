@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.azertio</groupId>
         <artifactId>azertio</artifactId>
-        <version>1.2.0</version>
+        <version>1.2.1</version>
     </parent>
 
     <artifactId>azertio-lsp</artifactId>
