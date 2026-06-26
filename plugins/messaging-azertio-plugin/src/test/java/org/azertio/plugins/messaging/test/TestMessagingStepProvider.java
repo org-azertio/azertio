@@ -12,6 +12,8 @@ import org.azertio.plugins.messaging.JmsMessagingEngine;
 import org.azertio.plugins.messaging.MessagingStepProvider;
 import org.myjtools.imconfig.Config;
 
+import static org.azertio.core.testplan.Document.of;
+
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
@@ -151,9 +153,48 @@ class TestMessagingStepProvider {
         void assertReceived_contentNotFound_throws() {
             provider.use("main");
             provider.subscribe("topic://partial");
-            provider.publish("topic://partial", Document.of("text/plain", "actual content"));
-            assertThatThrownBy(() -> provider.assertReceived("topic://partial", Document.of("text/plain", "not present")))
+            provider.publish("topic://partial", of("text/plain", "actual content"));
+            assertThatThrownBy(() -> provider.assertReceived("topic://partial", of("text/plain", "not present")))
                 .isInstanceOf(AssertionError.class);
+        }
+
+        @Test
+        void assertReceived_withNullMimeType_fallsBackToTextPlain() {
+            provider.use("main");
+            provider.subscribe("topic://nulltype");
+            provider.publish("topic://nulltype", of("text/plain", "hello"));
+            provider.assertReceived("topic://nulltype", new Document(null, "hello"));
+        }
+
+        @Test
+        void assertReceivedExact_withNullMimeType_fallsBackToTextPlain() {
+            provider.use("main");
+            provider.subscribe("topic://nulltype2");
+            provider.publish("topic://nulltype2", of("text/plain", "exact"));
+            provider.assertReceivedExact("topic://nulltype2", new Document(null, "exact"));
+        }
+
+        @Test
+        void extractField_withoutJsonContentType_throws() {
+            provider.use("main");
+            provider.subscribe("topic://field");
+            provider.publish("topic://field", of("application/json", "{\"id\":\"1\"}"));
+            assertThatThrownBy(() -> provider.extractField("topic://field", "$.id", "myVar"))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("No JSON ContentType handler");
+        }
+
+        @Test
+        void init_withUnknownFactoryClass_throwsIllegalStateException() throws Exception {
+            Config config = Config.ofMap(Map.of(
+                "messaging.systems.bad.connectionFactoryClass", "com.example.Missing",
+                "messaging.systems.bad.brokerUrl", brokerUrl
+            ));
+            TestableProvider fresh = new TestableProvider();
+            setField(fresh, "contentTypes", ContentTypes.of(List.of()));
+            assertThatThrownBy(() -> fresh.init(config))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Failed to connect");
         }
     }
 
