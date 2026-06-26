@@ -89,4 +89,20 @@ class TestJmsMessagingEngine {
         assertThat(received).isEqualTo("keyed body");
     }
 
+    @Test
+    void publishAndReceiveOnQueueWithPrefix() {
+        engine.subscribe("queue://orders");
+        engine.publish("queue://orders", "queue message");
+        String received = engine.pollNext("queue://orders", 5);
+        assertThat(received).isEqualTo("queue message");
+    }
+
+    @Test
+    void publishAndReceiveOnQueueWithoutPrefix() {
+        engine.subscribe("orders");
+        engine.publish("orders", "no-prefix message");
+        String received = engine.pollNext("orders", 5);
+        assertThat(received).isEqualTo("no-prefix message");
+    }
+
 }

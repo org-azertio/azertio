@@ -44,6 +44,7 @@ class TestMessagingStepProvider {
         private BrokerService broker;
         private JmsMessagingEngine engine;
         private TestableProvider provider;
+        private String brokerUrl;
 
         @BeforeEach
         void setUp() throws Exception {
@@ -52,9 +53,10 @@ class TestMessagingStepProvider {
             broker.setUseJmx(false);
             var connector = broker.addConnector("tcp://localhost:0");
             broker.start();
+            brokerUrl = connector.getConnectUri().toString();
 
             engine = new JmsMessagingEngine();
-            engine.init("org.apache.activemq.ActiveMQConnectionFactory", connector.getConnectUri().toString(), "", "");
+            engine.init("org.apache.activemq.ActiveMQConnectionFactory", brokerUrl, "", "");
 
             provider = new TestableProvider();
             setField(provider, "contentTypes", ContentTypes.of(List.of()));
@@ -129,6 +131,29 @@ class TestMessagingStepProvider {
         @Test
         void close_doesNotThrow() {
             provider.close();
+        }
+
+        @Test
+        void init_withValidConfig_connectsAndCreatesEngine() throws Exception {
+            Config config = Config.ofMap(Map.of(
+                "messaging.timeout", "5",
+                "messaging.systems.mybroker.connectionFactoryClass", "org.apache.activemq.ActiveMQConnectionFactory",
+                "messaging.systems.mybroker.brokerUrl", brokerUrl
+            ));
+            TestableProvider fresh = new TestableProvider();
+            setField(fresh, "contentTypes", ContentTypes.of(List.of()));
+            fresh.init(config);
+            fresh.subscribe("topic://init-test");
+            fresh.close();
+        }
+
+        @Test
+        void assertReceived_contentNotFound_throws() {
+            provider.use("main");
+            provider.subscribe("topic://partial");
+            provider.publish("topic://partial", Document.of("text/plain", "actual content"));
+            assertThatThrownBy(() -> provider.assertReceived("topic://partial", Document.of("text/plain", "not present")))
+                .isInstanceOf(AssertionError.class);
         }
     }
 
