@@ -1,0 +1,40 @@
+project:
+    name: Messaging Example
+    organization: Azertio
+    description: |
+      JMS messaging tests using the messaging-azertio-plugin against ActiveMQ Classic.
+
+      Prerequisites:
+        1. Build and install the plugin locally (from the repo root):
+               ./mvnw install -pl plugins/messaging-azertio-plugin -am -DskipTests
+        2. Start the broker:
+               docker compose up -d
+        3. Run the tests:
+               azertio exec -s all
+
+      Web console: http://localhost:8161  (admin / admin)
+    test-suites:
+      - name: topics
+        description: Publish and subscribe on JMS topics
+        tag-expression: topic
+      - name: queues
+        description: Publish and subscribe on JMS queues
+        tag-expression: queue
+      - name: all
+        description: All messaging tests
+        tag-expression: "topic or queue"
+
+plugins:
+    - org.azertio.plugins:gherkin-azertio-plugin:1.0.1
+    - "org.azertio.plugins:messaging-azertio-plugin:1.0.0-SNAPSHOT with org.apache.activemq:activemq-client:6.2.6 org.fusesource.hawtbuf:hawtbuf:1.11"
+
+configuration:
+    messaging:
+        timeout: 10
+        systems:
+            activemq:
+                connectionFactoryClass: org.apache.activemq.ActiveMQConnectionFactory
+                brokerUrl: tcp://localhost:61616
+
+profiles:
+    default: {}
