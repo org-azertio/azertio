@@ -29,15 +29,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.1.0] - 2026-06-19
 
 ### Added
-- Declared step outputs are printed at the end of `exec` command
-- `since` version field in step definitions for documentation
-- Static plugin documentation pages published at predictable URLs
-- Configuration properties can be used as interpolatable variables in step expressions
 
+- Configuration properties can now be used as interpolatable variables in step parameters (#130)
+- Plugin doc pages are published at predictable static URLs (`/plugins/<id>/steps.html`, etc.) (#129)
+- `exec` command now prints declared outputs after execution (#118)
+- Step definitions can declare a `since` version field for documentation purposes
 
 ## [1.0.0] - 2026-05-17
 
 ### Added
+
 - `init` CLI command to initialize the local environment (idempotent)
 - `report` CLI command to generate reports for a given execution
 - Colorized CLI output with execution summary
@@ -52,6 +53,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Petclinic example project
 
 ### Fixed
+
 - LSP: stale configuration no longer persists across serve mode restarts
 - LSP: config values are validated and reported as diagnostics
 - VS Code: Contributors view now populates on startup without manual refresh
