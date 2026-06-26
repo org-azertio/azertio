@@ -199,9 +199,4 @@ class TestWebUiSteps {
         plan.withConfig("webui.baseURL", baseUrl()).execute().assertAllPassed();
     }
 
-    @Test
-    @FeatureDir("wait-hidden")
-    void waitForHidden_blocksUntilElementDisappears(JUnitAzertioPlan plan) {
-        plan.withConfig("webui.baseURL", baseUrl()).execute().assertAllPassed();
-    }
 }

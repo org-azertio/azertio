@@ -1,0 +1,46 @@
+'messaging.use':
+  expression: 'uso el sistema de mensajería {alias:text}'
+  example: |
+    Dado uso el sistema de mensajería "rabbitmq"
+
+'messaging.subscribe':
+  expression: 'me suscribo al destino {destination:text}'
+  example: |
+    Dado me suscribo al destino "topic://pedidos"
+
+'messaging.publish':
+  expression: 'publico en el destino {destination:text} el mensaje:'
+  example: |
+    Cuando publico en el destino "topic://pedidos" el mensaje:
+      """json
+      {"pedidoId": 42, "estado": "recibido"}
+      """
+
+'messaging.publish.keyed':
+  expression: 'publico en el destino {destination:text} con clave {key:text} el mensaje:'
+  example: |
+    Cuando publico en el destino "topic://pedidos" con clave "pedido-42" el mensaje:
+      """json
+      {"pedidoId": 42}
+      """
+
+'messaging.assert.received':
+  expression: 'el destino {destination:text} debería haber recibido un mensaje que contiene:'
+  example: |
+    Entonces el destino "topic://pedidos" debería haber recibido un mensaje que contiene:
+      """json
+      {"pedidoId": 42}
+      """
+
+'messaging.assert.received.exact':
+  expression: 'el destino {destination:text} debería haber recibido exactamente:'
+  example: |
+    Entonces el destino "topic://notificaciones" debería haber recibido exactamente:
+      """json
+      {"evento": "pedido.recibido", "pedidoId": 42}
+      """
+
+'messaging.extract.field':
+  expression: 'extraigo el campo {field:text} del destino {destination:text} en {variable:id}'
+  example: |
+    Entonces extraigo el campo "pedidoId" del destino "topic://pedidos" en pedidoId

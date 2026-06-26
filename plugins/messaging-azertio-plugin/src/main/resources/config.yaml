@@ -1,0 +1,39 @@
+messaging.timeout:
+  description: |
+    Default timeout in seconds for messaging.assert.* and messaging.extract.* steps.
+    If no matching message arrives within this time the step fails.
+  type: integer
+  defaultValue: 10
+
+messaging.systems:
+  description: |
+    Map of named messaging system configurations. Each key is an alias used in
+    test steps to identify the target JMS broker connection.
+  type: map
+  entries:
+    connectionFactoryClass:
+      description: |
+        Fully qualified class name of the JMS ConnectionFactory implementation.
+        The class must be on the module path (declared with `with` in azertio.yaml).
+        Examples:
+          - org.apache.activemq.ActiveMQConnectionFactory  (ActiveMQ Classic)
+          - org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory  (Artemis)
+          - com.rabbitmq.jms.admin.RMQConnectionFactory  (RabbitMQ)
+      type: text
+      required: true
+    brokerUrl:
+      description: |
+        Broker connection URL. Format depends on the JMS provider.
+        Examples:
+          - tcp://localhost:61616  (ActiveMQ Classic / Artemis)
+          - amqp://localhost:5672  (RabbitMQ)
+      type: text
+      defaultValue: tcp://localhost:61616
+    username:
+      description: Username for broker authentication. Leave empty for anonymous connections.
+      type: text
+      defaultValue: ''
+    password:
+      description: Password for broker authentication.
+      type: text
+      defaultValue: ''

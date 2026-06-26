@@ -1,0 +1,112 @@
+'messaging.use':
+  since: '1.0.0'
+  role: given
+  description: |
+    Selects the active messaging system by alias for subsequent messaging steps.
+    The alias must match a key under messaging.systems in the configuration.
+    Only required when multiple systems are configured; if a single system is configured it is used automatically.
+  parameters:
+    - name: alias
+      type: text
+      description: The alias of the messaging system to use (e.g. 'rabbitmq', 'activemq')
+
+
+'messaging.subscribe':
+  since: '1.0.0'
+  role: given
+  description: |
+    Subscribes to a JMS destination, capturing its state at subscribe time.
+    For JMS Topics (non-durable subscription), only messages published after this call
+    are visible to assertion steps. Must be called before the action that produces the message.
+  parameters:
+    - name: destination
+      type: text
+      description: |
+        The JMS destination URI. Use 'topic://name' for a JMS Topic or 'queue://name' for a JMS Queue.
+        If no prefix is given, the destination is treated as a Queue.
+
+
+'messaging.publish':
+  since: '1.0.0'
+  role: when
+  description: |
+    Publishes a text or JSON message to a JMS destination as a docstring block.
+    The step blocks until the broker acknowledges receipt.
+    Variable placeholders (${var}) in the message body are interpolated before publishing.
+  parameters:
+    - name: destination
+      type: text
+      description: The JMS destination URI (e.g. 'topic://orders', 'queue://payments')
+  additional-data: |
+    The message body is provided as a docstring block after the step.
+
+
+'messaging.publish.keyed':
+  since: '1.0.0'
+  role: when
+  description: |
+    Publishes a message to a JMS destination with an explicit string key set as the JMS property 'key'.
+    Variable placeholders in both key and body are interpolated before publishing.
+  parameters:
+    - name: destination
+      type: text
+      description: The JMS destination URI
+    - name: key
+      type: text
+      description: The message key value (stored as JMS property 'key')
+  additional-data: |
+    The message body is provided as a docstring block after the step.
+
+
+'messaging.assert.received':
+  since: '1.0.0'
+  role: then
+  description: |
+    Waits until a message is received on the destination and asserts that its body contains
+    the expected content. For JSON bodies, performs a structural subset match (extra fields accepted).
+    For plain text, checks that the body contains the expected string.
+    Fails with a descriptive timeout error if no message arrives within messaging.timeout seconds.
+    Requires a prior messaging.subscribe call for the same destination.
+  parameters:
+    - name: destination
+      type: text
+      description: The JMS destination URI previously subscribed to
+  additional-data: |
+    The expected content (JSON subset or plain text fragment) is provided as a docstring block.
+
+
+'messaging.assert.received.exact':
+  since: '1.0.0'
+  role: then
+  description: |
+    Waits until a message is received on the destination and asserts that its body matches
+    the expected content exactly. For JSON bodies, all fields must match with no extras.
+    For plain text, the body must equal the expected string exactly.
+    Fails with a descriptive timeout error if no message arrives within messaging.timeout seconds.
+    Requires a prior messaging.subscribe call for the same destination.
+  parameters:
+    - name: destination
+      type: text
+      description: The JMS destination URI previously subscribed to
+  additional-data: |
+    The expected exact content (JSON or plain text) is provided as a docstring block.
+
+
+'messaging.extract.field':
+  since: '1.0.0'
+  role: then
+  description: |
+    Waits until a message is received on the destination, extracts a JSON field by path,
+    and stores its value in a named scenario variable for use in subsequent steps.
+    Fails with a descriptive timeout error if no message arrives within messaging.timeout seconds.
+    Requires a prior messaging.subscribe call for the same destination.
+  parameters:
+    - name: destination
+      type: text
+      description: The JMS destination URI previously subscribed to
+    - name: field
+      type: text
+      description: JSON field path to extract (e.g. 'orderId', 'customer.id')
+    - name: variable
+      type: id
+      description: Name of the variable to store the extracted value in
