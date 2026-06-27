@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.azertio</groupId>
         <artifactId>azertio</artifactId>
-        <version>1.3.0-SNAPSHOT</version>
+        <version>1.2.1</version>
     </parent>
 
     <artifactId>azertio-docgen-maven-plugin</artifactId>

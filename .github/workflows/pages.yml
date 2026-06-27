@@ -27,6 +27,9 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
+      - name: Install core locally
+        run: ./mvnw -B install -DskipTests
+
       - name: Build and generate docs
         run: ./mvnw -B install -Pplugins,generate-doc -DskipTests
 

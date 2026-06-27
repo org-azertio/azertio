@@ -15,6 +15,7 @@ class TestJmsMessagingEngine {
 
     private BrokerService broker;
     private JmsMessagingEngine engine;
+    private String brokerUrl;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -23,7 +24,7 @@ class TestJmsMessagingEngine {
         broker.setUseJmx(false);
         var connector = broker.addConnector("tcp://localhost:0");
         broker.start();
-        String brokerUrl = connector.getConnectUri().toString();
+        brokerUrl = connector.getConnectUri().toString();
 
         engine = new JmsMessagingEngine();
         engine.init(FACTORY_CLASS, brokerUrl, "", "");
@@ -87,6 +88,39 @@ class TestJmsMessagingEngine {
         engine.publish("topic://keyed", "my-key", "keyed body");
         String received = engine.pollNext("topic://keyed", 5);
         assertThat(received).isEqualTo("keyed body");
+    }
+
+    @Test
+    void publishAndReceiveOnQueueWithPrefix() {
+        engine.subscribe("queue://orders");
+        engine.publish("queue://orders", "queue message");
+        String received = engine.pollNext("queue://orders", 5);
+        assertThat(received).isEqualTo("queue message");
+    }
+
+    @Test
+    void publishAndReceiveOnQueueWithoutPrefix() {
+        engine.subscribe("orders");
+        engine.publish("orders", "no-prefix message");
+        String received = engine.pollNext("orders", 5);
+        assertThat(received).isEqualTo("no-prefix message");
+    }
+
+    @Test
+    void init_withCredentials_connectsSuccessfully() throws Exception {
+        JmsMessagingEngine credEngine = new JmsMessagingEngine();
+        credEngine.init(FACTORY_CLASS, brokerUrl, "user", "pass");
+        credEngine.subscribe("topic://cred-test");
+        credEngine.publish("topic://cred-test", "hello");
+        assertThat(credEngine.pollNext("topic://cred-test", 5)).isEqualTo("hello");
+        credEngine.close();
+    }
+
+    @Test
+    void init_withUnknownFactoryClass_throwsReflectiveOperationException() {
+        JmsMessagingEngine badEngine = new JmsMessagingEngine();
+        assertThatThrownBy(() -> badEngine.init("com.example.Missing", brokerUrl, "", ""))
+            .isInstanceOf(ReflectiveOperationException.class);
     }
 
 }
