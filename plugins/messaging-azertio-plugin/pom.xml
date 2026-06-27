@@ -8,18 +8,18 @@
         <groupId>org.azertio</groupId>
         <artifactId>azertio-plugin-starter</artifactId>
         <relativePath/>
-        <version>1.2.0</version>
+        <version>1.2.2</version>
     </parent>
 
     <groupId>org.azertio.plugins</groupId>
     <artifactId>messaging-azertio-plugin</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
 
     <name>Messaging Azertio Plugin</name>
-    <description>A plugin that provides steps for testing event-driven systems via Kafka</description>
+    <description>A plugin that provides steps for testing event-driven systems via JMS</description>
 
     <properties>
-        <azertio-core.version>1.2.0</azertio-core.version>
+        <azertio-core.version>1.2.2</azertio-core.version>
         <azertio.docgen.stepDocFile>${project.basedir}/src/main/resources/steps.yaml</azertio.docgen.stepDocFile>
         <azertio.docgen.configFile>${project.basedir}/src/main/resources/config.yaml</azertio.docgen.configFile>
         <azertio.docgen.stepTitle>Messaging Plugin — Step Reference</azertio.docgen.stepTitle>
@@ -35,6 +35,22 @@
     </licenses>
 
     <url>https://azertio.org/plugins/messaging</url>
+
+    <developers>
+        <developer>
+            <id>luiinge</id>
+            <name>Luis Iñesta Gelabert</name>
+            <email>luiinge@gmail.com</email>
+            <url>https://github.com/luiinge</url>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/org-azertio/azertio.git</connection>
+        <developerConnection>scm:git:ssh://github.com/org-azertio/azertio.git</developerConnection>
+        <url>https://github.com/org-azertio/azertio</url>
+        <tag>messaging-1.0.0</tag>
+    </scm>
 
     <dependencies>
         <dependency>
