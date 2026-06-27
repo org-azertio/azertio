@@ -14,22 +14,22 @@
   since: '1.0.0'
   role: when
   description: |
-    Clicks the element identified by the given Playwright locator.
+    Clicks the element identified by the given CSS selector.
   parameters:
     - name: locator
       type: text
-      description: A Playwright locator expression (e.g. CSS selector, role, text)
+      description: A CSS selector (e.g. '#submit', '.btn-primary', 'input[name="email"]')
 
 
 'webui.fill':
   since: '1.0.0'
   role: when
   description: |
-    Clears the input field identified by the locator and types the given value into it.
+    Clears the input field identified by the CSS selector and types the given value into it.
   parameters:
     - name: locator
       type: text
-      description: A Playwright locator expression targeting the input field
+      description: A CSS selector targeting the input field
     - name: value
       type: text
       description: The text to type into the field
@@ -39,96 +39,100 @@
   since: '1.0.0'
   role: when
   description: |
-    Selects the option matching the given value in the dropdown identified by the locator.
-    The value is matched against the option label, value attribute, or index.
+    Selects the option whose visible label matches the given value in the dropdown identified by the CSS selector.
   parameters:
     - name: value
       type: text
-      description: The option to select (label, value attribute, or index)
+      description: The visible label of the option to select
     - name: locator
       type: text
-      description: A Playwright locator expression targeting the select element
+      description: A CSS selector targeting the select element
 
 
 'webui.check':
   since: '1.0.0'
   role: when
   description: |
-    Checks the checkbox or radio button identified by the locator.
+    Checks the checkbox or radio button identified by the CSS selector.
+    If the element is already checked, no action is taken.
   parameters:
     - name: locator
       type: text
-      description: A Playwright locator expression targeting the checkbox or radio button
+      description: A CSS selector targeting the checkbox or radio button
 
 
 'webui.uncheck':
   since: '1.0.0'
   role: when
   description: |
-    Unchecks the checkbox identified by the locator.
+    Unchecks the checkbox identified by the CSS selector.
+    If the element is already unchecked, no action is taken.
   parameters:
     - name: locator
       type: text
-      description: A Playwright locator expression targeting the checkbox
+      description: A CSS selector targeting the checkbox
 
 
 'webui.wait.visible':
   since: '1.0.0'
   role: when
   description: |
-    Waits until the element identified by the locator becomes visible.
+    Waits until the element identified by the CSS selector becomes visible.
     Blocks until the element is present in the DOM and visible, or until the
     configured timeout is reached, in which case the step fails.
   parameters:
     - name: locator
       type: text
-      description: A Playwright locator expression
+      description: A CSS selector
 
 
 'webui.wait.hidden':
   since: '1.0.0'
   role: when
   description: |
-    Waits until the element identified by the locator becomes hidden or is removed from the DOM.
+    Waits until the element identified by the CSS selector becomes hidden or is removed from the DOM.
     Blocks until the condition is met, or until the configured timeout is reached,
     in which case the step fails.
   parameters:
     - name: locator
       type: text
-      description: A Playwright locator expression
+      description: A CSS selector
 
 
 'webui.assert.visible':
   since: '1.0.0'
   role: then
   description: |
-    Asserts that the element identified by the locator is present in the DOM and visible.
+    Asserts that the element identified by the CSS selector is present in the DOM and visible.
   parameters:
     - name: locator
       type: text
-      description: A Playwright locator expression
+      description: A CSS selector
 
 
 'webui.assert.hidden':
   since: '1.0.0'
   role: then
   description: |
-    Asserts that the element identified by the locator is absent or not visible.
+    Asserts that the element identified by the CSS selector is absent or not visible.
   parameters:
     - name: locator
       type: text
-      description: A Playwright locator expression
+      description: A CSS selector
 
 
 'webui.assert.text':
   since: '1.0.0'
   role: then
   description: |
-    Asserts that the inner text of the element identified by the locator satisfies the given condition.
+    Asserts that the inner text of the element identified by the CSS selector satisfies the given condition.
   parameters:
     - name: locator
       type: text
-      description: A Playwright locator expression
+      description: A CSS selector
+    - name: text-assertion
+      type: assertion
+      description: A text condition (e.g. '= "Welcome"', 'contains "Error"', 'starts with "Hello"')
 
 
 'webui.assert.url':
@@ -136,6 +140,10 @@
   role: then
   description: |
     Asserts that the current page URL satisfies the given condition.
+  parameters:
+    - name: url-assertion
+      type: assertion
+      description: A text condition (e.g. 'contains "dashboard"', '= "https://example.com/"')
 
 
 'webui.assert.title':
@@ -143,13 +151,17 @@
   role: then
   description: |
     Asserts that the current page title satisfies the given condition.
+  parameters:
+    - name: title-assertion
+      type: assertion
+      description: A text condition (e.g. '= "My App"', 'contains "Error"')
 
 
 'webui.extract.text':
   since: '1.0.0'
   role: then
   description: |
-    Stores the inner text of the element identified by the locator into a scenario variable
+    Stores the inner text of the element identified by the CSS selector into a scenario variable
     for later use in the test.
   parameters:
     - name: variable
@@ -157,4 +169,4 @@
       description: The name of the variable where the text will be stored
     - name: locator
       type: text
-      description: A Playwright locator expression
+      description: A CSS selector

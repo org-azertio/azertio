@@ -7,8 +7,8 @@
     <parent>
         <groupId>org.azertio</groupId>
         <artifactId>azertio-plugin-starter</artifactId>
-        <relativePath/>
-        <version>1.2.1</version>
+        <relativePath>../../azertio-plugin-starter/pom.xml</relativePath>
+        <version>1.2.2</version>
     </parent>
 
     <groupId>org.azertio.plugins</groupId>
@@ -19,7 +19,7 @@
     <description>A plugin that provides web UI browser automation steps</description>
 
     <properties>
-        <azertio-core.version>1.2.1</azertio-core.version>
+        <azertio-core.version>1.2.2</azertio-core.version>
         <gherkin.version>1.0.1</gherkin.version>
         <azertio.docgen.stepDocFile>${project.basedir}/src/main/resources/steps.yaml</azertio.docgen.stepDocFile>
         <azertio.docgen.configFile>${project.basedir}/src/main/resources/config.yaml</azertio.docgen.configFile>
@@ -111,7 +111,7 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.5.25</version>
+            <version>1.5.37</version>
             <scope>test</scope>
         </dependency>
         <dependency>

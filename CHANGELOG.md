@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.2] - 2026-06-27
+
+### Fixed
+- jexten 1.0.1: fixes runtime dependency download for plugins using the `with` clause in `azertio.yaml` (jexten issue #14)
+
+### Security
+- `minio` 8.5.12 → 8.6.0 (XML Tag Value Substitution vulnerability)
+- `commons-configuration2` 2.13.0 → 2.15.0 (StackOverflowError with cyclic YAML input)
+- `jackson-databind` 2.18.2 → 2.18.8 (HIGH: PolymorphicTypeValidator bypass, array subtype allowlist bypass, InetSocketAddress SSRF)
+
+### Dependencies
+- `jexten` 1.0.0 → 1.0.1
+- `jacoco-maven-plugin` 0.8.12 → 0.8.15
+- `jooq` 3.21.5 → 3.21.6
+- `guava` 33.4.8-jre → 33.6.0-jre
+- `logback-classic` 1.5.25 → 1.5.37
+- `commons-csv` 1.10.0 → 1.14.1
+- `commonmark` 0.28.0 → 0.29.0
+- `duckdb_jdbc` 1.5.3.0 → 1.5.4.0
+
+
 ## [1.2.0] - 2026-06-24
 
 ### Added

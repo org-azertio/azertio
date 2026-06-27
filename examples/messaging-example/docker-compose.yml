@@ -1,0 +1,11 @@
+services:
+  activemq:
+    image: apache/activemq-classic:6.1.6
+    ports:
+      - "61616:61616"   # JMS (TCP)
+      - "8161:8161"     # Web console  →  http://localhost:8161  (admin/admin)
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8161/api/jolokia/read/org.apache.activemq:type=Broker,brokerName=localhost/BrokerName || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
