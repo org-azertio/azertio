@@ -6,7 +6,7 @@
 
     <groupId>org.azertio</groupId>
     <artifactId>azertio-plugin-starter</artifactId>
-    <version>1.2.1</version>
+    <version>1.2.2</version>
     <packaging>pom</packaging>
 
     <name>Azertio Plugin Starter</name>
@@ -53,8 +53,8 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <java.version>21</java.version>
-        <azertio-core.version>1.2.1</azertio-core.version>
-        <azertio-docgen.version>1.2.1</azertio-docgen.version>
+        <azertio-core.version>1.2.2</azertio-core.version>
+        <azertio-docgen.version>1.2.2</azertio-docgen.version>
         <jexten.version>1.0.1</jexten.version>
         <sonar.coverage.jacoco.xmlReportPaths>
             ${project.basedir}/target/site/jacoco/jacoco.xml

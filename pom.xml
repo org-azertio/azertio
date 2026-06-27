@@ -12,7 +12,7 @@
 
 	<groupId>org.azertio</groupId>
 	<artifactId>azertio</artifactId>
-	<version>1.2.1</version>
+	<version>1.2.2</version>
 	<packaging>pom</packaging>
 
 	<name>Azertio</name>
