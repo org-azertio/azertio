@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.4] - 2026-07-04
+
+### Fixed
+- LSP: `*` (the universal Gherkin step keyword) was not recognized for step completion when the file's locale has no dedicated keyword resource — affects Azertio's `dsl` compact shorthand, where `*` is the only step marker. Step-body completions in VS Code never triggered for these files.
+
+### Dependencies
+- `commons-configuration2` 2.15.0 → 2.15.1
+- `junit-jupiter` 5.11.4 → 5.14.4
+- `maven-plugin-annotations` 3.15.1 → 3.15.2
+- `commonmark-ext-gfm-tables` 0.24.0 → 0.29.0
+- `jackson-databind` 2.18.8 → 2.22.0
+- `okhttp-jvm` 5.1.0 → 5.4.0
+
+
 ## [1.2.3] - 2026-06-29
 
 ### Fixed
