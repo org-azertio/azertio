@@ -9,7 +9,9 @@ import { ISSUE_URI_SCHEME } from './testPlanProvider';
 // ---------------------------------------------------------------------------
 
 function readProjectInfo(workspacePath: string): { organization: string; projectName: string } {
-    const defaults = { organization: 'Unknown Organization', projectName: 'Unknown Project' };
+    // organization defaults to '' (not a placeholder label) so it matches the server-side
+    // normalization of a missing `project.organization` field (see JooqPlanRepository#persistProject).
+    const defaults = { organization: '', projectName: 'Unknown Project' };
     try {
         const yamlPath = path.join(workspacePath, 'azertio.yaml');
         const content = fs.readFileSync(yamlPath, 'utf8');
@@ -196,10 +198,10 @@ export class ExecutionProvider implements vscode.TreeDataProvider<ExecutionItem>
     private projectItem(): ExecutionItem {
         const { organization, projectName } = this.workspacePath
             ? readProjectInfo(this.workspacePath)
-            : { organization: 'Unknown Organization', projectName: 'Unknown Project' };
+            : { organization: '', projectName: 'Unknown Project' };
         return new ExecutionItem(
             'project',
-            `${organization} / ${projectName}`,
+            `${organization || 'Unknown Organization'} / ${projectName}`,
             vscode.TreeItemCollapsibleState.Expanded,
         );
     }
