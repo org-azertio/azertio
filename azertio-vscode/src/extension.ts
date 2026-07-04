@@ -17,6 +17,7 @@ import {
     LanguageClient,
     LanguageClientOptions,
     ServerOptions,
+    Trace,
 } from 'vscode-languageclient/node';
 
 let client: LanguageClient | undefined;
@@ -208,6 +209,8 @@ async function startClient(): Promise<void> {
     );
 
     await client.start();
+    // Uncomment to see raw LSP request/response traffic in the "Azertio LSP" output channel:
+    // await client.setTrace(Trace.Verbose);
     extensionContext.subscriptions.push(client);
 }
 

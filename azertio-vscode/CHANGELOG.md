@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.0] - 2026-07-04
+
+### Added
+- **Live execution follow** — the execution detail view now auto-expands and auto-scrolls to the currently running node as the test plan executes, instead of requiring manual clicks to track progress. Scrolling is "sticky": it stops following as soon as you scroll away manually, and resumes once you scroll back near the bottom.
+
+### Fixed
+- **Executions view stuck empty** — projects without an `organization` field in `azertio.yaml` showed no plans/executions under the project node, and the extension kept polling the server every second for up to 5 minutes per execution. The placeholder label used for display (`Unknown Organization`) was incorrectly also sent as the server query filter, which never matched.
+
 ## [1.1.0] - 2026-05-18
 
 ### Added
