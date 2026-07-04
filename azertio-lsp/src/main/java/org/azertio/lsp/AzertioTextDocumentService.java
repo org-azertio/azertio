@@ -26,10 +26,14 @@ public class AzertioTextDocumentService implements TextDocumentService {
     private static final List<KeywordType> STEP_KEYWORD_TYPES = List.of(
         KeywordType.GIVEN, KeywordType.WHEN, KeywordType.THEN, KeywordType.AND, KeywordType.BUT
     );
-    private static final List<String> DEFAULT_STEP_KEYWORDS  = List.of("Given", "When", "Then", "And", "But");
+    // '*' is included because it is a universal step keyword valid in every Gherkin dialect
+    // (see gherkin_en.properties / gherkin_es.properties: "given=*,Given,...") — it must be
+    // recognized even when the locale has no dedicated keyword resource, e.g. Azertio's "dsl"
+    // pseudo-locale, which uses '*' exclusively.
+    private static final List<String> DEFAULT_STEP_KEYWORDS  = List.of("Given", "When", "Then", "And", "But", "*");
     private static final List<String> DEFAULT_GHERKIN_KEYWORDS = List.of(
         "Feature:", "Background:", "Scenario:", "Scenario Outline:",
-        "Examples:", "Given ", "When ", "Then ", "And ", "But "
+        "Examples:", "Given ", "When ", "Then ", "And ", "But ", "* "
     );
 
     // ─── azertio.yaml schema (static) ─────────────────────────────────────────

@@ -1,5 +1,6 @@
 project:
     name: Web UI Examples
+    organization: Azertio
     description: |
       Browser automation examples using the webui-azertio-plugin against the-internet.herokuapp.com,
       a stable public site maintained for UI testing practice.
