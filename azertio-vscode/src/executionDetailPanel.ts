@@ -404,12 +404,39 @@ function buildHtml(webview: vscode.Webview, _extensionUri: vscode.Uri): string {
   const nodeStatusMap = new Map();   // nodeId -> { status, result }
   const statusIconEls = new Map();   // nodeId -> span element
   const durationEls = new Map();     // nodeId -> span element
+  const rowEls = new Map();          // nodeId -> row element (for auto-scroll)
+  const nodeExpandFns = new Map();   // nodeId -> () => Promise<void>, auto-expand on RUNNING
   let rootNodeId = null;
   let headerBadgeEl = null;
   let pollTimer = null;
   let pollAttempts = 0;
   const POLL_INTERVAL = 1000;
   const POLL_MAX = 300;
+
+  // "Sticky" auto-scroll: follow the active node while the user hasn't scrolled away.
+  // Any user-driven scroll disables following until the user scrolls back near the
+  // bottom of the currently loaded content.
+  let followActive = true;
+  let programmaticScroll = false;
+  const FOLLOW_REENABLE_THRESHOLD = 80;
+
+  function isNearBottom() {
+    return (window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - FOLLOW_REENABLE_THRESHOLD);
+  }
+
+  window.addEventListener('scroll', () => {
+    if (programmaticScroll) { return; }
+    followActive = isNearBottom();
+  });
+
+  function scrollToNode(nodeId) {
+    if (!followActive) { return; }
+    const el = rowEls.get(nodeId);
+    if (!el) { return; }
+    programmaticScroll = true;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(() => { programmaticScroll = false; }, 500);
+  }
 
   function startPolling() {
     if (pollTimer !== null) return;
@@ -612,6 +639,7 @@ function buildHtml(webview: vscode.Webview, _extensionUri: vscode.Uri): string {
     }
 
     li.appendChild(row);
+    rowEls.set(node.nodeId, row);
 
     if (hasChildren) {
       let expanded = false;
@@ -622,38 +650,60 @@ function buildHtml(webview: vscode.Webview, _extensionUri: vscode.Uri): string {
       childrenContainer.style.display = 'none';
       li.appendChild(childrenContainer);
 
+      async function ensureExpanded() {
+        if (!expanded) {
+          expanded = true;
+          expander.textContent = '▼';
+          childrenContainer.style.display = '';
+        }
+        if (childrenLoaded) { return; }
+        childrenLoaded = true;
+        const loading = document.createElement('li');
+        loading.className = 'loading';
+        loading.textContent = 'Loading…';
+        childrenContainer.appendChild(loading);
+
+        const id = msgId++;
+        const { nodes, attachments } = await requestChildren(node.nodeId, id);
+        childrenContainer.removeChild(loading);
+
+        // docstring / datatable first
+        if (node.document) {
+          childrenContainer.appendChild(createDocumentEl(node.document));
+        }
+        if (node.dataTable) {
+          childrenContainer.appendChild(createDataTableEl(node.dataTable));
+        }
+        for (const child of nodes) {
+          childrenContainer.appendChild(createNodeEl(child, 0));
+        }
+        for (const att of attachments) {
+          childrenContainer.appendChild(createAttachmentEl(att, node));
+        }
+        if (node.message) {
+          childrenContainer.appendChild(createMessageEl(node.message));
+        }
+
+        // A child may already be RUNNING by the time it was fetched — expand it too
+        // so the tree keeps unfolding down to whatever is currently executing.
+        for (const child of nodes) {
+          if (child.status === 'RUNNING') {
+            const childExpand = nodeExpandFns.get(child.nodeId);
+            if (childExpand) { childExpand(); }
+            scrollToNode(child.nodeId);
+          }
+        }
+      }
+
+      nodeExpandFns.set(node.nodeId, ensureExpanded);
+
       expander.addEventListener('click', async () => {
-        expanded = !expanded;
-        expander.textContent = expanded ? '▼' : '▶';
-        childrenContainer.style.display = expanded ? '' : 'none';
-
-        if (expanded && !childrenLoaded) {
-          childrenLoaded = true;
-          const loading = document.createElement('li');
-          loading.className = 'loading';
-          loading.textContent = 'Loading…';
-          childrenContainer.appendChild(loading);
-
-          const id = msgId++;
-          const { nodes, attachments } = await requestChildren(node.nodeId, id);
-          childrenContainer.removeChild(loading);
-
-          // docstring / datatable first
-          if (node.document) {
-            childrenContainer.appendChild(createDocumentEl(node.document));
-          }
-          if (node.dataTable) {
-            childrenContainer.appendChild(createDataTableEl(node.dataTable));
-          }
-          for (const child of nodes) {
-            childrenContainer.appendChild(createNodeEl(child, 0));
-          }
-          for (const att of attachments) {
-            childrenContainer.appendChild(createAttachmentEl(att, node));
-          }
-          if (node.message) {
-            childrenContainer.appendChild(createMessageEl(node.message));
-          }
+        if (expanded) {
+          expanded = false;
+          expander.textContent = '▶';
+          childrenContainer.style.display = 'none';
+        } else {
+          await ensureExpanded();
         }
       });
     } else {
@@ -805,8 +855,14 @@ function buildHtml(webview: vscode.Webview, _extensionUri: vscode.Uri): string {
       root.innerHTML = '';
       root.appendChild(createNodeEl(msg.node, 0));
       startPolling();
+      if (msg.node.status === 'RUNNING') {
+        const rootExpand = nodeExpandFns.get(msg.node.nodeId);
+        if (rootExpand) { rootExpand(); }
+      }
     } else if (msg.type === 'update') {
+      let lastRunningNodeId = null;
       for (const upd of msg.nodes) {
+        const prev = nodeStatusMap.get(upd.nodeId);
         nodeStatusMap.set(upd.nodeId, { status: upd.status, result: upd.result });
         const iconEl = statusIconEls.get(upd.nodeId);
         if (iconEl) { applyStatusIcon(iconEl, upd.status, upd.result); }
@@ -814,7 +870,13 @@ function buildHtml(webview: vscode.Webview, _extensionUri: vscode.Uri): string {
         if (durEl && upd.status === 'FINISHED' && upd.durationMs !== null && upd.durationMs !== undefined) {
           durEl.textContent = formatDuration(upd.durationMs);
         }
+        if (upd.status === 'RUNNING' && (!prev || prev.status !== 'RUNNING')) {
+          const expandFn = nodeExpandFns.get(upd.nodeId);
+          if (expandFn) { expandFn(); }
+          lastRunningNodeId = upd.nodeId;
+        }
       }
+      if (lastRunningNodeId) { scrollToNode(lastRunningNodeId); }
     } else if (msg.type === 'children') {
       const resolve = pendingExpand.get(msg.msgId);
       if (resolve) {
