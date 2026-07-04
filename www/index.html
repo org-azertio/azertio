@@ -597,6 +597,7 @@
     .badge-htmlrpt   { background: rgba(20,184,166,0.12);  color: #2dd4bf; border: 1px solid rgba(20,184,166,0.25); }
     .badge-pdfrpt    { background: rgba(249,115,22,0.12);  color: #fb923c; border: 1px solid rgba(249,115,22,0.25); }
     .badge-messaging { background: rgba(232,121,249,0.12); color: #e879f9; border: 1px solid rgba(232,121,249,0.25); }
+    .badge-webui     { background: rgba(251,113,133,0.12); color: #fb7185; border: 1px solid rgba(251,113,133,0.25); }
 
     .plugin-name {
       font-size: 1rem;
@@ -753,6 +754,74 @@
       border-radius: 12px;
       box-shadow: inset 0 0 0 1px rgba(0,255,224,0.12);
       pointer-events: none;
+    }
+
+    /* ── Slideshow ────────────────────────────────────────────── */
+    .slideshow-frame {
+      position: relative;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .slideshow-frame .slide {
+      display: none;
+      width: 100%;
+    }
+
+    .slideshow-frame .slide.active { display: block; }
+
+    .slideshow-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(7,7,15,0.65);
+      border: 1px solid var(--border);
+      color: var(--white);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      font-size: 1.4rem;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, border-color 0.2s;
+      z-index: 2;
+    }
+
+    .slideshow-arrow:hover {
+      background: rgba(0,255,224,0.12);
+      border-color: rgba(0,255,224,0.4);
+    }
+
+    .slideshow-prev { left: 1rem; }
+    .slideshow-next { right: 1rem; }
+
+    .slideshow-dots {
+      display: flex;
+      justify-content: center;
+      gap: 0.6rem;
+      margin-top: 1.5rem;
+    }
+
+    .slideshow-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--border);
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .slideshow-dot.active { background: var(--cyan); }
+
+    @media (max-width: 800px) {
+      .slideshow-arrow { width: 34px; height: 34px; font-size: 1.2rem; }
+      .slideshow-prev { left: 0.4rem; }
+      .slideshow-next { right: 0.4rem; }
     }
 
     .vscode-points {
@@ -1047,6 +1116,30 @@
 
 <div class="glow-line"></div>
 
+<!-- ── Slideshow ────────────────────────────────────────────────── -->
+<section id="slideshow">
+  <div class="container">
+    <div class="reveal">
+      <div class="slideshow-frame vscode-screenshot">
+        <video class="slide active" data-src="images/execution3.mp4" data-index="0" loop muted playsinline preload="none"></video>
+        <video class="slide"        data-src="images/execution4.mp4" data-index="1" loop muted playsinline preload="none"></video>
+        <video class="slide"        data-src="images/execution5.mp4" data-index="2" loop muted playsinline preload="none"></video>
+        <video class="slide"        data-src="images/execution2.mp4" data-index="3" loop muted playsinline preload="none"></video>
+        <button class="slideshow-arrow slideshow-prev" aria-label="Previous slide">&#8249;</button>
+        <button class="slideshow-arrow slideshow-next" aria-label="Next slide">&#8250;</button>
+      </div>
+      <div class="slideshow-dots">
+        <button class="slideshow-dot active" data-index="0" aria-label="Go to slide 1"></button>
+        <button class="slideshow-dot"        data-index="1" aria-label="Go to slide 2"></button>
+        <button class="slideshow-dot"        data-index="2" aria-label="Go to slide 3"></button>
+        <button class="slideshow-dot"        data-index="3" aria-label="Go to slide 4"></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="glow-line"></div>
+
 <!-- ── Quick Start ──────────────────────────────────────────────── -->
 <section id="quickstart">
   <div class="container">
@@ -1140,11 +1233,6 @@
               Full documentation →
             </a>
           </div>
-        </div>
-        <div class="vscode-screenshot reveal">
-          <a href="images/execution1.gif" target="_blank" rel="noopener">
-            <img src="images/execution1.gif" alt="Azertio execution example" style="cursor:zoom-in" loading="lazy" />
-          </a>
         </div>
       </div>
 
@@ -1434,6 +1522,28 @@
 
       <div class="plugin-card reveal">
         <div class="plugin-header">
+          <span class="plugin-badge badge-webui">webui</span>
+          <span class="plugin-name">Web UI</span>
+        </div>
+        <p class="plugin-desc">
+          Browser automation steps — navigate, click, fill, select, and assert on visibility, text, title or URL — powered by Selenium WebDriver. Works with Chrome and Firefox; bring the driver as a runtime dependency.
+        </p>
+        <div class="plugin-tags">
+          <span class="tag-chip">Selenium</span>
+          <span class="tag-chip">Chrome & Firefox</span>
+          <span class="tag-chip">Headless</span>
+          <span class="tag-chip">Locators</span>
+        </div>
+        <div class="plugin-snippet">
+<span class="sk">plugins</span>:
+  - <span class="sv">"webui with org.seleniumhq.selenium:selenium-chrome-driver"</span>
+<span class="sk">configuration</span>:
+  <span class="sc">webui</span>:
+    <span class="sc">headless</span>: <span class="sv">true</span></div>
+      </div>
+
+      <div class="plugin-card reveal">
+        <div class="plugin-header">
           <span class="plugin-badge badge-htmlrpt">htmlreport</span>
           <span class="plugin-name">HTML Report</span>
         </div>
@@ -1547,7 +1657,7 @@
       <div class="reveal" style="text-align:center">
         <div class="vscode-badge" style="justify-content:center">
           <svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="5" fill="#00ffe0"/></svg>
-          VS Code Extension &nbsp;·&nbsp; v1.1.0
+          VS Code Extension &nbsp;·&nbsp; v1.2.0
         </div>
         <span class="section-label">IDE Integration</span>
         <h2>Run and inspect tests without leaving the editor</h2>
@@ -1768,6 +1878,41 @@
       localStorage.setItem(KEY, 'rejected');
       banner.style.display = 'none';
     });
+  })();
+
+  // Slideshow
+  (function () {
+    const slides = document.querySelectorAll('.slideshow-frame .slide');
+    const dots = document.querySelectorAll('.slideshow-dot');
+    const prevBtn = document.querySelector('.slideshow-prev');
+    const nextBtn = document.querySelector('.slideshow-next');
+    if (!slides.length) return;
+    let current = 0;
+
+    function loadSlide(el) {
+      if (el.tagName === 'VIDEO' && !el.src) {
+        el.src = el.dataset.src;
+        el.load();
+        el.play().catch(() => {});
+      }
+    }
+
+    function show(index) {
+      slides[current].classList.remove('active');
+      dots[current].classList.remove('active');
+      if (slides[current].tagName === 'VIDEO') { slides[current].pause(); }
+      current = (index + slides.length) % slides.length;
+      slides[current].classList.add('active');
+      dots[current].classList.add('active');
+      loadSlide(slides[current]);
+      if (slides[current].tagName === 'VIDEO') { slides[current].play().catch(() => {}); }
+    }
+
+    prevBtn.addEventListener('click', () => show(current - 1));
+    nextBtn.addEventListener('click', () => show(current + 1));
+    dots.forEach((dot, i) => dot.addEventListener('click', () => show(i)));
+
+    loadSlide(slides[0]);
   })();
 
   // Scroll reveal
